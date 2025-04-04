@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sale.Share.Entities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -6,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sale.Share.Entities
+namespace Sale.Share.DTOs
 {
-    public class Product
+    public class ProductDTO
     {
         public int Id { get; set; }
 
@@ -39,22 +40,6 @@ namespace Sale.Share.Entities
         [Required(ErrorMessage = "Field {0} is required.")]
         public decimal Cost { get; set; }
 
-        [DisplayFormat(DataFormatString = "{0:C2}")]
-        [Display(Name = "Profit")]
-        public decimal Profit => Price - Cost;
-
-        [DisplayFormat(DataFormatString = "{0:C2}")]
-        [Display(Name = "Value of Cost")]
-        public decimal CostValue => Cost * Stock;
-
-        [DisplayFormat(DataFormatString = "{0:C2}")]
-        [Display(Name = "Value of Price")]
-        public decimal PriceValue => Price * Stock;
-
-        [DisplayFormat(DataFormatString = "{0:P2}")]
-        [Display(Name = "% Pure Profit")]
-        public decimal RealProfit => Cost == 0 ? 0 : Profit / Cost;
-
         [DisplayFormat(DataFormatString = "{0:P2}")]
         [Display(Name = "% Desired Profit")]
         [Required(ErrorMessage = "Field {0} is required.")]
@@ -65,22 +50,10 @@ namespace Sale.Share.Entities
         [Required(ErrorMessage = "Field {0} is required.")]
         public decimal Stock { get; set; }
 
-        
+       
         public bool HasSerial { get; set; }
-        public ICollection<ProductCategory>? ProductCategories { get; set; }
-
-
-        [Display(Name = "Categories")]
-        public int ProductCategoriesNumber => ProductCategories?.Count ?? 0;
-
-        public ICollection<ProductImage>? ProductImages { get; set; }
-
-        [Display(Name = "Images")]
-        public int ProductImagesNumber => ProductImages?.Count ?? 0;
-
-        [Display(Name = "Main Image")]
-        public string MainImage => ProductImages?.FirstOrDefault()?.Image ?? string.Empty;
-
-        public ICollection<SerialNumber>? serialNumbers { get; set; }
+        public List<int>? ProductCategoryIds { get; set; }
+        public List<string>? ProductImages { get; set; }
+        public List<string>? SerialNumbers { get; set; }
     }
 }

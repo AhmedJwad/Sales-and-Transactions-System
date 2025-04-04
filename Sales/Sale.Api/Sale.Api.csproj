@@ -22,4 +22,8 @@
     <ProjectReference Include="..\Sale.Share\Sale.Share.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="images\products\" />
+  </ItemGroup>
+
 </Project>
