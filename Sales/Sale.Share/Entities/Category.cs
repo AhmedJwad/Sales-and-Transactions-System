@@ -17,9 +17,8 @@ namespace Sale.Share.Entities
         [Required(ErrorMessage = "Field {0} is required.")]
         public string Name { get; set; } = null!;
 
-        public ICollection<ProductCategory>? ProductCategories { get; set; }
+        public ICollection<Subcategory>? subcategories { get; set; }
 
-        [Display(Name = "Products")]
-        public int ProductCategoriesNumber => ProductCategories == null || ProductCategories.Count == 0 ? 0 : ProductCategories.Count;
+        
     }
 }

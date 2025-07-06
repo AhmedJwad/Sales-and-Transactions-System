@@ -67,11 +67,12 @@ namespace Sale.Share.Entities
 
         
         public bool HasSerial { get; set; }
-        public ICollection<ProductCategory>? ProductCategories { get; set; }
+        public ICollection<ProductsubCategory>? productsubCategories { get; set; }
 
-
+        public int BrandId { get; set; }
+        public Brand? brand { get; set; }
         [Display(Name = "Categories")]
-        public int ProductCategoriesNumber => ProductCategories?.Count ?? 0;
+        public int ProductCategoriesNumber => productsubCategories?.Count ?? 0;
 
         public ICollection<ProductImage>? ProductImages { get; set; }
 

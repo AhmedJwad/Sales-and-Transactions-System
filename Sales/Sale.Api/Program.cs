@@ -25,8 +25,10 @@ builder.Services.AddScoped(typeof(IGenericUnitOfWork<>), typeof(GenericUnitOfWor
 builder.Services.AddScoped<ICategoriesRepository, CategoriesRepository>();
 builder.Services.AddScoped<ICategoriesUnitOfWork, CategoriesUnitOfWork>();
 builder.Services.AddScoped<IFileStorage, FileStorage>();
-builder.Services.AddScoped<IProductsRepository, ProductsRepository>();
-builder.Services.AddScoped<IProductsUnitOfWork, ProductsUnitOfWork>();
+builder.Services.AddScoped<ISubcategoryRepository, SubcategoryRepository>();
+builder.Services.AddScoped<iSubcategoriesUnitofWorks, SubcategoriesUnitofWorks>();
+builder.Services.AddScoped<IbrandRepository, BrandRepository>();
+builder.Services.AddScoped<IbrandUnitofWork, brandUnitofWork>();
 
 var app = builder.Build();
 

@@ -13,6 +13,6 @@ namespace Sale.Share.DTOs
         public int RecordsNumber { get; set; } = 10;
         public string? Filter { get; set; }
         public string? CategoryFilter { get; set; }
-        public int? CategoryId { get; set; }
+       
     }
 }
