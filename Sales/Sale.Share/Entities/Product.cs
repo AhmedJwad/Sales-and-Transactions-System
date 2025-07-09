@@ -63,12 +63,9 @@ namespace Sale.Share.Entities
         [DisplayFormat(DataFormatString = "{0:N2}")]
         [Display(Name = "Inventory")]
         [Required(ErrorMessage = "Field {0} is required.")]
-        public decimal Stock { get; set; }
-
-        
+        public decimal Stock { get; set; }        
         public bool HasSerial { get; set; }
         public ICollection<ProductsubCategory>? productsubCategories { get; set; }
-
         public int BrandId { get; set; }
         public Brand? brand { get; set; }
         [Display(Name = "Categories")]

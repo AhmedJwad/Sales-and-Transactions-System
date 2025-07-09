@@ -13,7 +13,17 @@ namespace Sale.Api.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            DisableCascadingDelete(modelBuilder);
+            modelBuilder.Entity<Subcategory>()
+                     .HasOne(sc => sc.Category)
+                     .WithMany(c => c.subcategories)
+                     .HasForeignKey(sc => sc.CategoryId)
+                     .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Brand>()
+                        .HasOne(p => p.Subcategory)
+                        .WithMany(sc => sc.Brands)
+                        .HasForeignKey(p => p.SubcategoryId)
+                        .OnDelete(DeleteBehavior.Cascade);
         }
 
         private void DisableCascadingDelete(ModelBuilder modelBuilder)

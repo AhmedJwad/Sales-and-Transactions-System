@@ -27,7 +27,7 @@ namespace Sale.Api.Repositories.Implementations
             return new ActionResponse<IEnumerable<Category>>
             {
                 WasSuccess = true,
-                Result = await queryable.OrderBy(x => x.Name).Paginate(pagination).ToListAsync()
+                Result = await queryable.OrderBy(x => x.Name).ToListAsync()
             };
         }
 

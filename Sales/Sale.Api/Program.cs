@@ -19,7 +19,8 @@ builder.Services.AddControllers()
 builder.Services.AddDbContext<DataContext>(x => x.UseSqlServer("name=LocalConnection"));
 
 builder.Services.AddOpenApi();
-
+builder.Services.AddTransient<SeedDb>();
+builder.Services.AddScoped<IRuntimeInformationWrapper, RuntimeInformationWrapper>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped(typeof(IGenericUnitOfWork<>), typeof(GenericUnitOfWork<>));
 builder.Services.AddScoped<ICategoriesRepository, CategoriesRepository>();
@@ -29,8 +30,21 @@ builder.Services.AddScoped<ISubcategoryRepository, SubcategoryRepository>();
 builder.Services.AddScoped<iSubcategoriesUnitofWorks, SubcategoriesUnitofWorks>();
 builder.Services.AddScoped<IbrandRepository, BrandRepository>();
 builder.Services.AddScoped<IbrandUnitofWork, brandUnitofWork>();
+builder.Services.AddScoped<IProductRepository, ProductsRepository>();
+builder.Services.AddScoped<IProductsUnitofWork, ProductsUnitofWork>();
 
 var app = builder.Build();
+SeedData(app);
+void SeedData(WebApplication app)
+{
+    var scopedFactory = app.Services.GetService<IServiceScopeFactory>();
+
+    using (var scope = scopedFactory!.CreateScope())
+    {
+        var service = scope.ServiceProvider.GetService<SeedDb>();
+        service!.SeedAsync().Wait();
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

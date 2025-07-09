@@ -49,8 +49,8 @@ namespace Sale.Share.DTOs
         [Display(Name = "Inventory")]
         [Required(ErrorMessage = "Field {0} is required.")]
         public decimal Stock { get; set; }
+        public int BrandId { get; set; }       
 
-       
         public bool HasSerial { get; set; }
         public List<int>? ProductCategoryIds { get; set; }
         public List<string>? ProductImages { get; set; }
