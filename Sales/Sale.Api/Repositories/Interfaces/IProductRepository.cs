@@ -1,5 +1,6 @@
 ﻿using Sale.Share.DTOs;
 using Sale.Share.Entities;
+using Sale.Share.Response;
 using Sale.Share.Responses;
 
 namespace Sale.Api.Repositories.Interfaces
@@ -12,7 +13,7 @@ namespace Sale.Api.Repositories.Interfaces
         Task<ActionResponse<ImageDTO>> AddImageAsync(ImageDTO imageDTO);
         Task<ActionResponse<ImageDTO>> RemoveLastImageAsync(ImageDTO imageDTO);
         Task<ActionResponse<Product>> GetAsync(int id);
-        Task<ActionResponse<IEnumerable<Product>>> GetAsync(PaginationDTO pagination);
+        Task<ActionResponse<IEnumerable<ProductResponseDTO>>> GetAsync(PaginationDTO pagination);
         Task<ActionResponse<int>> GetTotalPagesAsync(PaginationDTO paginationDTO);
         Task<ActionResponse<Product>> AddFullAsync(ProductDTO productDTO);
         Task<ActionResponse<Product>> UpdateFullAsync(ProductDTO productDTO);

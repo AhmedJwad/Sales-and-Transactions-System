@@ -2,6 +2,7 @@
 using Sale.Api.UnitsOfWork.Interfaces;
 using Sale.Share.DTOs;
 using Sale.Share.Entities;
+using Sale.Share.Response;
 using Sale.Share.Responses;
 
 namespace Sale.Api.UnitsOfWork.Implementations
@@ -22,7 +23,7 @@ namespace Sale.Api.UnitsOfWork.Implementations
         => await _productRepository.DeleteAsync(id);
         public override async Task<ActionResponse<Product>> GetAsync(int id)
         => await _productRepository.GetAsync(id);
-        public override async Task<ActionResponse<IEnumerable<Product>>> GetAsync(PaginationDTO pagination)
+        public  async Task<ActionResponse<IEnumerable<ProductResponseDTO>>> GetAsync(PaginationDTO pagination)
         => await _productRepository.GetAsync(pagination);
         public async Task<IEnumerable<Product>> GetComboAsync()
         => await _productRepository.GetComboAsync();

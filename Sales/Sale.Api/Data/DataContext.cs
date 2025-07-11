@@ -24,6 +24,26 @@ namespace Sale.Api.Data
                         .WithMany(sc => sc.Brands)
                         .HasForeignKey(p => p.SubcategoryId)
                         .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Product>()
+                         .HasOne(p => p.brand)
+                         .WithMany(b => b.Products) 
+                         .HasForeignKey(p => p.BrandId)
+                         .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Product>()
+                        .HasMany(p => p.ProductImages)
+                        .WithOne(pi => pi.Product)
+                        .HasForeignKey(pi => pi.ProductId)
+                        .OnDelete(DeleteBehavior.Cascade);
+                        modelBuilder.Entity<Product>()
+                        .HasMany(p => p.productsubCategories)
+                        .WithOne(sc => sc.Product) 
+                        .HasForeignKey(sc => sc.ProductId)
+                        .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Product>()
+                        .HasMany(p => p.serialNumbers)
+                        .WithOne(sn => sn.Product) 
+                        .HasForeignKey(sn => sn.ProductId)
+                        .OnDelete(DeleteBehavior.Cascade);
         }
 
         private void DisableCascadingDelete(ModelBuilder modelBuilder)

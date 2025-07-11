@@ -4,6 +4,7 @@ using Sale.Api.Helpers;
 using Sale.Api.Repositories.Interfaces;
 using Sale.Share.DTOs;
 using Sale.Share.Entities;
+using Sale.Share.Response;
 using Sale.Share.Responses;
 
 namespace Sale.Api.Repositories.Implementations
@@ -30,8 +31,7 @@ namespace Sale.Api.Repositories.Implementations
                    Stock=productDTO.Stock,
                    Cost=productDTO.Cost,
                    Barcode= string.IsNullOrEmpty(productDTO.Barcode) ? GenerateBarcode() : productDTO.Barcode,
-                   Price =productDTO.Price,
-                   BrandId=productDTO.BrandId,
+                   Price =productDTO.Price,                   
                    HasSerial=productDTO.HasSerial,
                    productsubCategories=new List<ProductsubCategory>(),
                    ProductImages=new List<ProductImage>(),
@@ -51,7 +51,15 @@ namespace Sale.Api.Repositories.Implementations
                 {                  
                   
                    product.productsubCategories.Add(new ProductsubCategory { Category = subcategory });
-                    
+                   
+                }
+                var brands = subCategories
+                            .SelectMany(sc => sc.Brands!)
+                            .Distinct() 
+                            .ToList();
+                if (brands.Any())
+                {
+                    product.BrandId = brands.First().Id; 
                 }
 
                 if (product.HasSerial && product.Stock > 0)
@@ -142,8 +150,8 @@ namespace Sale.Api.Repositories.Implementations
 
         public override async Task<ActionResponse<Product>> DeleteAsync(int id)
         {
-            var product = await _context.Products.Include(x => x.productsubCategories).Include(x => x.ProductImages)
-                 .FirstOrDefaultAsync(x => x.Id == id);
+            var product = await _context.Products.Include(x => x.productsubCategories).Include(x => x.ProductImages).Include(c=>c.serialNumbers)
+                .Include(x=>x.brand).FirstOrDefaultAsync(x => x.Id == id);
             if(product == null)
             {
                 return new ActionResponse<Product>
@@ -159,9 +167,10 @@ namespace Sale.Api.Repositories.Implementations
             try
             {
                 _context.productsubCategories.RemoveRange(product.productsubCategories!);
-                _context.ProductImages.RemoveRange(product.ProductImages);
-                _context.brands.RemoveRange(product.brand!);
+                _context.ProductImages.RemoveRange(product.ProductImages);               
+                _context.serialNumbers.RemoveRange(product.serialNumbers!);
                 _context.Remove(product);
+                await _context.SaveChangesAsync();
                 return new ActionResponse<Product>
                 {
                     WasSuccess=true,
@@ -199,7 +208,7 @@ namespace Sale.Api.Repositories.Implementations
             };
         }
 
-        public override async Task<ActionResponse<IEnumerable<Product>>> GetAsync(PaginationDTO pagination)
+        public  async Task<ActionResponse<IEnumerable<ProductResponseDTO>>> GetAsync(PaginationDTO pagination)
         {
             var queryable = _context.Products.Include(x => x.productsubCategories!).ThenInclude(x => x.Category).ThenInclude(x => x.Category)
                 .Include(x => x.ProductImages).Include(x => x.brand).Include(x => x.serialNumbers).AsQueryable();
@@ -213,12 +222,37 @@ namespace Sale.Api.Repositories.Implementations
             }
             if(!string.IsNullOrWhiteSpace(pagination.CategoryFilter))
             {
-                queryable = queryable.Where(x => x.productsubCategories!.Any(x => x.Category.Name == pagination.CategoryFilter));
+                queryable = queryable.Where(x => x.productsubCategories!.Any(x => x.Category!.Name == pagination.CategoryFilter));
             }
-            return new ActionResponse<IEnumerable<Product>>
+            var products = await queryable.OrderBy(x => x.Name).ToListAsync();
+            var productDTOs = products.Select(p => new ProductResponseDTO
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Barcode = p.Barcode,
+                Description = p.Description,
+                Price = p.Price,
+                Cost = p.Cost,
+                DesiredProfit = p.DesiredProfit,
+                Stock = p.Stock,
+                Brand = p.brand?.Name ?? "No Brand",
+                HasSerial = p.HasSerial,
+                ProductImagesNumber = p.ProductImagesNumber,
+                Image = p.ProductImages!.FirstOrDefault()?.Image ?? "/no-image.png",
+                SerialCount = p.serialNumbers?.Count ?? 0,
+                Subcategories = p.productsubCategories!
+                                .Select(x => x.Category!.Name ?? "No Subcategory")
+                                .Distinct()
+                                .ToList(),
+                Categories = p.productsubCategories!
+                                .Select(x => x.Category?.Category?.Name ?? "No Category")
+                                .Distinct()
+                                .ToList()
+            });
+            return new ActionResponse<IEnumerable<ProductResponseDTO>>
             {
                 WasSuccess = true,
-                Result =await queryable.OrderBy(x => x.Name).Paginate(pagination).ToListAsync()
+                Result = productDTOs,
             };
 
         }
