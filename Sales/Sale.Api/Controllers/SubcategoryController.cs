@@ -28,10 +28,10 @@ namespace Sale.Api.Controllers
             return BadRequest();
         }
         [AllowAnonymous]
-        [HttpGet("combo/{categoryId:int}")]
-        public async Task<IActionResult> GetComboAsync(int categoryId)
+        [HttpGet("combo")]
+        public async Task<IActionResult> GetComboAsync()
         {
-            return Ok(await _iSubcategoriesUnitofWorks.GetComboAsync(categoryId));
+            return Ok(await _iSubcategoriesUnitofWorks.GetComboAsync());
         }
 
         [HttpGet]

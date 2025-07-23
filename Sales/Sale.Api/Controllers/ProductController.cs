@@ -24,7 +24,7 @@ namespace Sale.Api.Controllers
             return Ok(await _productsUnitOfWork.GetComboAsync());
         }
 
-        [HttpGet("recordsNumber")]
+        [HttpGet("recordsNumber")]        
         public override async Task<IActionResult> GetRecordsNumberAsync([FromQuery] PaginationDTO pagination)
         {
             var response = await _productsUnitOfWork.GetRecordsNumberAsync(pagination);
@@ -35,7 +35,7 @@ namespace Sale.Api.Controllers
             return BadRequest();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}")]       
         public override async Task<IActionResult> DeleteAsync(int id)
         {
             var action = await _productsUnitOfWork.DeleteAsync(id);
@@ -69,7 +69,7 @@ namespace Sale.Api.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet]
+        [HttpGet]      
         public override async Task<IActionResult> GetAsync([FromQuery] PaginationDTO pagination)
         {
             var response = await _productsUnitOfWork.GetAsync(pagination);
@@ -81,7 +81,7 @@ namespace Sale.Api.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("totalPages")]
+        [HttpGet("totalPages")]        
         public override async Task<IActionResult> GetPagesAsync([FromQuery] PaginationDTO pagination)
         {
             var action = await _productsUnitOfWork.GetTotalPagesAsync(pagination);
@@ -94,6 +94,7 @@ namespace Sale.Api.Controllers
 
         [AllowAnonymous]
         [HttpGet("{id}")]
+
         public override async Task<IActionResult> GetAsync(int id)
         {
             var action = await _productsUnitOfWork.GetAsync(id);

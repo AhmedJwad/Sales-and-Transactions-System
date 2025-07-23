@@ -1,17 +1,31 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Sale.Share.Entities;
 
 namespace Sale.Api.Data
 {
-    public class DataContext: DbContext
+    public class DataContext: IdentityDbContext<User>
     {
         public DataContext(DbContextOptions<DataContext> options):base(options)
         {
                 
         }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<ProductsubCategory> productsubCategories { get; set; }
+        public DbSet<ProductImage> ProductImages { get; set; }
+        public DbSet<SerialNumber> serialNumbers { get; set; }
+        public DbSet<Brand> brands { get; set; }
+        public DbSet<Subcategory> subcategories { get; set; }
+        public DbSet<Country> countries { get; set; }
+        public DbSet<State> states { get; set; }
+        public DbSet<City> cities { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Country>().HasIndex(country => country.Name).IsUnique();           
+            modelBuilder.Entity<State>().HasIndex(state => state.Name).IsUnique();
+            modelBuilder.Entity<City>().HasIndex(city => city.Name).IsUnique();
 
             modelBuilder.Entity<Subcategory>()
                      .HasOne(sc => sc.Category)
@@ -53,16 +67,7 @@ namespace Sale.Api.Data
             {
                 item.DeleteBehavior = DeleteBehavior.Restrict;
             }
-        }
-
-        public DbSet<Category> Categories { get; set; }
-        public DbSet<Product> Products { get; set; }
-        public DbSet<ProductsubCategory> productsubCategories { get; set; }
-        public DbSet<ProductImage> ProductImages { get; set; }
-        public DbSet<SerialNumber> serialNumbers { get; set; }
-        public DbSet<Brand> brands { get; set; }
-
-        public DbSet<Subcategory> subcategories { get; set; }
+        }      
 
     }
 }

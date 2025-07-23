@@ -17,7 +17,7 @@ namespace Sale.Api.Controllers
         {
            _categoriesUnitOfWork = categoriesUnitOfWork;
         }
-        [HttpGet]
+        [HttpGet]       
         public override async Task<IActionResult> GetAsync([FromQuery] PaginationDTO pagination)
         {
             var response = await _categoriesUnitOfWork.GetAsync(pagination);
@@ -27,7 +27,7 @@ namespace Sale.Api.Controllers
             }
             return BadRequest();
         }
-        [HttpGet("recordsNumber")]
+        [HttpGet("recordsNumber")]        
         public override async Task<IActionResult> GetRecordsNumberAsync([FromQuery] PaginationDTO pagination)
         {
             var response = await _categoriesUnitOfWork.GetRecordsNumberAsync(pagination);
@@ -44,7 +44,7 @@ namespace Sale.Api.Controllers
             return Ok(await _categoriesUnitOfWork.GetComboAsync());
         }
 
-        [HttpGet("totalPages")]
+        [HttpGet("totalPages")]       
         public override async Task<IActionResult> GetPagesAsync([FromQuery] PaginationDTO pagination)
         {
             var action = await _categoriesUnitOfWork.GetTotalPagesAsync(pagination);

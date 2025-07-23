@@ -18,9 +18,8 @@ namespace Sale.Api.UnitsOfWork.Implementations
         public override async Task<ActionResponse<IEnumerable<Subcategory>>> GetAsync(PaginationDTO pagination)
         => await _subcategoryRepository.GetAsync(pagination);
 
-        public async Task<IEnumerable<Subcategory>> GetComboAsync(int CategoryId)
-       => await _subcategoryRepository.GetComboAsync(CategoryId);
-
+        public async Task<IEnumerable<Subcategory>> GetComboAsync()
+       => await _subcategoryRepository.GetComboAsync();
         public override async Task<ActionResponse<int>> GetRecordsNumberAsync(PaginationDTO pagination)
         => await _subcategoryRepository.GetRecordsNumberAsync(pagination);
 

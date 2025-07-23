@@ -41,7 +41,7 @@ namespace Sale.Api.Repositories.Implementations
                 foreach (var image in productDTO.ProductImages!)
                 {
                     var productPhoto = Convert.FromBase64String(image);
-                    product.ProductImages.Add(new ProductImage { Image = await _fileStorage.SaveFileAsync(productPhoto,".png" , "prodcuts") });
+                    product.ProductImages.Add(new ProductImage { Image = await _fileStorage.SaveFileAsync(productPhoto,".jpg" , "products") }); 
                 }
                 var subCategories = await _context.subcategories!
                                         .Include(x => x.Brands)
@@ -208,9 +208,9 @@ namespace Sale.Api.Repositories.Implementations
             };
         }
 
-        public  async Task<ActionResponse<IEnumerable<ProductResponseDTO>>> GetAsync(PaginationDTO pagination)
+        public override async Task<ActionResponse<IEnumerable<Product>>> GetAsync(PaginationDTO pagination)
         {
-            var queryable = _context.Products.Include(x => x.productsubCategories!).ThenInclude(x => x.Category).ThenInclude(x => x.Category)
+            var queryable = _context.Products.Include(x => x.productsubCategories!)
                 .Include(x => x.ProductImages).Include(x => x.brand).Include(x => x.serialNumbers).AsQueryable();
             if(!string.IsNullOrWhiteSpace(pagination.Filter))
             {
@@ -225,34 +225,11 @@ namespace Sale.Api.Repositories.Implementations
                 queryable = queryable.Where(x => x.productsubCategories!.Any(x => x.Category!.Name == pagination.CategoryFilter));
             }
             var products = await queryable.OrderBy(x => x.Name).ToListAsync();
-            var productDTOs = products.Select(p => new ProductResponseDTO
-            {
-                Id = p.Id,
-                Name = p.Name,
-                Barcode = p.Barcode,
-                Description = p.Description,
-                Price = p.Price,
-                Cost = p.Cost,
-                DesiredProfit = p.DesiredProfit,
-                Stock = p.Stock,
-                Brand = p.brand?.Name ?? "No Brand",
-                HasSerial = p.HasSerial,
-                ProductImagesNumber = p.ProductImagesNumber,
-                Image = p.ProductImages!.FirstOrDefault()?.Image ?? "/no-image.png",
-                SerialCount = p.serialNumbers?.Count ?? 0,
-                Subcategories = p.productsubCategories!
-                                .Select(x => x.Category!.Name ?? "No Subcategory")
-                                .Distinct()
-                                .ToList(),
-                Categories = p.productsubCategories!
-                                .Select(x => x.Category?.Category?.Name ?? "No Category")
-                                .Distinct()
-                                .ToList()
-            });
-            return new ActionResponse<IEnumerable<ProductResponseDTO>>
+            
+            return new ActionResponse<IEnumerable<Product>>
             {
                 WasSuccess = true,
-                Result = productDTOs,
+                Result = products,
             };
 
         }

@@ -22,9 +22,11 @@ namespace Sale.Api.Data
             await _context.Database.EnsureCreatedAsync();
             await CheckCategoriesAsync();
             await CheckProductsAsync();
+            await CheckCountriesAsync();
 
         }
 
+        
         private async Task CheckCategoriesAsync()
         {
 
@@ -269,5 +271,139 @@ namespace Sale.Api.Data
             }
 
         }
+        private async Task CheckCountriesAsync()
+        {
+            if (!_context.countries.Any())
+            {
+                var countries = new List<Country>
+            {
+                new Country
+                {
+                    Name = "Iraq",
+                    states = new List<State>
+                    {
+                        new State
+                        {
+                            Name = "Baghdad",
+                            cities = new List<City>
+                            {
+                                new City { Name = "Al-Adel" },
+                                new City { Name = "Karrada" },
+                                new City { Name = "Al-Mansour" }
+                            }
+                        },
+                        new State
+                        {
+                            Name = "Basra",
+                            cities = new List<City>
+                            {
+                                new City { Name = "Al-Ashar" },
+                                new City { Name = "Al-Jubaila" }
+                            }
+                        }
+                    }
+                },
+
+                new Country
+                {
+                    Name = "Egypt",
+                    states = new List<State>
+                    {
+                        new State
+                        {
+                            Name = "Cairo",
+                            cities = new List<City>
+                            {
+                                new City { Name = "Nasr City" },
+                                new City { Name = "Heliopolis" }
+                            }
+                        },
+                        new State
+                        {
+                            Name = "Alexandria",
+                            cities = new List<City>
+                            {
+                                new City { Name = "Sidi Gaber" },
+                                new City { Name = "Miami" }
+                            }
+                        }
+                    }
+                },
+
+                new Country
+                {
+                    Name = "Saudi Arabia",
+                    states = new List<State>
+                    {
+                        new State
+                        {
+                            Name = "Riyadh",
+                            cities = new List<City>
+                            {
+                                new City { Name = "Al Olaya" },
+                                new City { Name = "Al Malaz" }
+                            }
+                        },
+                        new State
+                        {
+                            Name = "Jeddah",
+                            cities = new List<City>
+                            {
+                                new City { Name = "Al Hamra" },
+                                new City { Name = "Al Aziziyah" }
+                            }
+                        }
+                    }
+                },
+
+                new Country
+                {
+                    Name = "Jordan",
+                    states = new List<State>
+                    {
+                        new State
+                        {
+                            Name = "Amman",
+                            cities = new List<City>
+                            {
+                                new City { Name = "Shmeisani" },
+                                new City { Name = "Sweifieh" }
+                            }
+                        }
+                    }
+                },
+
+                new Country
+                {
+                    Name = "UAE",
+                    states = new List<State>
+                    {
+                        new State
+                        {
+                            Name = "Dubai",
+                            cities = new List<City>
+                            {
+                                new City { Name = "Deira" },
+                                new City { Name = "Jumeirah" }
+                            }
+                        },
+                        new State
+                        {
+                            Name = "Abu Dhabi",
+                            cities = new List<City>
+                            {
+                                new City { Name = "Khalifa City" },
+                                new City { Name = "Al Reem Island" }
+                            }
+                        }
+                    }
+                }
+            };
+
+                    _context.countries.AddRange(countries);
+                    await _context.SaveChangesAsync();
+                }
+            }
+
     }
 }

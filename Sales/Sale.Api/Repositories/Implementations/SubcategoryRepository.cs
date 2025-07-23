@@ -31,9 +31,9 @@ namespace Sale.Api.Repositories.Implementations
             };
         }
 
-        public async Task<IEnumerable<Subcategory>> GetComboAsync(int CategoryId)
+        public async Task<IEnumerable<Subcategory>> GetComboAsync()
         {
-            return await _context.subcategories.Where(x=>x.CategoryId==CategoryId).OrderBy(x=>x.Name).ToListAsync();
+            return await _context.subcategories.OrderBy(x=>x.Name).ToListAsync();
         }
 
         public override async Task<ActionResponse<int>> GetRecordsNumberAsync(PaginationDTO pagination)

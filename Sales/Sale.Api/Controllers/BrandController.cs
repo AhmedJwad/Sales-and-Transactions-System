@@ -35,7 +35,7 @@ namespace Sale.Api.Controllers
             return Ok(await _brandUnitofWork.GetComboAsync(subcategoryId));
         }
 
-        [HttpGet]
+        [HttpGet]       
         public override async Task<IActionResult> GetAsync([FromQuery] PaginationDTO pagination)
         {
             var response = await _brandUnitofWork.GetAsync(pagination);
@@ -46,7 +46,7 @@ namespace Sale.Api.Controllers
             return BadRequest();
         }
 
-        [HttpGet("totalPages")]
+        [HttpGet("totalPages")]      
         public override async Task<IActionResult> GetPagesAsync([FromQuery] PaginationDTO pagination)
         {
             var action = await _brandUnitofWork.GetTotalPagesAsync(pagination);
