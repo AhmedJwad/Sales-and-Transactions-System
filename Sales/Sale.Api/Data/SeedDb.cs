@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sale.Api.Helpers;
+using Sale.Api.UnitsOfWork.Interfaces;
 using Sale.Share.Entities;
+using Sale.Share.Enums;
 using System.Runtime.InteropServices;
 
 namespace Sale.Api.Data
@@ -10,12 +12,15 @@ namespace Sale.Api.Data
         private readonly DataContext _context;
         private readonly IFileStorage _fileStorage;
         private readonly IRuntimeInformationWrapper _runtimeInformationWrapper;
+        private readonly IUsersUnitOfWork _usersUnitOfWork;
 
-        public SeedDb(DataContext context, IFileStorage fileStorage, IRuntimeInformationWrapper runtimeInformationWrapper)
+        public SeedDb(DataContext context, IFileStorage fileStorage, IRuntimeInformationWrapper runtimeInformationWrapper, 
+            IUsersUnitOfWork usersUnitOfWork )
         {
             _context = context;
             _fileStorage = fileStorage;
             _runtimeInformationWrapper = runtimeInformationWrapper;
+           _usersUnitOfWork = usersUnitOfWork;
         }
         public async Task SeedAsync()
         {
@@ -23,10 +28,77 @@ namespace Sale.Api.Data
             await CheckCategoriesAsync();
             await CheckProductsAsync();
             await CheckCountriesAsync();
-
+            await CheckRolesAsync();
+            await CheckUsersAsync();
         }
 
-        
+        private async Task CheckRolesAsync()
+        {
+            await _usersUnitOfWork.CheckRoleAsync(UserType.Admin.ToString());
+            await _usersUnitOfWork.CheckRoleAsync(UserType.User.ToString());
+        }
+
+        private async Task CheckUsersAsync()
+        {
+            await CheckUserAsync("Ahmed", "Almershady", "Ahmed@yopmail.com", "+964", "322 311 4620", "babil 40 strret hilla", "AhmedAlmershady.jpg", UserType.Admin);
+            await CheckUserAsync("Ledys", "Bedoya", "ledys@yopmail.com", "+964", "322 311 4620", "babil 40 strret hilla", "LedysBedoya.jpg", UserType.User);
+            await CheckUserAsync("Brad", "Pitt", "brad@yopmail.com", "+964", "322 311 4620", "babil 40 strret hilla", "Brad.jpg", UserType.User);
+            await CheckUserAsync("Angelina", "Jolie", "angelina@yopmail.com", "+964", "322 311 4620", "babil 40 strret hilla", "Angelina.jpg", UserType.User);
+            await CheckUserAsync("Bob", "Marley", "bob@yopmail.com", "+964", "322 311 4620", "babil 40 strret hilla", "bob.jpg", UserType.User);
+            await CheckUserAsync("Celia", "Cruz", "celia@yopmail.com", "+964", "322 311 4620", "babil 40 strret hilla", "celia.jpg", UserType.Admin);
+            await CheckUserAsync("Fredy", "Mercury", "fredy@yopmail.com", "+964", "322 311 4620", "babil 40 strret hilla", "fredy.jpg", UserType.User);
+            await CheckUserAsync("Hector", "Lavoe", "hector@yopmail.com", "+964", "322 311 4620", "babil 40 strret hilla", "hector.jpg", UserType.User);
+            await CheckUserAsync("Liv", "Taylor", "liv@yopmail.com", "+964", "322 311 4620", "babil 40 strret hilla", "liv.jpg", UserType.User);
+            await CheckUserAsync("Otep", "Shamaya", "otep@yopmail.com", "+964", "322 311 4620", "babil 40 strret hilla", "otep.jpg", UserType.User);
+            await CheckUserAsync("Ozzy", "Osbourne", "ozzy@yopmail.com", "+964", "322 311 4620", "babil 40 strret hilla", "ozzy.jpg", UserType.User);
+            await CheckUserAsync("Selena", "Quintanilla", "selenba@yopmail.com", "+964", "322 311 4620", "babil 40 strret hilla", "selena.jpg", UserType.User);
+        }
+
+        private async Task<User> CheckUserAsync(string firstName, string lastName, string email, string countryCode,
+            string phoneNumber, string address, string image, UserType userType)
+        {
+            var user = await _usersUnitOfWork.GetUserAsync(email);
+            if (user == null)
+            {
+                var city = await _context.cities.FirstOrDefaultAsync(x => x.Name == "Hillah");
+                city ??= await _context.cities.FirstOrDefaultAsync();
+                string filePath;
+                if (_runtimeInformationWrapper.IsOSPlatform(OSPlatform.Windows))
+                {
+                    filePath = $"{Environment.CurrentDirectory}\\images\\users\\{image}";
+                }
+                else
+                {
+                    filePath = $"{Environment.CurrentDirectory}/images/users/{image}";
+                }
+
+                var fileBytes = File.ReadAllBytes(filePath);
+                var imagePath = await _fileStorage.SaveFileAsync(fileBytes, ".jpg", "users");
+
+                user = new User
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Email = email,
+                    UserName = email,
+                    PhoneNumber = phoneNumber,
+                    Address = address,
+                    City = city,
+                    UserType = userType,
+                    Photo = imagePath,
+                    CountryCode = "+964"
+                };
+
+                await _usersUnitOfWork.AddUserAsync(user, "123456");
+                await _usersUnitOfWork.AddUserToRoleAsync(user, userType.ToString());
+
+                var token = await _usersUnitOfWork.GenerateEmailConfirmationTokenAsync(user);
+                await _usersUnitOfWork.ConfirmEmailAsync(user, token);
+            }
+
+            return user;
+        }
+
         private async Task CheckCategoriesAsync()
         {
 
@@ -299,6 +371,15 @@ namespace Sale.Api.Data
                             {
                                 new City { Name = "Al-Ashar" },
                                 new City { Name = "Al-Jubaila" }
+                            }
+                        },
+                         new State
+                        {
+                            Name = "Babylon",
+                            cities = new List<City>
+                            {
+                                new City { Name = "Hillah" },
+                                new City { Name = "Bab Al Mashhad" }
                             }
                         }
                     }

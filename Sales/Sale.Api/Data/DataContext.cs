@@ -20,6 +20,7 @@ namespace Sale.Api.Data
         public DbSet<Country> countries { get; set; }
         public DbSet<State> states { get; set; }
         public DbSet<City> cities { get; set; }
+        public DbSet<RefreshToken> refreshTokens { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
