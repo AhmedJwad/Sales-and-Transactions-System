@@ -1,14 +1,14 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Sale.Share.Entities;
 
 namespace Sale.Api.Data
 {
-    public class DataContext: IdentityDbContext<User>
+    public class DataContext : IdentityDbContext<User>
     {
-        public DataContext(DbContextOptions<DataContext> options):base(options)
+        public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
-                
+
         }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
@@ -21,10 +21,18 @@ namespace Sale.Api.Data
         public DbSet<State> states { get; set; }
         public DbSet<City> cities { get; set; }
         public DbSet<RefreshToken> refreshTokens { get; set; }
+        public DbSet<Colour> colors { get; set; }
+        public DbSet<ProductColor>productColors { get; set; }
+        public DbSet<Sizep>sizes { get; set; }
+        public DbSet<productSize> productSizes { get; set; }
+        public DbSet<Discount> discounts { get; set; }
+        public DbSet<ProductDiscount> productDiscounts { get; set; }
+        public DbSet<Rating> ratings { get; set; }
+        public DbSet<ProductColorImage> productColorImages { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<Country>().HasIndex(country => country.Name).IsUnique();           
+            modelBuilder.Entity<Country>().HasIndex(country => country.Name).IsUnique();
             modelBuilder.Entity<State>().HasIndex(state => state.Name).IsUnique();
             modelBuilder.Entity<City>().HasIndex(city => city.Name).IsUnique();
 
@@ -41,7 +49,7 @@ namespace Sale.Api.Data
                         .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Product>()
                          .HasOne(p => p.brand)
-                         .WithMany(b => b.Products) 
+                         .WithMany(b => b.Products)
                          .HasForeignKey(p => p.BrandId)
                          .OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<Product>()
@@ -49,26 +57,35 @@ namespace Sale.Api.Data
                         .WithOne(pi => pi.Product)
                         .HasForeignKey(pi => pi.ProductId)
                         .OnDelete(DeleteBehavior.Cascade);
-                        modelBuilder.Entity<Product>()
+            modelBuilder.Entity<Product>()
                         .HasMany(p => p.productsubCategories)
-                        .WithOne(sc => sc.Product) 
+                        .WithOne(sc => sc.Product)
                         .HasForeignKey(sc => sc.ProductId)
                         .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Product>()
                         .HasMany(p => p.serialNumbers)
-                        .WithOne(sn => sn.Product) 
+                        .WithOne(sn => sn.Product)
                         .HasForeignKey(sn => sn.ProductId)
                         .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Product>()
+                      .HasMany(p => p.productColor)
+                      .WithOne(sn => sn.Product)
+                      .HasForeignKey(sn => sn.ProductId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Product>()
+                     .HasMany(p => p.productSize)
+                     .WithOne(sn => sn.product)
+                     .HasForeignKey(sn => sn.productId)
+                     .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Product>()
+                     .HasMany(p => p.productDiscount)
+                     .WithOne(sn => sn.product)
+                     .HasForeignKey(sn => sn.productID)
+                     .OnDelete(DeleteBehavior.Cascade);
+          
         }
 
-        private void DisableCascadingDelete(ModelBuilder modelBuilder)
-        {
-            var relationship = modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys());
-            foreach (var item in relationship)
-            {
-                item.DeleteBehavior = DeleteBehavior.Restrict;
-            }
-        }      
+        
 
     }
 }

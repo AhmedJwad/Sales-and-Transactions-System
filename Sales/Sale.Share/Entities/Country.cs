@@ -15,6 +15,7 @@ namespace Sale.Share.Entities
         [MaxLength(100, ErrorMessage = "The field {0} must have a maximum of {1} characters.")]
         [Required(ErrorMessage = "the field{0}is required")]
         public string Name { get; set; } = null!;
+
         [Display(Name = "State")]
         [JsonIgnore]
         public ICollection<State>? states { get; set; }      

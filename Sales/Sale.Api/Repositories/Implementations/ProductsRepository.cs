@@ -26,16 +26,17 @@ namespace Sale.Api.Repositories.Implementations
             {
                 var product = new Product
                 {
-                   Name=productDTO.Name,
-                   Description=productDTO.Description,
-                   Stock=productDTO.Stock,
-                   Cost=productDTO.Cost,
-                   Barcode= string.IsNullOrEmpty(productDTO.Barcode) ? GenerateBarcode() : productDTO.Barcode,
-                   Price =productDTO.Price,                   
-                   HasSerial=productDTO.HasSerial,
-                   productsubCategories=new List<ProductsubCategory>(),
-                   ProductImages=new List<ProductImage>(),
-                   serialNumbers=new List<SerialNumber>(),                 
+                    Name = productDTO.Name,
+                    Description = productDTO.Description,
+                    Stock = productDTO.Stock,
+                    Cost = productDTO.Cost,
+                    Barcode = string.IsNullOrEmpty(productDTO.Barcode) ? GenerateBarcode() : productDTO.Barcode,
+                    Price = productDTO.Price,
+                    HasSerial = productDTO.HasSerial,
+                    CreatedAt = DateTime.UtcNow,
+                    productsubCategories = new List<ProductsubCategory>(),
+                    ProductImages = new List<ProductImage>(),
+                    serialNumbers = new List<SerialNumber>(),
 
                 };
                 foreach (var image in productDTO.ProductImages!)
@@ -121,8 +122,12 @@ namespace Sale.Api.Repositories.Implementations
 
         public async Task<ActionResponse<ImageDTO>> AddImageAsync(ImageDTO imageDTO)
         {
-            var product = await _context.Products.Include(x => x.ProductImages).FirstOrDefaultAsync(x => x.Id == imageDTO.ProductId);
-            if(product == null)
+            var product = await _context.Products
+                        .Include(p => p.ProductImages!)
+                        .ThenInclude(pi => pi.productColorImages)
+                        .Include(p => p.productColor)
+                        .FirstOrDefaultAsync(p => p.Id == imageDTO.ProductId);
+            if (product == null)
             {
                 return new ActionResponse<ImageDTO>
                 {
@@ -130,16 +135,41 @@ namespace Sale.Api.Repositories.Implementations
                     Message = "Product does not exist",
                 };               
             }
+            var colors= await _context.colors!.Where(c =>imageDTO.ProductColorIds!.Contains(c.Id)).ToListAsync();
+            foreach (var color in colors)
+            {
+                if (!product.productColor!.Any(pc => pc.ColorId == color.Id))
+                {
+                    product.productColor!.Add(new ProductColor
+                    {
+                        ProductId = product.Id,
+                        ColorId = color.Id
+                    });
+                }
+            }
+
             for (int i = 0; i < imageDTO.Images.Count; i++)
             {
                 if (!imageDTO.Images[i].StartsWith("images/products"))
                 {
                     var photoProduct = Convert.FromBase64String(imageDTO.Images[i]);
                     imageDTO.Images[i] = await _fileStorage.SaveFileAsync(photoProduct, ".png", "products");
-                    product.ProductImages!.Add(new ProductImage { Image=imageDTO.Images[i] });
+                    
                 }
+                var productImage = new ProductImage
+                {
+                    ProductId = product.Id,
+                    Image = imageDTO.Images[i],
+                    productColorImages = colors.Select(c => new ProductColorImage
+                    {
+                        ColorId = c.Id
+                       
+                    }).ToList()
+                };
+                product.ProductImages!.Add(productImage);
             }
-            _context.Update(product);
+            _context.Update(product);         
+           
             await _context.SaveChangesAsync();
             return new ActionResponse<ImageDTO>
             {
@@ -240,6 +270,7 @@ namespace Sale.Api.Repositories.Implementations
              .OrderBy(x => x.Name)
              .ToListAsync();
         }
+       
 
         public override async Task<ActionResponse<int>> GetRecordsNumberAsync(PaginationDTO pagination)
         {
@@ -385,6 +416,33 @@ namespace Sale.Api.Repositories.Implementations
                                   }).ToListAsync();
 
             return response;
+        }
+
+        public async Task<ActionResponse<IEnumerable<ProductDTO>>> GetProductsBySubcategoryAsync(int subcategoryId)
+        {
+            var products = await _context.Products.Where(x => x.productsubCategories!.Any(psc => psc.subcategoryId == subcategoryId))
+               .Select(p => new ProductDTO
+               {                 
+                   Id = p.Id,
+                   Name = p.Name,
+                   Barcode = p.Barcode,
+                   Description = p.Description,
+                   Price = p.Price,
+                   Cost = p.Cost,
+                   DesiredProfit = p.DesiredProfit,
+                   Stock = p.Stock,
+                   BrandId = p.BrandId,
+                   HasSerial = p.HasSerial,
+                   ProductCategoryIds = p.productsubCategories!.Select(psc => psc.subcategoryId).ToList(),
+                   ProductImages = p.ProductImages!.Select(img => img.Image).ToList(),
+                   SerialNumbers = p.serialNumbers!.Select(sn => sn.SerialNumberValue).ToList()
+
+               }).ToListAsync();
+            return new ActionResponse<IEnumerable<ProductDTO>>
+            {
+                WasSuccess=true,
+                Result=products,
+            };
         }
     }
 }

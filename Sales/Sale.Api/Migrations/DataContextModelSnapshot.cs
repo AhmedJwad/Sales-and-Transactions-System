@@ -190,6 +190,9 @@ namespace Sale.Api.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("Photo")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
@@ -221,6 +224,29 @@ namespace Sale.Api.Migrations
                     b.ToTable("cities");
                 });
 
+            modelBuilder.Entity("Sale.Share.Entities.Colour", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("HexCode")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("colors");
+                });
+
             modelBuilder.Entity("Sale.Share.Entities.Country", b =>
                 {
                     b.Property<int>("Id")
@@ -242,6 +268,31 @@ namespace Sale.Api.Migrations
                     b.ToTable("countries");
                 });
 
+            modelBuilder.Entity("Sale.Share.Entities.Discount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("DiscountPercent")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<DateTime>("Endtime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("isActive")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("discounts");
+                });
+
             modelBuilder.Entity("Sale.Share.Entities.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -260,6 +311,9 @@ namespace Sale.Api.Migrations
 
                     b.Property<decimal>("Cost")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -288,6 +342,75 @@ namespace Sale.Api.Migrations
                     b.HasIndex("BrandId");
 
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("Sale.Share.Entities.ProductColor", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ColorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ColorId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("productColors");
+                });
+
+            modelBuilder.Entity("Sale.Share.Entities.ProductColorImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ColorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductImageId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ColorId");
+
+                    b.HasIndex("ProductImageId");
+
+                    b.ToTable("productColorImages");
+                });
+
+            modelBuilder.Entity("Sale.Share.Entities.ProductDiscount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("discountId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("productID")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("discountId");
+
+                    b.HasIndex("productID");
+
+                    b.ToTable("productDiscounts");
                 });
 
             modelBuilder.Entity("Sale.Share.Entities.ProductImage", b =>
@@ -335,6 +458,34 @@ namespace Sale.Api.Migrations
                     b.ToTable("productsubCategories");
                 });
 
+            modelBuilder.Entity("Sale.Share.Entities.Rating", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Comment")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Stars")
+                        .HasColumnType("decimal(2,1)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ratings");
+                });
+
             modelBuilder.Entity("Sale.Share.Entities.RefreshToken", b =>
                 {
                     b.Property<int>("Id")
@@ -353,7 +504,6 @@ namespace Sale.Api.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Token")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
@@ -392,6 +542,24 @@ namespace Sale.Api.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("serialNumbers");
+                });
+
+            modelBuilder.Entity("Sale.Share.Entities.Sizep", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("sizes");
                 });
 
             modelBuilder.Entity("Sale.Share.Entities.State", b =>
@@ -433,6 +601,9 @@ namespace Sale.Api.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Photo")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -544,6 +715,29 @@ namespace Sale.Api.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("Sale.Share.Entities.productSize", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("SizeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("productId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SizeId");
+
+                    b.HasIndex("productId");
+
+                    b.ToTable("productSizes");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -628,6 +822,63 @@ namespace Sale.Api.Migrations
                     b.Navigation("brand");
                 });
 
+            modelBuilder.Entity("Sale.Share.Entities.ProductColor", b =>
+                {
+                    b.HasOne("Sale.Share.Entities.Colour", "color")
+                        .WithMany("productColor")
+                        .HasForeignKey("ColorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Sale.Share.Entities.Product", "Product")
+                        .WithMany("productColor")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("color");
+                });
+
+            modelBuilder.Entity("Sale.Share.Entities.ProductColorImage", b =>
+                {
+                    b.HasOne("Sale.Share.Entities.Colour", "color")
+                        .WithMany("productColorImages")
+                        .HasForeignKey("ColorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Sale.Share.Entities.ProductImage", "productImage")
+                        .WithMany("productColorImages")
+                        .HasForeignKey("ProductImageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("color");
+
+                    b.Navigation("productImage");
+                });
+
+            modelBuilder.Entity("Sale.Share.Entities.ProductDiscount", b =>
+                {
+                    b.HasOne("Sale.Share.Entities.Discount", "discount")
+                        .WithMany("productDiscounts")
+                        .HasForeignKey("discountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Sale.Share.Entities.Product", "product")
+                        .WithMany("productDiscount")
+                        .HasForeignKey("productID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("discount");
+
+                    b.Navigation("product");
+                });
+
             modelBuilder.Entity("Sale.Share.Entities.ProductImage", b =>
                 {
                     b.HasOne("Sale.Share.Entities.Product", "Product")
@@ -654,6 +905,17 @@ namespace Sale.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("Category");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("Sale.Share.Entities.Rating", b =>
+                {
+                    b.HasOne("Sale.Share.Entities.Product", "Product")
+                        .WithMany("rating")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Product");
                 });
@@ -711,6 +973,25 @@ namespace Sale.Api.Migrations
                     b.Navigation("City");
                 });
 
+            modelBuilder.Entity("Sale.Share.Entities.productSize", b =>
+                {
+                    b.HasOne("Sale.Share.Entities.Sizep", "size")
+                        .WithMany("productSizes")
+                        .HasForeignKey("SizeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Sale.Share.Entities.Product", "product")
+                        .WithMany("productSize")
+                        .HasForeignKey("productId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("product");
+
+                    b.Navigation("size");
+                });
+
             modelBuilder.Entity("Sale.Share.Entities.Brand", b =>
                 {
                     b.Navigation("Products");
@@ -726,18 +1007,48 @@ namespace Sale.Api.Migrations
                     b.Navigation("Users");
                 });
 
+            modelBuilder.Entity("Sale.Share.Entities.Colour", b =>
+                {
+                    b.Navigation("productColor");
+
+                    b.Navigation("productColorImages");
+                });
+
             modelBuilder.Entity("Sale.Share.Entities.Country", b =>
                 {
                     b.Navigation("states");
+                });
+
+            modelBuilder.Entity("Sale.Share.Entities.Discount", b =>
+                {
+                    b.Navigation("productDiscounts");
                 });
 
             modelBuilder.Entity("Sale.Share.Entities.Product", b =>
                 {
                     b.Navigation("ProductImages");
 
+                    b.Navigation("productColor");
+
+                    b.Navigation("productDiscount");
+
+                    b.Navigation("productSize");
+
                     b.Navigation("productsubCategories");
 
+                    b.Navigation("rating");
+
                     b.Navigation("serialNumbers");
+                });
+
+            modelBuilder.Entity("Sale.Share.Entities.ProductImage", b =>
+                {
+                    b.Navigation("productColorImages");
+                });
+
+            modelBuilder.Entity("Sale.Share.Entities.Sizep", b =>
+                {
+                    b.Navigation("productSizes");
                 });
 
             modelBuilder.Entity("Sale.Share.Entities.State", b =>

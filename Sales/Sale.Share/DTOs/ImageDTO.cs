@@ -13,6 +13,9 @@ namespace Sale.Share.DTOs
         public int ProductId { get; set; }
 
         [Required]
+        public List<int>? ProductColorIds { get; set; }
+
+        [Required]
         public List<string> Images { get; set; } = null!;
     }
 }

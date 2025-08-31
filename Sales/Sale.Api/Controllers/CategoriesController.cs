@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Sale.Api.UnitsOfWork.Implementations;
 using Sale.Api.UnitsOfWork.Interfaces;
 using Sale.Share.DTOs;
 using Sale.Share.Entities;
@@ -8,6 +10,7 @@ using Sale.Share.Entities;
 namespace Sale.Api.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
     public class CategoriesController : GenericController<Category>
     {
@@ -53,6 +56,37 @@ namespace Sale.Api.Controllers
                 return Ok(action.Result);
             }
             return BadRequest();
+        }
+        [HttpPost("full")]
+        public async Task<IActionResult> PostFullAsync(CategoryDTO categoryDTO)
+        {
+            var action = await _categoriesUnitOfWork.AddFullAsync(categoryDTO);
+            if (action.WasSuccess)
+            {
+                return Ok(action.Result);
+            }
+            return NotFound(action.Message);
+        }
+
+        [HttpPut("full")]
+        public async Task<IActionResult> PutFullAsync(CategoryDTO categoryDTO)
+        {
+            var action = await _categoriesUnitOfWork.UpdateFullAsync(categoryDTO);
+            if (action.WasSuccess)
+            {
+                return Ok(action.Result);
+            }
+            return NotFound(action.Message);
+        }
+        [HttpDelete("{id}")]
+        public override async Task<IActionResult> DeleteAsync(int id)
+        {
+            var action = await _categoriesUnitOfWork.DeleteAsync(id);
+            if (!action.WasSuccess)
+            {
+                return NotFound();
+            }
+            return NoContent();
         }
     }
 }

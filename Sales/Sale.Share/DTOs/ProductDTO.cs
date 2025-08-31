@@ -48,7 +48,7 @@ namespace Sale.Share.DTOs
         [DisplayFormat(DataFormatString = "{0:N2}")]
         [Display(Name = "Inventory")]
         [Required(ErrorMessage = "Field {0} is required.")]
-        public decimal Stock { get; set; }
+        public decimal Stock { get; set; }       
         public int BrandId { get; set; }       
 
         public bool HasSerial { get; set; }

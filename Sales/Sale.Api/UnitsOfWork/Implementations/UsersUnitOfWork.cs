@@ -28,7 +28,7 @@ namespace Sale.Api.UnitsOfWork.Implementations
         public async Task<string> GenerateEmailConfirmationTokenAsync(User user)
         => await _usersRepository.GenerateEmailConfirmationTokenAsync(user);
         public async Task<string> GeneratePasswordResetTokenAsync(User user)
-        => await _usersRepository.GenerateEmailConfirmationTokenAsync(user);
+        => await _usersRepository.GeneratePasswordResetTokenAsync(user);
         public async Task<ActionResponse<IEnumerable<User>>> GetAsync(PaginationDTO pagination)
         => await _usersRepository.GetAsync(pagination);
         public async Task<ActionResponse<int>> GetRecordsNumberAsync(PaginationDTO pagination)

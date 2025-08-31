@@ -28,6 +28,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="images\categories\" />
+    <Folder Include="images\subcategories\" />
     <Folder Include="images\users\" />
     <Folder Include="images\products\" />
   </ItemGroup>

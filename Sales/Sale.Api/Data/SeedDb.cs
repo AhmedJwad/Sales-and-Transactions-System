@@ -4,6 +4,7 @@ using Sale.Api.UnitsOfWork.Interfaces;
 using Sale.Share.Entities;
 using Sale.Share.Enums;
 using System.Runtime.InteropServices;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Sale.Api.Data
 {
@@ -100,13 +101,12 @@ namespace Sale.Api.Data
         }
 
         private async Task CheckCategoriesAsync()
-        {
-
+        {          
             if (!_context.Categories.Any())
             {
                 _context.Categories.Add(new Category
                 {
-                    Name = "Apple",
+                    Name = "Apple",                    
                     subcategories =
                     [
                         new Subcategory { Name = "iPhone 16", Brands = [ new Brand { Name = "Apple" } ] },
@@ -293,6 +293,7 @@ namespace Sale.Api.Data
                 Price = price,
                 Stock = 10,
                 DesiredProfit = desiredProfit,
+                CreatedAt=DateTime.UtcNow,
                 serialNumbers = new List<SerialNumber>(),
                 HasSerial = true,
                 ProductImages = new List<ProductImage>(),

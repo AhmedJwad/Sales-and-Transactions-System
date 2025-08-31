@@ -13,12 +13,11 @@ namespace Sale.Api.UnitsOfWork.Implementations
         public CategoriesUnitOfWork(IGenericRepository<Category> repository , ICategoriesRepository categoriesRepository) : base(repository)
         {
            _categoriesRepository = categoriesRepository;
-        }
-
+        }        
         public override async Task<ActionResponse<IEnumerable<Category>>> GetAsync(PaginationDTO pagination)
        =>await _categoriesRepository.GetAsync(pagination);
 
-        public async Task<IEnumerable<Category>> GetComboAsync()
+        public async Task<IEnumerable<CategoryDTO>> GetComboAsync()
         => await _categoriesRepository.GetComboAsync();
 
         public override async Task<ActionResponse<int>> GetRecordsNumberAsync(PaginationDTO pagination)
@@ -26,5 +25,13 @@ namespace Sale.Api.UnitsOfWork.Implementations
 
         public override async Task<ActionResponse<int>> GetTotalPagesAsync(PaginationDTO pagination)
         => await _categoriesRepository.GetTotalPagesAsync(pagination);
+
+        public async Task<ActionResponse<Category>> UpdateFullAsync(CategoryDTO categoryDTO)
+        => await _categoriesRepository.UpdateFullAsync(categoryDTO);
+        public async Task<ActionResponse<Category>> AddFullAsync(CategoryDTO categoryDTO)
+        =>await _categoriesRepository.AddFullAsync(categoryDTO);
+        public override async Task<ActionResponse<Category>>DeleteAsync(int Id)
+        => await _categoriesRepository.DeleteAsync(Id);
+
     }
 }

@@ -13,6 +13,7 @@ namespace Sale.Share.Entities
         public Product? Product { get; set; }
         public int ProductId { get; set; }
         [Display(Name = "Image")]
-        public string Image { get; set; } = null!;
+        public string Image { get; set; } = null!;        
+        public ICollection<ProductColorImage>? productColorImages { get; set; }
     }
 }

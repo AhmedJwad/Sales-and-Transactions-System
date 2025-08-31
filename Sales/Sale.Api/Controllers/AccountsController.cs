@@ -90,12 +90,12 @@ namespace Sale.Api.Controllers
             if(user== null)
             {
                 return NotFound();
-            }
-            var result = await _usersUnitOfWork.ResetPasswordAsync(user, model.Password, model.Token);
+            }           
+            var result = await _usersUnitOfWork.ResetPasswordAsync(user, model.token, model.Password);
             if(result.Succeeded)
             {
                 return NoContent();
-            }
+            }           
             return BadRequest(result.Errors!.FirstOrDefault()!.Description);
         }
         [HttpPost("ResedToken")]
@@ -117,8 +117,8 @@ namespace Sale.Api.Controllers
         [HttpGet("ConfirmEmail")]
         public async Task<IActionResult> ConfirmEmailAsync(string userId, string token)
         {
-            token = token.Replace(" ", "+");
-            var user = await _usersUnitOfWork.GetUserAsync(userId);
+            token = token.Replace(" ", "+");            
+            var user = await _usersUnitOfWork.GetUserAsync(new Guid(userId));
             if(user ==null)
             {
                 return NotFound();
@@ -147,16 +147,20 @@ namespace Sale.Api.Controllers
                     var photoUser =Convert.FromBase64String(user.Photo);
                     user.Photo = await _fileStorage.SaveFileAsync(photoUser, ".jpg", "users");
                 }
-                currentUser.LastName = user.FirstName;
-                currentUser.FirstName= user.LastName;
+                currentUser.FirstName = user.FirstName;
+                currentUser.LastName= user.LastName;
                 currentUser.Address = user.Address;
                 currentUser.CountryCode = user.CountryCode;
                 currentUser.Photo = !string.IsNullOrEmpty(user.Photo) && user.Photo != currentUser.Photo ? user.Photo : currentUser.Photo;
                 currentUser.CityId = user.CityId;
+                currentUser.Latitude = user.Latitude;
+                currentUser.Longitude = user.Longitude; 
                 var result = await _usersUnitOfWork.UpdateUserAsync(currentUser);
                 if (result.Succeeded)
                 {
-                    return Ok(BuildToken(currentUser));
+                    //return Ok(BuildToken(currentUser));
+                    var token = BuildToken(currentUser);
+                    return Ok(new { token });
                 }
 
                 return BadRequest(result.Errors.FirstOrDefault());
@@ -177,7 +181,7 @@ namespace Sale.Api.Controllers
         [HttpPost("CreateUser")]
         public async Task<IActionResult> CreateUser([FromBody] UserDTO model)
         {
-            User user = model;
+            User user = model;            
             if(!string.IsNullOrEmpty(model.Photo))
             {
                 var photoUser = Convert.FromBase64String(model.Photo);
@@ -256,6 +260,8 @@ namespace Sale.Api.Controllers
             {
                 new(ClaimTypes.Name, user.Email!),
                 new(ClaimTypes.Role, user.UserType.ToString()),
+                new ("PhoneNumber", user.PhoneNumber!),
+                new("CountryCode", user.CountryCode),
                 new("FirstName", user.FirstName),
                 new("LastName", user.LastName),
                 new("Address", user.Address),
@@ -264,9 +270,9 @@ namespace Sale.Api.Controllers
             };
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["jwtKey"]!));
             var credentials=new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var expiration =DateTime.Now.AddDays(3);
+            var expiration =DateTime.Now.AddHours(8);
             var refreshToken = GenerateRefreshToken();
-            var refreshTokenExpiration = DateTime.Now.AddDays(7);
+            var refreshTokenExpiration = DateTime.Now.AddDays(90);
             var token = new JwtSecurityToken
             (
                 issuer:null,
@@ -310,6 +316,7 @@ namespace Sale.Api.Controllers
         }
 
         [HttpPost("RefreshToken")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> RefreshTokenAsync([FromBody]TokenDTO model)
         {
             if (string.IsNullOrEmpty(model.RefreshToken))

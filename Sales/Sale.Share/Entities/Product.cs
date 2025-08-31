@@ -65,6 +65,7 @@ namespace Sale.Share.Entities
         [Required(ErrorMessage = "Field {0} is required.")]
         public decimal Stock { get; set; }        
         public bool HasSerial { get; set; }
+        public DateTime CreatedAt { get; set; }
         public ICollection<ProductsubCategory>? productsubCategories { get; set; }
         public int BrandId { get; set; }
         public Brand? brand { get; set; }
@@ -78,7 +79,10 @@ namespace Sale.Share.Entities
 
         [Display(Name = "Main Image")]
         public string MainImage => ProductImages?.FirstOrDefault()?.Image ?? string.Empty;
-
         public ICollection<SerialNumber>? serialNumbers { get; set; }
+        public ICollection<ProductColor>? productColor { get; set; }
+        public ICollection<productSize>? productSize { get; set; }
+        public ICollection<ProductDiscount>? productDiscount { get; set; }
+        public ICollection<Rating>? rating { get; set; }   
     }
 }

@@ -21,6 +21,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers()
  .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole(); 
 
 
 //.AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
@@ -50,6 +52,10 @@ builder.Services.AddScoped<ICitiesRepository, CitiesRepository>();
 builder.Services.AddScoped<IMailHelper, MailHelper>();
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<IUsersUnitOfWork, UsersUnitOfWork>();
+builder.Services.AddScoped<IcolourRepository, ColourRepositorycs>();
+builder.Services.AddScoped<IcolourUnitofWorks, ColourUnitofWork>();
+builder.Services.AddScoped<IsizeRepository , SizeRepository>();
+builder.Services.AddScoped<IsizeUnitofWorks, SizeUnitofWorks>();
 builder.Services.AddIdentity<User, IdentityRole>(x =>
 {
     x.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
@@ -106,6 +112,24 @@ app.UseStaticFiles(new StaticFileOptions
     FileProvider = new PhysicalFileProvider(
            Path.Combine(builder.Environment.ContentRootPath, "images/products")),
     RequestPath = "/images/products"
+});
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+           Path.Combine(builder.Environment.ContentRootPath, "images/users")),
+    RequestPath = "/images/users"
+});
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+           Path.Combine(builder.Environment.ContentRootPath, "images/categories")),
+    RequestPath = "/images/categories"
+});
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+           Path.Combine(builder.Environment.ContentRootPath, "images/subcategories")),
+    RequestPath = "/images/subcategories"
 });
 app.UseCors(x => x
            .AllowAnyMethod()

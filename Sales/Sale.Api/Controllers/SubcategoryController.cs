@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Sale.Api.UnitsOfWork.Implementations;
 using Sale.Api.UnitsOfWork.Interfaces;
 using Sale.Share.DTOs;
 using Sale.Share.Entities;
@@ -8,6 +10,7 @@ using Sale.Share.Entities;
 namespace Sale.Api.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
     public class SubcategoryController : GenericController<Subcategory>
     {
@@ -33,6 +36,12 @@ namespace Sale.Api.Controllers
         {
             return Ok(await _iSubcategoriesUnitofWorks.GetComboAsync());
         }
+        [AllowAnonymous]
+        [HttpGet("combocategory/{categoryId}")]
+        public async Task<IActionResult> GetComboAsync(int categoryId)
+        {
+            return Ok(await _iSubcategoriesUnitofWorks.GetComboAsync(categoryId));
+        }
 
         [HttpGet]
         public override async Task<IActionResult> GetAsync([FromQuery] PaginationDTO pagination)
@@ -55,6 +64,36 @@ namespace Sale.Api.Controllers
             }
             return BadRequest();
         }
+        [HttpPost("full")]
+        public async Task<IActionResult> PostFullAsync(SubcategoryDTO subcategoryDTO)
+        {
+            var action = await _iSubcategoriesUnitofWorks.AddFullAsync(subcategoryDTO);
+            if (action.WasSuccess)
+            {
+                return Ok(action.Result);
+            }
+            return NotFound(action.Message);
+        }
 
+        [HttpPut("full")]
+        public async Task<IActionResult> PutFullAsync(SubcategoryDTO subcategoryDTO)
+        {
+            var action = await _iSubcategoriesUnitofWorks.UpdateFullAsync(subcategoryDTO);
+            if (action.WasSuccess)
+            {
+                return Ok(action.Result);
+            }
+            return NotFound(action.Message);
+        }
+        [HttpDelete("{id}")]
+        public override async Task<IActionResult> DeleteAsync(int id)
+        {
+            var action = await _iSubcategoriesUnitofWorks.DeleteAsync(id);
+            if (!action.WasSuccess)
+            {
+                return NotFound();
+            }
+            return NoContent();
+        }
     }
 }
