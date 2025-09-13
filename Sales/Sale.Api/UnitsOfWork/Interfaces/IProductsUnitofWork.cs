@@ -19,5 +19,6 @@ namespace Sale.Api.UnitsOfWork.Interfaces
         Task<ActionResponse<Product>> UpdateFullAsync(ProductDTO productDTO);
         Task<IEnumerable<CategoryProductDTO>> GetProductCountByCategoryAsync();
         Task<ActionResponse<IEnumerable<ProductDTO>>> GetProductsBySubcategoryAsync(int subcategoryId);
+        Task<ActionResponse<IEnumerable<ProductResponseDTO>>> FilterProducts(ProductFilterDto productFilterDto);
     }
 }

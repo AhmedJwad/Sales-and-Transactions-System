@@ -6,6 +6,8 @@ using Sale.Share.DTOs;
 using Sale.Share.Entities;
 using Sale.Share.Response;
 using Sale.Share.Responses;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Sale.Api.Repositories.Implementations
 {
@@ -35,14 +37,57 @@ namespace Sale.Api.Repositories.Implementations
                     HasSerial = productDTO.HasSerial,
                     CreatedAt = DateTime.UtcNow,
                     productsubCategories = new List<ProductsubCategory>(),
+                    productColor=new List<ProductColor>(),
                     ProductImages = new List<ProductImage>(),
                     serialNumbers = new List<SerialNumber>(),
+                    productSize=new List<productSize>(),
+                    BrandId=productDTO.BrandId,
+                    brand=_context.brands.Find(productDTO.BrandId),
 
                 };
+                var colors = await _context.colors!.Where(c => productDTO.ProductColorIds!.Contains(c.Id)).ToListAsync();
+                foreach (var color in colors)
+                {
+                    if (!product.productColor!.Any(pc => pc.ColorId == color.Id))
+                    {
+                        product.productColor!.Add(new ProductColor
+                        {
+                            ProductId = product.Id,
+                            ColorId = color.Id
+                        });
+                    }
+                }
+
+                var sizes = await _context.sizes!.Where(c => productDTO.ProductSizeIds!.Contains(c.Id)).ToListAsync();
+                foreach (var size in sizes)
+                {
+                    if (!product.productSize!.Any(pc => pc.SizeId == size.Id))
+                    {
+                        product.productSize!.Add(new productSize
+                        {
+                           productId = product.Id,
+                            SizeId = size.Id
+                        });
+                    }
+                }
                 foreach (var image in productDTO.ProductImages!)
                 {
                     var productPhoto = Convert.FromBase64String(image);
-                    product.ProductImages.Add(new ProductImage { Image = await _fileStorage.SaveFileAsync(productPhoto,".jpg" , "products") }); 
+                    var newImage = await _fileStorage.SaveFileAsync(productPhoto, ".jpg", "products");
+                    //product.ProductImages.Add(new ProductImage { Image = await _fileStorage.SaveFileAsync(productPhoto,".jpg" , "products") });
+
+                    var productImage = new ProductImage
+                    {
+                        ProductId = product.Id,
+                        Image = newImage,
+                        productColorImages = colors.Select(c => new ProductColorImage
+                        {
+                            ColorId = c.Id,
+
+
+                        }).ToList()
+                    };
+                    product.ProductImages!.Add(productImage);
                 }
                 var subCategories = await _context.subcategories!
                                         .Include(x => x.Brands)
@@ -154,19 +199,17 @@ namespace Sale.Api.Repositories.Implementations
                 {
                     var photoProduct = Convert.FromBase64String(imageDTO.Images[i]);
                     imageDTO.Images[i] = await _fileStorage.SaveFileAsync(photoProduct, ".png", "products");
-                    
-                }
-                var productImage = new ProductImage
-                {
-                    ProductId = product.Id,
-                    Image = imageDTO.Images[i],
-                    productColorImages = colors.Select(c => new ProductColorImage
+                    var productImage = new ProductImage
                     {
-                        ColorId = c.Id
-                       
-                    }).ToList()
-                };
-                product.ProductImages!.Add(productImage);
+                        ProductId = product.Id,
+                        Image = imageDTO.Images[i],
+                        productColorImages = colors.Select(c => new ProductColorImage
+                        {
+                            ColorId = c.Id,
+                        }).ToList()
+                    };
+                    product.ProductImages!.Add(productImage);
+                }               
             }
             _context.Update(product);         
            
@@ -222,7 +265,8 @@ namespace Sale.Api.Repositories.Implementations
         {
             var product=await _context.Products!.Include(x=>x.ProductImages!)
                 .Include(x=>x.productsubCategories!).ThenInclude(x=>x.Category).ThenInclude(x=>x.Category).Include(x=>x.serialNumbers)
-                .FirstOrDefaultAsync(x=>x.Id == id);
+                .Include(x=>x.productColor!).ThenInclude(x=>x.color).Include(x=>x.productSize!).ThenInclude(x=>x.size)
+                .Include(x=>x.brand).FirstOrDefaultAsync(x=>x.Id == id);
             if(product == null)
             {
                 return new ActionResponse<Product>
@@ -240,8 +284,9 @@ namespace Sale.Api.Repositories.Implementations
 
         public override async Task<ActionResponse<IEnumerable<Product>>> GetAsync(PaginationDTO pagination)
         {
-            var queryable = _context.Products.Include(x => x.productsubCategories!)
-                .Include(x => x.ProductImages).Include(x => x.brand).Include(x => x.serialNumbers).AsQueryable();
+            var queryable = _context.Products.Include(x => x.productsubCategories!).ThenInclude(x=>x.Category).Include(x=>x.productColor!)
+                .ThenInclude(x=>x.color).Include(x => x.ProductImages).Include(x => x.brand)
+                .Include(x => x.serialNumbers).Include(x=>x.productSize!).ThenInclude(x=>x.size).AsQueryable();
             if(!string.IsNullOrWhiteSpace(pagination.Filter))
             {
                 queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
@@ -315,7 +360,8 @@ namespace Sale.Api.Repositories.Implementations
 
         public async Task<ActionResponse<ImageDTO>> RemoveLastImageAsync(ImageDTO imageDTO)
         {
-            var product = await _context.Products.Include(x => x.ProductImages).FirstOrDefaultAsync(x => x.Id == imageDTO.ProductId);
+            var product = await _context.Products.Include(x => x.ProductImages!).ThenInclude(x=>x.productColorImages)
+                .Include(x=>x.productColor).FirstOrDefaultAsync(x => x.Id == imageDTO.ProductId);
             if(product == null)
             {
                 return new ActionResponse<ImageDTO>
@@ -333,8 +379,17 @@ namespace Sale.Api.Repositories.Implementations
                 };
             }
             var lastImage=product.ProductImages.LastOrDefault();
-            await _fileStorage.RemoveFileAsync(lastImage!.Image, "products");
-            _context.ProductImages.Remove(lastImage);
+            if(lastImage !=null)
+            {
+                await _fileStorage.RemoveFileAsync(lastImage!.Image, "products");
+                if (lastImage.productColorImages != null && lastImage.productColorImages.Any())
+                {
+                    _context.productColorImages.RemoveRange(lastImage.productColorImages);
+                }              
+
+            }         
+           
+            _context.ProductImages.Remove(lastImage!);
             await _context.SaveChangesAsync();
             imageDTO.Images=product.ProductImages.Select(x=>x.Image).ToList();
             return new ActionResponse<ImageDTO>
@@ -349,7 +404,8 @@ namespace Sale.Api.Repositories.Implementations
             try
             {
                 var product = await _context.Products.Include(x => x.productsubCategories!).ThenInclude(x => x.Category).ThenInclude(x => x.Category)
-                    .Include(x => x.brand).Include(x => x.serialNumbers).FirstOrDefaultAsync(x => x.Id == productDTO.Id);
+                    .Include(x => x.brand).Include(x => x.serialNumbers).Include(x=>x.productColor).Include(x=>x.productSize)
+                    .FirstOrDefaultAsync(x => x.Id == productDTO.Id);
                 if (product == null)
                 {
                     return new ActionResponse<Product>
@@ -367,15 +423,43 @@ namespace Sale.Api.Repositories.Implementations
                 product.Barcode=productDTO.Barcode;               
                 _context.productsubCategories.RemoveRange(product.productsubCategories!);
                 product.productsubCategories = new List<ProductsubCategory>();
-
+                _context.productColors.RemoveRange(product.productColor!);
+                product.productColor = new List<ProductColor>();
+                _context.productSizes.RemoveRange(product.productSize!);
+                product.productSize = new List<productSize>();
                 var subcategories = await _context.subcategories
                                   .Include(x => x.Brands)
                                   .Where(x => productDTO.ProductCategoryIds!.Contains(x.Id))
                                   .ToListAsync();
+                product.BrandId = productDTO.BrandId;
                 foreach (var item in subcategories!)
                 {                   
                     _context.productsubCategories.Add(new ProductsubCategory { subcategoryId = item!.Id, ProductId = product.Id });
                     
+                }
+                var colors = await _context.colors!.Where(c => productDTO.ProductColorIds!.Contains(c.Id)).ToListAsync();
+                foreach (var color in colors)
+                {
+                    if (!product.productColor!.Any(pc => pc.ColorId == color.Id))
+                    {
+                        _context.productColors!.Add(new ProductColor
+                        {
+                            ProductId = product.Id,
+                            ColorId = color.Id
+                        });
+                    }
+                }
+                var sizes = await _context.sizes!.Where(c => productDTO.ProductSizeIds!.Contains(c.Id)).ToListAsync();
+                foreach (var size in sizes)
+                {
+                    if (!product.productSize!.Any(pc => pc.SizeId == size.Id))
+                    {
+                        _context.productSizes!.Add(new productSize
+                        {
+                            productId = product.Id,
+                            SizeId = size.Id
+                        });
+                    }
                 }
                 _context.Update(product);
                 await _context.SaveChangesAsync();
@@ -442,6 +526,83 @@ namespace Sale.Api.Repositories.Implementations
             {
                 WasSuccess=true,
                 Result=products,
+            };
+        }
+
+        public async Task<ActionResponse<IEnumerable<ProductResponseDTO>>> FilterProducts(ProductFilterDto productFilterDto)
+        {
+            var queryable = _context.Products.Include(pc => pc.productColor!).ThenInclude(c => c.color).Include(ps => ps.productSize!)
+                 .ThenInclude(s => s.size).Include(b => b.brand).Include(pi => pi.ProductImages)
+                 .Include(sn => sn.serialNumbers).Include(x=>x.productsubCategories!).ThenInclude(x=>x.Category).AsQueryable();           
+
+            if (productFilterDto.BrandId.HasValue)
+            {
+                queryable = queryable.Where(p => p.BrandId == productFilterDto.BrandId);
+            }           
+
+            if (productFilterDto.ColorIds != null && productFilterDto.ColorIds.Any())
+            {
+                queryable = queryable.Where(p => p.productColor!.Any(pc => productFilterDto.ColorIds.Contains(pc.ColorId)));
+            }
+            if (productFilterDto.SizeIds != null && productFilterDto.SizeIds.Any())
+            {
+                queryable = queryable.Where(p => p.productSize!.Any(ps => productFilterDto.SizeIds.Contains(ps.SizeId)));
+            }
+            if (productFilterDto.MaxPrice.HasValue)
+            {
+                queryable = queryable.Where(p => p.Price <= productFilterDto.MaxPrice);
+            }
+            if (productFilterDto.MinPrice.HasValue)
+            {
+                queryable = queryable.Where(p => p.Price >= productFilterDto.MinPrice);
+            }
+            var products = await queryable.ToListAsync();
+            if (!products.Any())
+            {
+                return new ActionResponse<IEnumerable<ProductResponseDTO>>
+                {
+                    WasSuccess = false,
+                    Message = "No products found with the given filters"
+                };
+            }
+            var productresponse = products.Select(p => new ProductResponseDTO
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Description = p.Description,
+                DesiredProfit = p.DesiredProfit,
+                Barcode = p.Barcode,
+                brand = tobrand(p.brand),
+                Price = p.Price,
+                BrandId = p.BrandId,
+                Cost = p.Cost,
+                HasSerial = p.HasSerial,
+                ProductColor = p.productColor!.Select(pc => pc.color!.Name).ToList(),
+                ProductSize = p.productSize!.Select(ps => ps.size!.Name).ToList(),
+                ProductImages = p.ProductImages!.Select(pi => pi.Image).ToList(),
+                ProductSubCategories = p.productsubCategories!.Select(ps => ps.Category!.Name).ToList(),
+                SerialNumbers = p.serialNumbers!.Select(sn => sn.SerialNumberValue).ToList(),
+                Stock = p.Stock,
+            });
+            return new ActionResponse<IEnumerable<ProductResponseDTO>>
+            {
+                WasSuccess = true,
+                Result = productresponse,
+            };
+
+        }
+
+        private BrandDTO tobrand(Brand? brand)
+        {
+            if (brand == null)
+            {
+                return new BrandDTO();
+            }
+                
+            return new BrandDTO
+            {
+                Id = brand!.Id,
+                Name = brand.Name
             };
         }
     }

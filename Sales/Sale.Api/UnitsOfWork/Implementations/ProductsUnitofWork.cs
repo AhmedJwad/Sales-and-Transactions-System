@@ -21,6 +21,8 @@ namespace Sale.Api.UnitsOfWork.Implementations
        => await _productRepository.AddImageAsync(imageDTO);
         public override async Task<ActionResponse<Product>> DeleteAsync(int id)
         => await _productRepository.DeleteAsync(id);
+
+        
         public override async Task<ActionResponse<Product>> GetAsync(int id)
         => await _productRepository.GetAsync(id);
         public override async Task<ActionResponse<IEnumerable<Product>>> GetAsync(PaginationDTO pagination)
@@ -29,10 +31,8 @@ namespace Sale.Api.UnitsOfWork.Implementations
         => await _productRepository.GetComboAsync();
         public async Task<IEnumerable<CategoryProductDTO>> GetProductCountByCategoryAsync()
         => await _productRepository.GetProductCountByCategoryAsync();
-
         public async Task<ActionResponse<IEnumerable<ProductDTO>>> GetProductsBySubcategoryAsync(int subcategoryId)
        => await _productRepository.GetProductsBySubcategoryAsync(subcategoryId);
-
         public override async Task<ActionResponse<int>> GetRecordsNumberAsync(PaginationDTO pagination)
         => await _productRepository.GetRecordsNumberAsync(pagination);
         public override async Task<ActionResponse<int>> GetTotalPagesAsync(PaginationDTO pagination)
@@ -41,5 +41,7 @@ namespace Sale.Api.UnitsOfWork.Implementations
         => await _productRepository.RemoveLastImageAsync(imageDTO);
         public async Task<ActionResponse<Product>> UpdateFullAsync(ProductDTO productDTO)
         => await _productRepository.UpdateFullAsync(productDTO);
+        public async Task<ActionResponse<IEnumerable<ProductResponseDTO>>> FilterProducts(ProductFilterDto productFilterDto)
+        => await _productRepository.FilterProducts(productFilterDto);
     }
 }

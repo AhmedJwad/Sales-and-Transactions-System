@@ -6,6 +6,7 @@ using Sale.Api.UnitsOfWork.Implementations;
 using Sale.Api.UnitsOfWork.Interfaces;
 using Sale.Share.DTOs;
 using Sale.Share.Entities;
+using Sale.Share.Response;
 
 namespace Sale.Api.Controllers
 {
@@ -77,9 +78,39 @@ namespace Sale.Api.Controllers
             var response = await _productsUnitOfWork.GetAsync(pagination);
             if (response.WasSuccess)
             {
-                return Ok(response.Result);
+                var dtoList = response.Result!.Select(p => new ProductResponseDTO
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Barcode = p.Barcode,
+                    Description = p.Description,
+                    Price = p.Price,
+                    Cost = p.Cost,
+                    DesiredProfit = p.DesiredProfit,
+                    Stock = p.Stock,
+                    BrandId = p.BrandId,
+                    HasSerial = p.HasSerial,
+                    ProductSubCategories = p.productsubCategories?.Where(sc=>sc.Category!=null).Select(sc => sc.Category!.Name).ToList(),
+                    ProductColor = p.productColor?.Where(c=>c.color!=null).Select(c => c.color!.HexCode).ToList(),
+                    ProductSize = p.productSize?.Where(s=>s.size!=null).Select(s => s.size!.Name).ToList(),
+                    ProductImages = p.ProductImages?.Select(img => img.Image).ToList(),
+                    SerialNumbers = p.serialNumbers?.Where(sn=>sn.SerialNumberValue!=null).Select(sn => sn.SerialNumberValue).ToList(),
+                    brand=tobranddto(p.brand)
+                    
+                }).ToList();
+
+                return Ok(dtoList);
             }
             return BadRequest();
+        }
+
+        private BrandDTO tobranddto(Brand? brand)
+        {
+            return new BrandDTO
+            {
+                Id = brand!.Id,
+                Name = brand.Name,
+            };
         }
 
         [AllowAnonymous]
@@ -139,6 +170,18 @@ namespace Sale.Api.Controllers
         {
             var result=await _productsUnitOfWork.GetProductsBySubcategoryAsync(subcategoryId);
             if(result.WasSuccess)
+            {
+                return Ok(result.Result);
+            }
+            return NotFound(result.Message);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("productfilter")]
+        public async Task<IActionResult> GetProductbyfilter([FromBody]ProductFilterDto productFilterDto)
+        {
+            var result = await _productsUnitOfWork.FilterProducts(productFilterDto);
+            if (result.WasSuccess)
             {
                 return Ok(result.Result);
             }

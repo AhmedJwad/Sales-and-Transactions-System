@@ -82,7 +82,13 @@ namespace Sale.Api.Data
                      .WithOne(sn => sn.product)
                      .HasForeignKey(sn => sn.productID)
                      .OnDelete(DeleteBehavior.Cascade);
-          
+
+                     modelBuilder.Entity<ProductImage>()
+                    .HasMany(pi => pi.productColorImages)
+                    .WithOne(pci => pci.productImage)
+                    .HasForeignKey(pci => pci.ProductImageId)
+                    .OnDelete(DeleteBehavior.Cascade);
+           
         }
 
         

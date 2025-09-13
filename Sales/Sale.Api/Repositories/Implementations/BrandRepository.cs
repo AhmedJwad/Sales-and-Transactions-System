@@ -5,6 +5,7 @@ using Sale.Api.Repositories.Interfaces;
 using Sale.Share.DTOs;
 using Sale.Share.Entities;
 using Sale.Share.Responses;
+using System.Collections.Immutable;
 
 namespace Sale.Api.Repositories.Implementations
 {
@@ -35,6 +36,11 @@ namespace Sale.Api.Repositories.Implementations
         public async Task<IEnumerable<Brand>> GetComboAsync(int subcategoryId)
         {
             return await _context.brands.Where(x=>x.SubcategoryId==subcategoryId).OrderBy(x=>x.Name).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Brand>> GetComboAsync()
+        {
+            return await _context.brands.OrderBy(b => b.Name).ToListAsync();
         }
 
         public override async Task<ActionResponse<int>> GetRecordsNumberAsync(PaginationDTO pagination)

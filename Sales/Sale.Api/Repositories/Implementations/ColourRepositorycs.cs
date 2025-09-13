@@ -46,7 +46,7 @@ namespace Sale.Api.Repositories.Implementations
 
         public override async Task<ActionResponse<IEnumerable<Colour>>> GetAsync(PaginationDTO pagination)
         {
-            var queryable = _context.colors!.Include(x=>x.productColor!).ThenInclude(x=>x.Product).AsQueryable();
+            var queryable = _context.colors!.AsQueryable();
             if (!string.IsNullOrWhiteSpace(pagination.Filter))
             {
                 queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
