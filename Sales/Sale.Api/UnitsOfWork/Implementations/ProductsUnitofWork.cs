@@ -43,5 +43,10 @@ namespace Sale.Api.UnitsOfWork.Implementations
         => await _productRepository.UpdateFullAsync(productDTO);
         public async Task<ActionResponse<IEnumerable<ProductResponseDTO>>> FilterProducts(ProductFilterDto productFilterDto)
         => await _productRepository.FilterProducts(productFilterDto);
+        public async Task<ActionResponse<IEnumerable<ProductResponseDTO>>> GetfullProduct()
+        =>  await _productRepository.GetfullProduct();
+
+        public async Task<ActionResponse<List<Product>>> GetProductsByIdsAsync(List<int> ids)
+        => await _productRepository.GetProductsByIdsAsync(ids);
     }
 }

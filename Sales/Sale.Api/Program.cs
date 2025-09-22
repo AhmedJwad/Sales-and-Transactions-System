@@ -38,6 +38,7 @@ builder.Services.AddScoped(typeof(IGenericUnitOfWork<>), typeof(GenericUnitOfWor
 builder.Services.AddScoped<ICategoriesRepository, CategoriesRepository>();
 builder.Services.AddScoped<ICategoriesUnitOfWork, CategoriesUnitOfWork>();
 builder.Services.AddScoped<IFileStorage, FileStorage>();
+builder.Services.AddScoped<IorderHelper, OrderHelpers>();
 builder.Services.AddScoped<ISubcategoryRepository, SubcategoryRepository>();
 builder.Services.AddScoped<iSubcategoriesUnitofWorks, SubcategoriesUnitofWorks>();
 builder.Services.AddScoped<IbrandRepository, BrandRepository>();
@@ -57,6 +58,8 @@ builder.Services.AddScoped<IcolourRepository, ColourRepositorycs>();
 builder.Services.AddScoped<IcolourUnitofWorks, ColourUnitofWork>();
 builder.Services.AddScoped<IsizeRepository , SizeRepository>();
 builder.Services.AddScoped<IsizeUnitofWorks, SizeUnitofWorks>();
+builder.Services.AddScoped<IOrdersRepository, OrdersRepository>();
+builder.Services.AddScoped<IorderUnitofWorks,OrderUnitofWorks>();
 builder.Services.AddIdentity<User, IdentityRole>(x =>
 {
     x.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;

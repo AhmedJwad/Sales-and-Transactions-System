@@ -537,24 +537,44 @@ namespace Sale.Api.Repositories.Implementations
 
             if (productFilterDto.BrandId.HasValue)
             {
-                queryable = queryable.Where(p => p.BrandId == productFilterDto.BrandId);
+               var temp = queryable.Where(p => p.BrandId == productFilterDto.BrandId);
+                if (await temp.AnyAsync())
+                {
+                    queryable = temp;
+                }
             }           
 
             if (productFilterDto.ColorIds != null && productFilterDto.ColorIds.Any())
             {
-                queryable = queryable.Where(p => p.productColor!.Any(pc => productFilterDto.ColorIds.Contains(pc.ColorId)));
+                var temp = queryable.Where(p => p.productColor!.Any(pc => productFilterDto.ColorIds.Contains(pc.ColorId)));
+                if (await temp.AnyAsync())
+                {
+                    queryable = temp;
+                }
             }
             if (productFilterDto.SizeIds != null && productFilterDto.SizeIds.Any())
             {
-                queryable = queryable.Where(p => p.productSize!.Any(ps => productFilterDto.SizeIds.Contains(ps.SizeId)));
+                var temp = queryable.Where(p => p.productSize!.Any(ps => productFilterDto.SizeIds.Contains(ps.SizeId)));
+                if (await temp.AnyAsync())
+                {
+                    queryable = temp;
+                }
             }
             if (productFilterDto.MaxPrice.HasValue)
             {
-                queryable = queryable.Where(p => p.Price <= productFilterDto.MaxPrice);
+               var temp = queryable.Where(p => p.Price <= productFilterDto.MaxPrice);
+                if (await temp.AnyAsync())
+                {
+                    queryable = temp;
+                }
             }
             if (productFilterDto.MinPrice.HasValue)
             {
-                queryable = queryable.Where(p => p.Price >= productFilterDto.MinPrice);
+                var temp = queryable.Where(p => p.Price >= productFilterDto.MinPrice);
+                if (await temp.AnyAsync())
+                {
+                    queryable = temp;
+                }
             }
             var products = await queryable.ToListAsync();
             if (!products.Any())
@@ -605,5 +625,60 @@ namespace Sale.Api.Repositories.Implementations
                 Name = brand.Name
             };
         }
+
+        public async Task<ActionResponse<IEnumerable<ProductResponseDTO>>> GetfullProduct()
+        {
+            var product =await _context.Products.Select(p => new ProductResponseDTO
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Description = p.Description,
+                DesiredProfit = p.DesiredProfit,
+                Barcode = p.Barcode,
+                Cost = p.Cost,
+                Stock = p.Stock,
+                HasSerial = p.HasSerial,
+                Price = p.Price,
+                brand = p.brand != null ? new BrandDTO
+                {
+                    Id=p.brand.Id,
+                    Name=p.brand.Name,
+                } : null,
+                ProductSubCategories=p.productsubCategories!.Where
+                (sc=>sc.Category != null).Select(sc=>sc.Category!.Name).ToList(),
+                ProductImages=p.ProductImages!.Select(pi=>pi.Image).ToList(),
+                ProductColor=p.productColor!.Where(pc=>pc.color!=null).Select(pc=>pc.color!.HexCode).ToList(),
+                ProductSize=p.productSize!.Where(ps=>ps.size !=null).Select(ps=>ps.size!.Name).ToList(),
+            }).ToListAsync();
+            return new ActionResponse<IEnumerable<ProductResponseDTO>>
+            {
+                WasSuccess = true,
+                Result = product,
+            };
+        }
+        public async Task<ActionResponse<List<Product>>> GetProductsByIdsAsync(List<int> ids)
+        {
+            try
+            {
+                var products = await _context.Products
+                    .Where(p => ids.Contains(p.Id))                    
+                    .ToListAsync();
+
+                return new ActionResponse<List<Product>>
+                {
+                    WasSuccess = true,
+                    Result = products
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ActionResponse<List<Product>>
+                {
+                    WasSuccess = false,
+                    Message = ex.Message
+                };
+            }
+        }
+
     }
 }

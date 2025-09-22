@@ -104,6 +104,7 @@ namespace Sale.Api.Controllers
             return BadRequest();
         }
 
+        [AllowAnonymous]
         private BrandDTO tobranddto(Brand? brand)
         {
             return new BrandDTO
@@ -127,7 +128,6 @@ namespace Sale.Api.Controllers
 
         [AllowAnonymous]
         [HttpGet("{id}")]
-
         public override async Task<IActionResult> GetAsync(int id)
         {
             var action = await _productsUnitOfWork.GetAsync(id);
@@ -177,10 +177,22 @@ namespace Sale.Api.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("productfilter")]
-        public async Task<IActionResult> GetProductbyfilter([FromBody]ProductFilterDto productFilterDto)
+        [HttpPost("productfilter")]
+        public async Task<IActionResult> GetProductbyfilter([FromBody] ProductFilterDto productFilterDto)
         {
             var result = await _productsUnitOfWork.FilterProducts(productFilterDto);
+            if (result.WasSuccess)
+            {
+                return Ok(result.Result);
+            }
+            return NotFound(result.Message);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("getfullproduct")]
+        public async Task<IActionResult>GetFullProduct()
+        {
+            var result = await _productsUnitOfWork.GetfullProduct();
             if (result.WasSuccess)
             {
                 return Ok(result.Result);

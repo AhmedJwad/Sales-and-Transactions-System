@@ -55,5 +55,7 @@ namespace Sale.Share.Entities
         [Display(Name = "User")]
         public string FullName => $"{FirstName} {LastName}";
         public ICollection<RefreshToken>? refreshTokens{ get; set; }
+
+        public ICollection<Order>? orders{ get; set; }
     }
 }

@@ -29,6 +29,9 @@ namespace Sale.Api.Data
         public DbSet<ProductDiscount> productDiscounts { get; set; }
         public DbSet<Rating> ratings { get; set; }
         public DbSet<ProductColorImage> productColorImages { get; set; }
+        public DbSet<Order> orders { get; set; }    
+
+        public DbSet<OrderDetail> ordersDetail { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

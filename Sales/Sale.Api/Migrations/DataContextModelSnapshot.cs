@@ -293,6 +293,79 @@ namespace Sale.Api.Migrations
                     b.ToTable("discounts");
                 });
 
+            modelBuilder.Entity("Sale.Share.Entities.Order", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("OrderStatus")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("orders");
+                });
+
+            modelBuilder.Entity("Sale.Share.Entities.OrderDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Image")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<float>("Quantity")
+                        .HasColumnType("real");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ordersDetail");
+                });
+
             modelBuilder.Entity("Sale.Share.Entities.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -811,6 +884,34 @@ namespace Sale.Api.Migrations
                     b.Navigation("State");
                 });
 
+            modelBuilder.Entity("Sale.Share.Entities.Order", b =>
+                {
+                    b.HasOne("Sale.Share.Entities.User", "User")
+                        .WithMany("orders")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Sale.Share.Entities.OrderDetail", b =>
+                {
+                    b.HasOne("Sale.Share.Entities.Order", "Order")
+                        .WithMany("OrderDetails")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Sale.Share.Entities.Product", "Product")
+                        .WithMany("orderDetail")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("Sale.Share.Entities.Product", b =>
                 {
                     b.HasOne("Sale.Share.Entities.Brand", "brand")
@@ -1024,9 +1125,16 @@ namespace Sale.Api.Migrations
                     b.Navigation("productDiscounts");
                 });
 
+            modelBuilder.Entity("Sale.Share.Entities.Order", b =>
+                {
+                    b.Navigation("OrderDetails");
+                });
+
             modelBuilder.Entity("Sale.Share.Entities.Product", b =>
                 {
                     b.Navigation("ProductImages");
+
+                    b.Navigation("orderDetail");
 
                     b.Navigation("productColor");
 
@@ -1065,6 +1173,8 @@ namespace Sale.Api.Migrations
 
             modelBuilder.Entity("Sale.Share.Entities.User", b =>
                 {
+                    b.Navigation("orders");
+
                     b.Navigation("refreshTokens");
                 });
 #pragma warning restore 612, 618

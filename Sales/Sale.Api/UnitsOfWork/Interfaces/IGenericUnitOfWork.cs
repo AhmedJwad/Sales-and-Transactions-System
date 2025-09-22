@@ -3,7 +3,7 @@ using Sale.Share.Responses;
 
 namespace Sale.Api.UnitsOfWork.Interfaces
 {
-    public interface IGenericUnitOfWork<T>
+    public interface IGenericUnitOfWork<T> where T : class
     {
         Task<ActionResponse<int>> GetRecordsNumberAsync(PaginationDTO paginationDTO);
         Task<ActionResponse<IEnumerable<T>>> GetAsync();

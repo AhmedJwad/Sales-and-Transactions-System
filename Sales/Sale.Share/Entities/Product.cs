@@ -84,5 +84,6 @@ namespace Sale.Share.Entities
         public ICollection<productSize>? productSize { get; set; }
         public ICollection<ProductDiscount>? productDiscount { get; set; }
         public ICollection<Rating>? rating { get; set; }   
+        public ICollection<OrderDetail>? orderDetail { get; set; }
     }
 }
