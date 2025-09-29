@@ -6,7 +6,7 @@ namespace Sale.Api.UnitsOfWork.Interfaces
 {
     public interface IorderUnitofWorks
     {
-        Task<ActionResponse<IEnumerable<Order>>> GetAsync(string email, PaginationDTO pagination);
+        Task<ActionResponse<IEnumerable<OrderResponseDTO>>> GetAsync(string email, PaginationDTO pagination);
         Task<ActionResponse<int>> GetTotalPagesAsync(string email, PaginationDTO pagination);
         Task<ActionResponse<Order>> GetAsync(int id);
         Task<ActionResponse<Order>> UpdateFullAsync(string email, OrderDTO orderDTO);

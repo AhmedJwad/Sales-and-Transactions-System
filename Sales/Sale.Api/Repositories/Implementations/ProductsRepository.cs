@@ -661,7 +661,7 @@ namespace Sale.Api.Repositories.Implementations
             try
             {
                 var products = await _context.Products
-                    .Where(p => ids.Contains(p.Id))                    
+                    .Where(p => ids.Contains(p.Id)).Include(pi=>pi.ProductImages)                    
                     .ToListAsync();
 
                 return new ActionResponse<List<Product>>

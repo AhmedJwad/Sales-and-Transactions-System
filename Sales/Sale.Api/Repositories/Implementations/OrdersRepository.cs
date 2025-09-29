@@ -22,12 +22,12 @@ namespace Sale.Api.Repositories.Implementations
             _usersRepository = usersRepository;
         }
 
-        public async Task<ActionResponse<IEnumerable<Order>>> GetAsync(string email, PaginationDTO pagination)
+        public async Task<ActionResponse<IEnumerable<OrderResponseDTO>>> GetAsync(string email, PaginationDTO pagination)
         {
             var user = await _usersRepository.GetUserAsync(email);
             if (user == null)
             {
-                return new ActionResponse<IEnumerable<Order>>()
+                return new ActionResponse<IEnumerable<OrderResponseDTO>>()
                 {
                     WasSuccess = false,
                     Message = "user does not exist"
@@ -43,10 +43,34 @@ namespace Sale.Api.Repositories.Implementations
             {
                 queryable = queryable.Where(u => u.User!.Email == email);
             }
-            return new ActionResponse<IEnumerable<Order>>
+            var result=queryable.Select(o=> new OrderResponseDTO
+            {
+                Id=o.Id,
+                Date=o.Date,
+                Remarks=o.Remarks,
+                UserFullName=o.User!.FirstName +" "+ o.User.LastName,
+                UserEmail=o.User!.Email,
+                UserPhoto=o.User!.Photo,
+                Lines=o.Lines,
+                Quantity=(int)o.Quantity,
+                Value=o.Value,
+                orderStatus=o.OrderStatus,
+                orderDetailResponseDTOs=o.OrderDetails!.Select(od=> new OrderDetailResponseDTO
+                {
+                    Id=od.Id,
+                    Description=od.Description,
+                    Image=od.Image,
+                    Name=od.Name,
+                    Price=od.Price,
+                    Quantity=(int)od.Quantity,
+                    Value=od.Value,
+
+                }).ToList(),                
+            }).ToList();
+            return new ActionResponse<IEnumerable<OrderResponseDTO>>
             {
                 WasSuccess = true,
-                Result = await queryable.OrderByDescending(x => x.Date).ToListAsync()
+                Result = result,
             };
 
         }

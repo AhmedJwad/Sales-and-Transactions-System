@@ -97,8 +97,8 @@ namespace Sale.Api.Helpers
                         Name = product.Name!,
                         Image = product.MainImage!,
                         Quantity = item.Quantity,
-                        Remarks = item.Remarks,
-                        ProductId = item.ProductId
+                        Remarks = orderDTO.Remarks,
+                        ProductId = item.ProductId                        
                     };
                 }).ToList()
             };
@@ -106,7 +106,9 @@ namespace Sale.Api.Helpers
             await _orderUnitofWorks.AddAsync(order);
             return new ActionResponse<bool>
             {
-                WasSuccess = true
+                WasSuccess = true,
+                Message = "Order placed successfully",
+                Result = true
             };
 
            

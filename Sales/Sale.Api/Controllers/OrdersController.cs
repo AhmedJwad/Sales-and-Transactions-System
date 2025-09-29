@@ -27,7 +27,7 @@ namespace Sale.Api.Controllers
             var response = await _orderHelper.ProcessOrderAsync(User.Identity!.Name!, orderDTO);
             if (response.WasSuccess)
             {
-                return NoContent();
+                return Ok(response);
             }
             return BadRequest(response.Message);
         }
