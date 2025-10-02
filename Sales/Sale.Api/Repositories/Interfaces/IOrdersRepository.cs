@@ -8,7 +8,7 @@ namespace Sale.Api.Repositories.Interfaces
     {
         Task<ActionResponse<IEnumerable<OrderResponseDTO>>> GetAsync(string email, PaginationDTO pagination);
         Task<ActionResponse<int>> GetTotalPagesAsync(string email, PaginationDTO pagination);
-        Task<ActionResponse<Order>> GetAsync(int id);
+        Task<ActionResponse<OrderResponseDTO>> GetAsync(int id);
         Task<ActionResponse<Order>> UpdateFullAsync(string email, OrderDTO orderDTO);
         Task<ActionResponse<IEnumerable<Order>>> GetReportAsync(DatesDTO datesDTO);
     }

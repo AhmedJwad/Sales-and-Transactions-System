@@ -17,7 +17,7 @@ namespace Sale.Api.UnitsOfWork.Implementations
         }
         public async Task<ActionResponse<IEnumerable<OrderResponseDTO>>> GetAsync(string email, PaginationDTO pagination)
         => await _ordersRepository.GetAsync(email, pagination);
-        public override async Task<ActionResponse<Order>> GetAsync(int id)
+        public  async Task<ActionResponse<OrderResponseDTO>> GetAsync(int id)
         =>await _ordersRepository.GetAsync(id);
         public async Task<ActionResponse<IEnumerable<Order>>> GetReportAsync(DatesDTO datesDTO)
         => await _ordersRepository.GetReportAsync(datesDTO);

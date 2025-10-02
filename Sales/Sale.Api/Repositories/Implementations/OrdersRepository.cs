@@ -75,7 +75,7 @@ namespace Sale.Api.Repositories.Implementations
 
         }
 
-        public override async Task<ActionResponse<Order>> GetAsync(int id)
+        public  async Task<ActionResponse<OrderResponseDTO>> GetAsync(int id)
         {
             var order = await _context.orders.Include(u => u.User!)
                         .ThenInclude(c => c.City!).ThenInclude(s => s.State!).ThenInclude(cn => cn.Country!)
@@ -83,16 +83,39 @@ namespace Sale.Api.Repositories.Implementations
                         .FirstOrDefaultAsync(o => o.Id == id);
             if (order == null)
             {
-                return new ActionResponse<Order>
+                return new ActionResponse<OrderResponseDTO>
                 {
                     WasSuccess = false,
                     Message = "order does not exist"
                 };
             }
-            return new ActionResponse<Order>
+            var orderDTO = new OrderResponseDTO
+            {
+                Id = order.Id,
+                Date = order.Date,
+                Remarks = order.Remarks,
+                UserFullName = order.User!.FirstName + " " + order.User.LastName,
+                UserEmail = order.User!.Email,
+                UserPhoto = order.User!.Photo ?? "/no-image.png",
+                Lines = order.Lines,
+                Quantity = (int)order.Quantity,
+                Value = order.Value,
+                orderStatus = order.OrderStatus,
+                orderDetailResponseDTOs = order.OrderDetails!.Select(od => new OrderDetailResponseDTO
+                {
+                    Id = od.Id,
+                    Name = od.Name,
+                    Description = od.Description,
+                    Price = od.Price,
+                    Quantity = (int)od.Quantity,
+                    Value = od.Value,
+                    Image = od.Image ?? "/no-image.png"
+                }).ToList()
+            };
+            return new ActionResponse<OrderResponseDTO>
             {
                 WasSuccess = true,
-                Result = order
+                Result = orderDTO
             };
         }
 
