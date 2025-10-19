@@ -70,7 +70,7 @@ namespace Sale.Api.Repositories.Implementations
             return new ActionResponse<IEnumerable<OrderResponseDTO>>
             {
                 WasSuccess = true,
-                Result = result,
+                Result = result.OrderByDescending(o=>o.Date),
             };
 
         }

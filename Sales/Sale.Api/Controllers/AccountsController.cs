@@ -178,6 +178,7 @@ namespace Sale.Api.Controllers
         {
             return Ok(await _usersUnitOfWork.GetUserAsync(User.Identity!.Name!));
         }
+        [AllowAnonymous]
         [HttpPost("CreateUser")]
         public async Task<IActionResult> CreateUser([FromBody] UserDTO model)
         {

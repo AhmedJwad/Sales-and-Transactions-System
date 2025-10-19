@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Sale.Api.UnitsOfWork.Implementations;
 using Sale.Api.UnitsOfWork.Interfaces;
@@ -28,6 +29,7 @@ namespace Sale.Api.Controllers
             return BadRequest();
         }
 
+        [AllowAnonymous]
         [HttpGet("combo")]
         public async Task<IActionResult> GetComboAsync()
         {

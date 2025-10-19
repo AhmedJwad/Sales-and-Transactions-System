@@ -29,7 +29,7 @@ namespace Sale.Api.Controllers
             return BadRequest();
         }
 
-
+        [AllowAnonymous]
         [HttpGet("combo/{countryId:int}")]
         public async Task<IActionResult> GetComboAsync(int countryId)
         {

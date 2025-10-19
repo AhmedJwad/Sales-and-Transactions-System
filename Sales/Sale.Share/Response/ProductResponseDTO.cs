@@ -21,6 +21,7 @@ namespace Sale.Share.Response
         public int BrandId { get; set; }
         public BrandDTO? brand { get; set; }
         public bool HasSerial { get; set; }
+        public DateTime CreatedAt { get; set; }
         public List<string>? ProductSubCategories { get; set; }
         public List<string>? ProductColor { get; set; }
         public List<string>? ProductSize { get; set; }

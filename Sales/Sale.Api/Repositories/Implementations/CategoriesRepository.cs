@@ -22,24 +22,37 @@ namespace Sale.Api.Repositories.Implementations
 
         public override async Task<ActionResponse<IEnumerable<Category>>> GetAsync(PaginationDTO pagination)
         {
-            var queryable = _context.Categories.AsQueryable();
+            var lang = pagination.Language?.ToLower() ?? "en";
+            var queryable = _context.Categories?.Include(x=>x.categoryTranslations).AsQueryable();
             if (!string.IsNullOrWhiteSpace(pagination.Filter))
             {
-                queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
+                var filter = pagination?.Language?.ToLower();
+                queryable = queryable?.Where(c =>c.categoryTranslations!.Any(t => t.Language.ToLower() == lang && t.Name.ToLower()
+                .Contains(filter!))); 
             }
             return new ActionResponse<IEnumerable<Category>>
             {
                 WasSuccess = true,
-                Result = await queryable.OrderBy(x => x.Name).ToListAsync()
+                Result = await queryable!.OrderBy(c => c.categoryTranslations!.FirstOrDefault(t => t.Language == lang)!.Name).Paginate(pagination!).ToListAsync()
             };
         }
 
-        public async Task<IEnumerable<CategoryDTO>> GetComboAsync()
+        public async Task<IEnumerable<CategoryDTO>> GetComboAsync(string lang = "en")
         {
-            return await _context.Categories.OrderBy(x => x.Name).Select(x=> new CategoryDTO
+            lang = lang.ToLower();
+            return await _context.Categories.Include(s=>s.subcategories)
+                .Include(c=>c.categoryTranslations).Select(x=> new CategoryDTO
             {
                 Id = x.Id,
-                Name = x.Name,
+                Name = x.categoryTranslations!
+                    .Where(t => t.Language == lang)
+                    .Select(t => t.Name)
+                    .FirstOrDefault()
+                ?? x.categoryTranslations!
+                    .Where(t => t.Language == "en")
+                    .Select(t => t.Name)
+                    .FirstOrDefault()
+                ?? "Unnamed",
                 Subcategories = x.subcategories!.OrderBy(s => s.Name).Select(s => s.Name).ToList(),
                 photo=x.Photo,
             }).ToListAsync();
@@ -47,12 +60,15 @@ namespace Sale.Api.Repositories.Implementations
 
         public override async Task<ActionResponse<int>> GetRecordsNumberAsync(PaginationDTO pagination)
         {
-            var queryable = _context.Categories.AsQueryable();
-            if (!string.IsNullOrWhiteSpace(pagination?.Filter))
+            var lang = pagination.Language?.ToLower() ?? "en";
+            var queryable = _context.Categories?.Include(x => x.categoryTranslations).AsQueryable();
+            if (!string.IsNullOrWhiteSpace(pagination.Filter))
             {
-                queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
+                var filter = pagination?.Language?.ToLower();
+                queryable = queryable?.Where(c => c.categoryTranslations!.Any(t => t.Language.ToLower() == lang && t.Name.ToLower()
+                .Contains(filter!)));
             }
-            int recordsNumber = await queryable.CountAsync();
+            int recordsNumber = await queryable!.CountAsync();
             return new ActionResponse<int>
             {
                 WasSuccess = true,
@@ -62,12 +78,15 @@ namespace Sale.Api.Repositories.Implementations
 
         public override async Task<ActionResponse<int>> GetTotalPagesAsync(PaginationDTO pagination)
         {
-            var queryable = _context.Categories.AsQueryable();
-            if (!string.IsNullOrWhiteSpace(pagination?.Filter))
+            var lang = pagination.Language?.ToLower() ?? "en";
+            var queryable = _context.Categories?.Include(x => x.categoryTranslations).AsQueryable();
+            if (!string.IsNullOrWhiteSpace(pagination.Filter))
             {
-                queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
+                var filter = pagination?.Language?.ToLower();
+                queryable = queryable?.Where(c => c.categoryTranslations!.Any(t => t.Language.ToLower() == lang && t.Name.ToLower()
+                .Contains(filter!)));
             }
-            double count = await queryable.CountAsync();
+            double count = await queryable!.CountAsync();
             int totalPages = (int)Math.Ceiling(count / pagination!.RecordsNumber);
             return new ActionResponse<int>
             {
@@ -81,10 +100,16 @@ namespace Sale.Api.Repositories.Implementations
             {
                 var category = new Category
                 {
-                    Name = categoryDTO.Name,
                     subcategories = new List<Subcategory>(),
-                };
-                if (!string.IsNullOrEmpty(categoryDTO.photo))
+                    categoryTranslations = categoryDTO!.Translations!.Select(t => new CategoryTranslation
+                    {
+                        Language = t.Language.ToLower(),
+                        Name = t.Name,
+                    }).ToList()
+
+                };              
+
+                 if (!string.IsNullOrEmpty(categoryDTO.photo))
                 {
                     var productPhoto = Convert.FromBase64String(categoryDTO!.photo!);
                     category.Photo = await _fileStorage.SaveFileAsync(productPhoto, ".jpg", "categories");
@@ -111,7 +136,8 @@ namespace Sale.Api.Repositories.Implementations
         {
             try
             {
-                var category = await _context.Categories.Include(x => x.subcategories).FirstOrDefaultAsync(x => x.Id == categoryDTO.Id);
+                var category = await _context.Categories.Include(x => x.subcategories)
+                    .Include(c=>c.categoryTranslations).FirstOrDefaultAsync(x => x.Id == categoryDTO.Id);
                 if (category == null)
                 {
                     return new ActionResponse<Category>
@@ -125,7 +151,14 @@ namespace Sale.Api.Repositories.Implementations
                     var productPhoto = Convert.FromBase64String(categoryDTO!.photo!);
                     category.Photo = await _fileStorage.SaveFileAsync(productPhoto, ".jpg", "categories");
                 }
-                category.Name = categoryDTO.Name;
+                _context.categoryTranslations.RemoveRange(category.categoryTranslations!);
+
+                category.categoryTranslations = category.categoryTranslations!.Select(t => new CategoryTranslation
+                {
+                    Language = t.Language.ToLower(),
+                    Name = t.Name,
+                    CategoryId = category.Id
+                }).ToList();
                 _context.Update(category);
                 await _context.SaveChangesAsync();
                 return new ActionResponse<Category>
@@ -148,7 +181,7 @@ namespace Sale.Api.Repositories.Implementations
         {
             try
             {
-                var category = await _context.Categories.Include(x => x.subcategories).FirstOrDefaultAsync(x => x.Id == Id);
+                var category = await _context.Categories.Include(x => x.subcategories).Include(t=>t.categoryTranslations).FirstOrDefaultAsync(x => x.Id == Id);
                 if (category == null)
                 {
                     return new ActionResponse<Category>

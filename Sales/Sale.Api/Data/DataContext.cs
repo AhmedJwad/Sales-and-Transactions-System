@@ -32,6 +32,8 @@ namespace Sale.Api.Data
         public DbSet<Order> orders { get; set; }    
 
         public DbSet<OrderDetail> ordersDetail { get; set; }
+
+        public DbSet<CategoryTranslation> categoryTranslations { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -86,12 +88,21 @@ namespace Sale.Api.Data
                      .HasForeignKey(sn => sn.productID)
                      .OnDelete(DeleteBehavior.Cascade);
 
-                     modelBuilder.Entity<ProductImage>()
+             modelBuilder.Entity<ProductImage>()
                     .HasMany(pi => pi.productColorImages)
                     .WithOne(pci => pci.productImage)
                     .HasForeignKey(pci => pci.ProductImageId)
                     .OnDelete(DeleteBehavior.Cascade);
-           
+            modelBuilder.Entity<Category>()
+                .HasMany(c => c.categoryTranslations)
+                .WithOne(t => t.Category)
+                .HasForeignKey(t => t.CategoryId)
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<CategoryTranslation>()
+              .HasIndex(t => new { t.CategoryId, t.Language })
+              .IsUnique();
+
+
         }
 
         

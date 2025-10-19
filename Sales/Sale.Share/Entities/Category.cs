@@ -8,18 +8,14 @@ using System.Threading.Tasks;
 
 namespace Sale.Share.Entities
 {
-    public class Category : IEntityWithName
+    public class Category 
     {
         public int Id { get; set; }
-
-        [Display(Name = "Category")]
-        [MaxLength(100, ErrorMessage = "Field {0} cannot be longer than {1} characters.")]
-        [Required(ErrorMessage = "Field {0} is required.")]
-        public string Name { get; set; } = null!;
+      
         [Display(Name = "Photo")]
         public string? Photo { get; set; }
         public ICollection<Subcategory>? subcategories { get; set; }
-
+        public ICollection<CategoryTranslation>? categoryTranslations { get; set; }
         
     }
 }

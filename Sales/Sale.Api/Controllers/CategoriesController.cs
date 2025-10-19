@@ -42,9 +42,9 @@ namespace Sale.Api.Controllers
         }
         [AllowAnonymous]
         [HttpGet("combo")]
-        public async Task<IActionResult> GetComboAsync()
+        public async Task<IActionResult> GetComboAsync(string lang = "en")
         {
-            return Ok(await _categoriesUnitOfWork.GetComboAsync());
+            return Ok(await _categoriesUnitOfWork.GetComboAsync(lang));
         }
 
         [HttpGet("totalPages")]       

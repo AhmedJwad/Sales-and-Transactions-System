@@ -29,7 +29,7 @@ namespace Sale.Api.Controllers
             }
             return BadRequest();
         }
-
+        [AllowAnonymous]
         [HttpGet("combo")]
         public async Task<IActionResult> GetComboAsync()
         {

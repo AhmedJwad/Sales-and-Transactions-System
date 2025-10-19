@@ -304,7 +304,7 @@ namespace Sale.Api.Repositories.Implementations
             return new ActionResponse<IEnumerable<Product>>
             {
                 WasSuccess = true,
-                Result = products,
+                Result = products.OrderByDescending(p=>p.CreatedAt),
             };
 
         }
@@ -639,6 +639,7 @@ namespace Sale.Api.Repositories.Implementations
                 Stock = p.Stock,
                 HasSerial = p.HasSerial,
                 Price = p.Price,
+                CreatedAt=p.CreatedAt,
                 brand = p.brand != null ? new BrandDTO
                 {
                     Id=p.brand.Id,
@@ -653,7 +654,7 @@ namespace Sale.Api.Repositories.Implementations
             return new ActionResponse<IEnumerable<ProductResponseDTO>>
             {
                 WasSuccess = true,
-                Result = product,
+                Result = product.OrderByDescending(p=>p.CreatedAt),
             };
         }
         public async Task<ActionResponse<List<Product>>> GetProductsByIdsAsync(List<int> ids)
