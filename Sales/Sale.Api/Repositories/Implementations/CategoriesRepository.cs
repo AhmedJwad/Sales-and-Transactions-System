@@ -23,12 +23,15 @@ namespace Sale.Api.Repositories.Implementations
         public override async Task<ActionResponse<IEnumerable<Category>>> GetAsync(PaginationDTO pagination)
         {
             var lang = pagination.Language?.ToLower() ?? "en";
-            var queryable = _context.Categories?.Include(x=>x.categoryTranslations).AsQueryable();
+            var queryable = _context.Categories
+                            .Include(c => c.categoryTranslations!
+                                .Where(t => t.Language.ToLower() == lang))
+                            .AsQueryable();
             if (!string.IsNullOrWhiteSpace(pagination.Filter))
             {
-                var filter = pagination?.Language?.ToLower();
+                
                 queryable = queryable?.Where(c =>c.categoryTranslations!.Any(t => t.Language.ToLower() == lang && t.Name.ToLower()
-                .Contains(filter!))); 
+                .Contains(pagination.Filter.ToLower()!))); 
             }
             return new ActionResponse<IEnumerable<Category>>
             {
