@@ -43,6 +43,7 @@ namespace Sale.Api.Repositories.Implementations
             return await _context.brands.OrderBy(b => b.Name).ToListAsync();
         }
 
+
         public override async Task<ActionResponse<int>> GetRecordsNumberAsync(PaginationDTO pagination)
         {
             var queryable=_context.brands.AsQueryable();

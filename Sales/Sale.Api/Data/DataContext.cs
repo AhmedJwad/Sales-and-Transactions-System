@@ -101,8 +101,17 @@ namespace Sale.Api.Data
             modelBuilder.Entity<CategoryTranslation>()
               .HasIndex(t => new { t.CategoryId, t.Language })
               .IsUnique();
+            modelBuilder.Entity<Category>()
+                .HasMany(c => c.subcategories)
+                .WithOne(s => s.Category)
+                .HasForeignKey(s=>s.CategoryId)
+                .OnDelete(DeleteBehavior.Cascade);         
 
-
+            modelBuilder.Entity<Brand>()
+                .HasMany(b => b.Products)
+                .WithOne(p => p.brand)
+                .HasForeignKey(p => p.BrandId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         

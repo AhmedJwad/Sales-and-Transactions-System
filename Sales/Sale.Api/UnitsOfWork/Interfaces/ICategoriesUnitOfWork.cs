@@ -13,5 +13,6 @@ namespace Sale.Api.UnitsOfWork.Interfaces
         Task<ActionResponse<Category>> AddFullAsync(CategoryDTO categoryDTO);
         Task<ActionResponse<Category>> UpdateFullAsync(CategoryDTO categoryDTO);
         Task<ActionResponse<Category>> DeleteAsync(int id);
+        Task<ActionResponse<Category>> GetAsync(int id);
     }
 }

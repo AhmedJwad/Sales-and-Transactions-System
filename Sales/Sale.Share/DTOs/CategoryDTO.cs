@@ -13,6 +13,6 @@ namespace Sale.Share.DTOs
         public string? Name { get; set; }    
         public string? photo { get; set; }
         public List<string>? Subcategories { get; set; }       
-        public List<CategoryTranslationDto>? Translations { get; set; } 
+        public List<CategoryTranslationDto>? categoryTranslations { get; set; } 
     }
 }

@@ -32,6 +32,8 @@ namespace Sale.Api.UnitsOfWork.Implementations
         =>await _categoriesRepository.AddFullAsync(categoryDTO);
         public override async Task<ActionResponse<Category>>DeleteAsync(int Id)
         => await _categoriesRepository.DeleteAsync(Id);
+        public override async Task<ActionResponse<Category>> GetAsync(int id)
+        => await _categoriesRepository.GetAsync(id);
 
     }
 }

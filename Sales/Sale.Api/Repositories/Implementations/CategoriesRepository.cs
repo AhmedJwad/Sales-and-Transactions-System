@@ -104,7 +104,7 @@ namespace Sale.Api.Repositories.Implementations
                 var category = new Category
                 {
                     subcategories = new List<Subcategory>(),
-                    categoryTranslations = categoryDTO!.Translations!.Select(t => new CategoryTranslation
+                    categoryTranslations = categoryDTO!.categoryTranslations!.Select(t => new CategoryTranslation
                     {
                         Language = t.Language.ToLower(),
                         Name = t.Name,
@@ -156,7 +156,7 @@ namespace Sale.Api.Repositories.Implementations
                 }
                 _context.categoryTranslations.RemoveRange(category.categoryTranslations!);
 
-                category.categoryTranslations = category.categoryTranslations!.Select(t => new CategoryTranslation
+                category.categoryTranslations = categoryDTO.categoryTranslations!.Select(t => new CategoryTranslation
                 {
                     Language = t.Language.ToLower(),
                     Name = t.Name,
@@ -180,11 +180,32 @@ namespace Sale.Api.Repositories.Implementations
             }
 
         }
+        public override async Task<ActionResponse<Category>> GetAsync(int id)
+        {
+            var category = await _context.Categories
+                .Include(c => c.categoryTranslations)
+                .Include(s => s.subcategories)
+                .FirstOrDefaultAsync(c => c.Id == id);
+            if (category == null)
+            {
+                return new ActionResponse<Category>
+                {
+                    WasSuccess = false,
+                    Message = "Category not found"
+                };
+            }
+            return new ActionResponse<Category>
+            {
+                WasSuccess = true,
+                Result = category
+            };  
+        }
         public override async Task<ActionResponse<Category>> DeleteAsync(int Id)
         {
             try
             {
-                var category = await _context.Categories.Include(x => x.subcategories).Include(t=>t.categoryTranslations).FirstOrDefaultAsync(x => x.Id == Id);
+                var category = await _context.Categories.Include(x => x.subcategories).Include(t=>t.categoryTranslations)
+                    .FirstOrDefaultAsync(x => x.Id == Id);
                 if (category == null)
                 {
                     return new ActionResponse<Category>
@@ -193,7 +214,10 @@ namespace Sale.Api.Repositories.Implementations
                         Message = "category does not exist"
                     };
                 }
-                await _fileStorage.RemoveFileAsync(category.Photo!, "categories");
+                if(category.Photo!=null)
+                {
+                    await _fileStorage.RemoveFileAsync(category.Photo!, "categories");
+                }             
 
                 _context.Remove(category);
                 await _context.SaveChangesAsync();
@@ -212,5 +236,7 @@ namespace Sale.Api.Repositories.Implementations
                
             }
         }
+
+       
     }
 }
