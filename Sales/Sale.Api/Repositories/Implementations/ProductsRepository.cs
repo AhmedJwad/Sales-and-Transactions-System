@@ -297,7 +297,7 @@ namespace Sale.Api.Repositories.Implementations
             }
             if(!string.IsNullOrWhiteSpace(pagination.CategoryFilter))
             {
-                queryable = queryable.Where(x => x.productsubCategories!.Any(x => x.Category!.Name == pagination.CategoryFilter));
+                queryable = queryable.Where(x => x.productsubCategories!.Any(x => x.Category!.SubcategoryTranslations!.Any(c=>c.Name==pagination.CategoryFilter)));
             }
             var products = await queryable.OrderBy(x => x.Name).ToListAsync();
             
@@ -346,7 +346,7 @@ namespace Sale.Api.Repositories.Implementations
 
             if (!string.IsNullOrWhiteSpace(pagination.CategoryFilter))
             {
-                queryable = queryable.Where(x => x.productsubCategories!.Any(y => y.Category!.Name == pagination.CategoryFilter));
+                queryable = queryable.Where(x => x.productsubCategories!.Any(y => y.Category!.SubcategoryTranslations!.Any(s=>s.Name==pagination.CategoryFilter)));
             }
 
             double count = await queryable.CountAsync();
@@ -486,21 +486,32 @@ namespace Sale.Api.Repositories.Implementations
                 };
             }
         }
-        public async Task<IEnumerable<CategoryProductDTO>> GetProductCountByCategoryAsync()
+        public async Task<IEnumerable<CategoryProductDTO>> GetProductCountByCategoryAsync(string lang = "en")
         {
-            // Query to join Product, ProductCategory, and Category tables
-            var response = await (from prodCat in _context.productsubCategories
-                                  join prod in _context.Products on prodCat.ProductId equals prod.Id
-                                  join cat in _context.subcategories on prodCat.subcategoryId equals cat.Id
-                                  group prodCat by new { cat.Id, cat.Name } into g
-                                  select new CategoryProductDTO
-                                  {
-                                      CategoryName = g.Key.Name,     // The name of the category
-                                      ProductCount = g.Count()       // The number of products in that category
-                                  }).ToListAsync();
+            lang = lang.ToLower();
+
+            var response = await (
+                from prodCat in _context.productsubCategories
+                join prod in _context.Products on prodCat.ProductId equals prod.Id
+                join cat in _context.subcategories on prodCat.subcategoryId equals cat.Id
+                from trans in cat.SubcategoryTranslations!
+                    .Where(t => t.Language.ToLower() == lang)
+                    .DefaultIfEmpty()
+                group prodCat by new
+                {
+                    CategoryId = cat.Id,
+                    CategoryName = trans != null ? trans.Name : "Unnamed"
+                } into g
+                select new CategoryProductDTO
+                {
+                    CategoryName = g.Key.CategoryName,
+                    ProductCount = g.Count()
+                }
+            ).ToListAsync();
 
             return response;
         }
+
 
         public async Task<ActionResponse<IEnumerable<ProductDTO>>> GetProductsBySubcategoryAsync(int subcategoryId)
         {
@@ -599,8 +610,11 @@ namespace Sale.Api.Repositories.Implementations
                 HasSerial = p.HasSerial,
                 ProductColor = p.productColor!.Select(pc => pc.color!.Name).ToList(),
                 ProductSize = p.productSize!.Select(ps => ps.size!.Name).ToList(),
-                ProductImages = p.ProductImages!.Select(pi => pi.Image).ToList(),
-                ProductSubCategories = p.productsubCategories!.Select(ps => ps.Category!.Name).ToList(),
+                ProductImages = p.ProductImages!.Select(pi => pi.Image).ToList(),              
+                ProductSubCategories = p.productsubCategories!
+                                        .SelectMany(ps => ps.Category!.SubcategoryTranslations!                                           
+                                        .Select(t => t.Name))
+                                        .ToList(),
                 SerialNumbers = p.serialNumbers!.Select(sn => sn.SerialNumberValue).ToList(),
                 Stock = p.Stock,
             });
@@ -646,7 +660,7 @@ namespace Sale.Api.Repositories.Implementations
                     Name=p.brand.Name,
                 } : null,
                 ProductSubCategories=p.productsubCategories!.Where
-                (sc=>sc.Category != null).Select(sc=>sc.Category!.Name).ToList(),
+                (sc=>sc.Category != null).SelectMany(sc=>sc.Category!.SubcategoryTranslations!).Select(s=>s.Name).ToList(),
                 ProductImages=p.ProductImages!.Select(pi=>pi.Image).ToList(),
                 ProductColor=p.productColor!.Where(pc=>pc.color!=null).Select(pc=>pc.color!.HexCode).ToList(),
                 ProductSize=p.productSize!.Where(ps=>ps.size !=null).Select(ps=>ps.size!.Name).ToList(),

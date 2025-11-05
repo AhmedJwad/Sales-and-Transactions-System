@@ -206,7 +206,7 @@ namespace Sale.Api.Migrations
 
                     b.Property<string>("Language")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -215,8 +215,7 @@ namespace Sale.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryId", "Language")
-                        .IsUnique();
+                    b.HasIndex("CategoryId");
 
                     b.ToTable("categoryTranslations");
                 });
@@ -695,10 +694,6 @@ namespace Sale.Api.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Photo")
                         .HasColumnType("nvarchar(max)");
 
@@ -707,6 +702,33 @@ namespace Sale.Api.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("subcategories");
+                });
+
+            modelBuilder.Entity("Sale.Share.Entities.SubcategoryTranslation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("SubcategoryId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SubcategoryId");
+
+                    b.ToTable("subcategoryTranslations");
                 });
 
             modelBuilder.Entity("Sale.Share.Entities.User", b =>
@@ -890,7 +912,7 @@ namespace Sale.Api.Migrations
                     b.HasOne("Sale.Share.Entities.Subcategory", "Subcategory")
                         .WithMany("Brands")
                         .HasForeignKey("SubcategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Subcategory");
@@ -1097,6 +1119,17 @@ namespace Sale.Api.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("Sale.Share.Entities.SubcategoryTranslation", b =>
+                {
+                    b.HasOne("Sale.Share.Entities.Subcategory", "subcategory")
+                        .WithMany("SubcategoryTranslations")
+                        .HasForeignKey("SubcategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("subcategory");
+                });
+
             modelBuilder.Entity("Sale.Share.Entities.User", b =>
                 {
                     b.HasOne("Sale.Share.Entities.City", "City")
@@ -1205,6 +1238,8 @@ namespace Sale.Api.Migrations
                     b.Navigation("Brands");
 
                     b.Navigation("Prosubcategories");
+
+                    b.Navigation("SubcategoryTranslations");
                 });
 
             modelBuilder.Entity("Sale.Share.Entities.User", b =>

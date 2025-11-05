@@ -19,11 +19,11 @@ namespace Sale.Api.UnitsOfWork.Implementations
         public override async Task<ActionResponse<IEnumerable<Subcategory>>> GetAsync(PaginationDTO pagination)
         => await _subcategoryRepository.GetAsync(pagination);
 
-        public async Task<IEnumerable<Subcategory>> GetComboAsync()
-       => await _subcategoryRepository.GetComboAsync();
+        public async Task<IEnumerable<SubcategoryDTO>> GetComboAsync(string lang = "en")
+       => await _subcategoryRepository.GetComboAsync(lang);
 
-        public async Task<IEnumerable<SubcategoryDTO>> GetComboAsync(int categoryId)
-        =>await _subcategoryRepository.GetComboAsync(categoryId);
+        public async Task<IEnumerable<SubcategoryDTO>> GetComboAsync(int categoryId, string lang = "en")
+        =>await _subcategoryRepository.GetComboAsync(categoryId , lang);
 
         public override async Task<ActionResponse<int>> GetRecordsNumberAsync(PaginationDTO pagination)
         => await _subcategoryRepository.GetRecordsNumberAsync(pagination);

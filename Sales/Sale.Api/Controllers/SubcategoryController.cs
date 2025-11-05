@@ -32,15 +32,15 @@ namespace Sale.Api.Controllers
         }
         [AllowAnonymous]
         [HttpGet("combo")]
-        public async Task<IActionResult> GetComboAsync()
+        public async Task<IActionResult> GetComboAsync(string lang = "en")
         {
-            return Ok(await _iSubcategoriesUnitofWorks.GetComboAsync());
+            return Ok(await _iSubcategoriesUnitofWorks.GetComboAsync(lang));
         }
         [AllowAnonymous]
         [HttpGet("combocategory/{categoryId}")]
-        public async Task<IActionResult> GetComboAsync(int categoryId)
+        public async Task<IActionResult> GetComboAsync(int categoryId, string lang = "en")
         {
-            return Ok(await _iSubcategoriesUnitofWorks.GetComboAsync(categoryId));
+            return Ok(await _iSubcategoriesUnitofWorks.GetComboAsync(categoryId, lang));
         }
 
         [HttpGet]

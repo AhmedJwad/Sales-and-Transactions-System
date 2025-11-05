@@ -17,7 +17,7 @@ namespace Sale.Api.UnitsOfWork.Interfaces
         Task<ActionResponse<int>> GetTotalPagesAsync(PaginationDTO pagination);
         Task<ActionResponse<Product>> AddFullAsync(ProductDTO productDTO);
         Task<ActionResponse<Product>> UpdateFullAsync(ProductDTO productDTO);
-        Task<IEnumerable<CategoryProductDTO>> GetProductCountByCategoryAsync();
+        Task<IEnumerable<CategoryProductDTO>> GetProductCountByCategoryAsync(string lang = "en");
         Task<ActionResponse<IEnumerable<ProductDTO>>> GetProductsBySubcategoryAsync(int subcategoryId);
         Task<ActionResponse<IEnumerable<ProductResponseDTO>>> FilterProducts(ProductFilterDto productFilterDto);
         Task<ActionResponse<IEnumerable<ProductResponseDTO>>> GetfullProduct();

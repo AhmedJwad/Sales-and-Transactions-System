@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Sale.Share.Entities;
 
@@ -34,29 +34,56 @@ namespace Sale.Api.Data
         public DbSet<OrderDetail> ordersDetail { get; set; }
 
         public DbSet<CategoryTranslation> categoryTranslations { get; set; }
+        public DbSet<SubcategoryTranslation> subcategoryTranslations { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Country>().HasIndex(country => country.Name).IsUnique();
             modelBuilder.Entity<State>().HasIndex(state => state.Name).IsUnique();
             modelBuilder.Entity<City>().HasIndex(city => city.Name).IsUnique();
-
+            // =============================
+            // 🔹 Category - Translations - Subcategories
+            // =============================
+            modelBuilder.Entity<Category>()
+               .HasMany(c => c.categoryTranslations)
+               .WithOne(t => t.Category)
+               .HasForeignKey(t => t.CategoryId)
+               .OnDelete(DeleteBehavior.Cascade);          
+            modelBuilder.Entity<Category>()
+                .HasMany(c => c.subcategories)
+                .WithOne(s => s.Category)
+                .HasForeignKey(s => s.CategoryId)
+                .OnDelete(DeleteBehavior.Cascade);
+            // =============================
+            // 🔹 Subcategory - Translations - Brands
+            // =============================
             modelBuilder.Entity<Subcategory>()
                      .HasOne(sc => sc.Category)
                      .WithMany(c => c.subcategories)
                      .HasForeignKey(sc => sc.CategoryId)
                      .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Subcategory>()
+              .HasMany(c => c.SubcategoryTranslations)
+              .WithOne(t => t.subcategory)
+              .HasForeignKey(t => t.SubcategoryId)
+              .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Subcategory>()
+             .HasMany(c => c.Brands)
+             .WithOne(t => t.Subcategory)
+             .HasForeignKey(t => t.SubcategoryId)
+             .OnDelete(DeleteBehavior.Restrict);           
+            // =============================
+            // 🔹 Brand - Products
+            // =============================
 
-            modelBuilder.Entity<Brand>()
-                        .HasOne(p => p.Subcategory)
-                        .WithMany(sc => sc.Brands)
-                        .HasForeignKey(p => p.SubcategoryId)
-                        .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Product>()
-                         .HasOne(p => p.brand)
-                         .WithMany(b => b.Products)
-                         .HasForeignKey(p => p.BrandId)
-                         .OnDelete(DeleteBehavior.Restrict);
+                 .HasOne(p => p.brand)
+                 .WithMany(b => b.Products)
+                 .HasForeignKey(p => p.BrandId)
+                 .OnDelete(DeleteBehavior.Restrict);
+            // =============================
+            // 🔹 Product - Related Collections
+            // =============================
             modelBuilder.Entity<Product>()
                         .HasMany(p => p.ProductImages)
                         .WithOne(pi => pi.Product)
@@ -92,29 +119,8 @@ namespace Sale.Api.Data
                     .HasMany(pi => pi.productColorImages)
                     .WithOne(pci => pci.productImage)
                     .HasForeignKey(pci => pci.ProductImageId)
-                    .OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<Category>()
-                .HasMany(c => c.categoryTranslations)
-                .WithOne(t => t.Category)
-                .HasForeignKey(t => t.CategoryId)
-                .OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<CategoryTranslation>()
-              .HasIndex(t => new { t.CategoryId, t.Language })
-              .IsUnique();
-            modelBuilder.Entity<Category>()
-                .HasMany(c => c.subcategories)
-                .WithOne(s => s.Category)
-                .HasForeignKey(s=>s.CategoryId)
-                .OnDelete(DeleteBehavior.Cascade);         
-
-            modelBuilder.Entity<Brand>()
-                .HasMany(b => b.Products)
-                .WithOne(p => p.brand)
-                .HasForeignKey(p => p.BrandId)
-                .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.Cascade);                    
+          
         }
-
-        
-
     }
 }

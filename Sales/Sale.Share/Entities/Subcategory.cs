@@ -9,14 +9,14 @@ namespace Sale.Share.Entities
 {
     public class Subcategory
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
+        public int Id { get; set; }      
         [Display(Name = "Photo")]
         public string? Photo { get; set; }
         public int CategoryId { get; set; }
         public Category? Category { get; set; }
         public ICollection<ProductsubCategory>? Prosubcategories { get; set; }
         public ICollection<Brand>? Brands { get; set; }
+        public ICollection<SubcategoryTranslation>? SubcategoryTranslations { get; set; }   
 
         [Display(Name = "Products")]
         public int ProductCategoriesNumber => Prosubcategories == null || Prosubcategories.Count == 0 ? 0 : Prosubcategories.Count;

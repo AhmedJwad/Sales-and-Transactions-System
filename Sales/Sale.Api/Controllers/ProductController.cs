@@ -89,8 +89,7 @@ namespace Sale.Api.Controllers
                     DesiredProfit = p.DesiredProfit,
                     Stock = p.Stock,
                     BrandId = p.BrandId,
-                    HasSerial = p.HasSerial,
-                    ProductSubCategories = p.productsubCategories?.Where(sc=>sc.Category!=null).Select(sc => sc.Category!.Name).ToList(),
+                    HasSerial = p.HasSerial,                    
                     ProductColor = p.productColor?.Where(c=>c.color!=null).Select(c => c.color!.HexCode).ToList(),
                     ProductSize = p.productSize?.Where(s=>s.size!=null).Select(s => s.size!.Name).ToList(),
                     ProductImages = p.ProductImages?.Select(img => img.Image).ToList(),
@@ -160,9 +159,9 @@ namespace Sale.Api.Controllers
             return NotFound(action.Message);
         }
         [HttpGet("getProductbyCategory")]
-        public async Task<IActionResult> GetProductCountByCategoryAsync()
+        public async Task<IActionResult> GetProductCountByCategoryAsync(string lang = "en")
         {
-            return Ok(await _productsUnitOfWork.GetProductCountByCategoryAsync());
+            return Ok(await _productsUnitOfWork.GetProductCountByCategoryAsync(lang));
         }
         [AllowAnonymous]
         [HttpGet("getproductbysubcategory/{subcategoryId}")]

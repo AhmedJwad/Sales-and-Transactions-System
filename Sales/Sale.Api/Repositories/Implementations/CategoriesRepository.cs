@@ -56,7 +56,7 @@ namespace Sale.Api.Repositories.Implementations
                     .Select(t => t.Name)
                     .FirstOrDefault()
                 ?? "Unnamed",
-                Subcategories = x.subcategories!.OrderBy(s => s.Name).Select(s => s.Name).ToList(),
+                Subcategories = x.subcategories!.OrderBy(s => s.SubcategoryTranslations!.FirstOrDefault()!.Name).Select(s => s.SubcategoryTranslations!.FirstOrDefault()!.Name).ToList(),
                 photo=x.Photo,
             }).ToListAsync();
         }

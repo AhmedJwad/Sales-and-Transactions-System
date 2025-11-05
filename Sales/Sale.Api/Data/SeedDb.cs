@@ -4,6 +4,7 @@ using Sale.Api.UnitsOfWork.Interfaces;
 using Sale.Share.Entities;
 using Sale.Share.Enums;
 using System.Runtime.InteropServices;
+using static Org.BouncyCastle.Asn1.Cmp.Challenge;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace Sale.Api.Data
@@ -111,12 +112,22 @@ namespace Sale.Api.Data
                             new CategoryTranslation { Language = "en", Name = "Apple" },
                             new CategoryTranslation { Language = "ar", Name = "آبل" }
                         },
-                    subcategories =
-                    [
-                        new Subcategory { Name = "iPhone 16", Brands = [ new Brand { Name = "Apple" } ] },
-                        new Subcategory { Name = "MacBook Pro", Brands = [ new Brand { Name = "Apple" } ] },
-                        new Subcategory { Name = "iPad Air", Brands = [ new Brand { Name = "Apple" } ] }
-                    ]
+                    subcategories =new List<Subcategory>
+                    {
+                        new Subcategory
+                            {                               
+                                SubcategoryTranslations = new List<SubcategoryTranslation>
+                                {
+                                    new SubcategoryTranslation { Language = "en", Name = "iPhone 16" },
+                                    new SubcategoryTranslation { Language = "ar", Name = "ايفون 16" },
+                                    new SubcategoryTranslation { Language = "en", Name = "MacBook Pro" },
+                                    new SubcategoryTranslation { Language = "ar", Name = "ماك بوك برو" },
+                                    new SubcategoryTranslation { Language = "en", Name = "iPad Air" },
+                                    new SubcategoryTranslation { Language = "ar", Name = "ايباد اير" },
+
+                                },
+                            }                      
+                    }
                 });
 
                 _context.Categories.Add(new Category
@@ -127,27 +138,50 @@ namespace Sale.Api.Data
                             new CategoryTranslation { Language = "en", Name = "Cars" },
                             new CategoryTranslation { Language = "ar", Name = "السيارات" }
                         },
-                    subcategories =
-                    [
-                        new Subcategory { Name = "Electric Cars", Brands = [ new Brand { Name = "Tesla" }, new Brand { Name = "Lucid" } ] },
-                        new Subcategory { Name = "Luxury Cars", Brands = [ new Brand { Name = "BMW" }, new Brand { Name = "Mercedes-Benz" } ] },
-                        new Subcategory { Name = "SUV", Brands = [ new Brand { Name = "Toyota" }, new Brand { Name = "Ford" } ] }
-                    ]
-                });
+                    subcategories = new List<Subcategory>
+                    {
+                        new Subcategory
+                        {                       
+                       SubcategoryTranslations = new List<SubcategoryTranslation>
+                        {
+
+                            new SubcategoryTranslation { Language = "en", Name = "Electric Cars" },
+                            new SubcategoryTranslation { Language = "ar", Name = "سيارات كهربائية" },
+                            new SubcategoryTranslation { Language = "en", Name = "Luxury Cars" },
+                            new SubcategoryTranslation { Language = "ar", Name = "سيارات فاخرة" },
+                            new SubcategoryTranslation { Language = "en", Name = "SUV" },
+                            new SubcategoryTranslation { Language = "ar", Name = "دفع رباعي" }
+                        }
+                    }
+                  }
+                 }
+                );
 
                 _context.Categories.Add(new Category
                 {
-                   categoryTranslations= new List<CategoryTranslation>()
+                    categoryTranslations = new List<CategoryTranslation>()
                    {
                        new CategoryTranslation { Language = "en", Name = "Beauty" },
                        new CategoryTranslation { Language = "ar", Name = "الجمال" }
                    },
-                    subcategories =
-                    [
-                        new Subcategory { Name = "Skincare", Brands = [ new Brand { Name = "Nivea" }, new Brand { Name = "L'Oreal" } ] },
-                        new Subcategory { Name = "Makeup", Brands = [ new Brand { Name = "Maybelline" }, new Brand { Name = "MAC" } ] },
-                        new Subcategory { Name = "Haircare", Brands = [ new Brand { Name = "Pantene" }, new Brand { Name = "Dove" } ] }
-                    ]
+                    subcategories = new List<Subcategory>
+                    {
+                        new Subcategory
+                        {
+                           
+                            SubcategoryTranslations = new List<SubcategoryTranslation>
+                            {
+                                new SubcategoryTranslation { Language = "en", Name = "Skincare" },
+                                new SubcategoryTranslation { Language = "ar", Name = "العناية بالبشرة" },
+                                new SubcategoryTranslation { Language = "en", Name = "Makeup" },
+                                new SubcategoryTranslation { Language = "ar", Name = "مكياج" },
+                                new SubcategoryTranslation { Language = "en", Name = "Haircare" },
+                                new SubcategoryTranslation { Language = "ar", Name = "العناية بالشعر" }
+
+                        }
+                    }
+
+                }
                 });
 
                 _context.Categories.Add(new Category
@@ -158,11 +192,20 @@ namespace Sale.Api.Data
                        new CategoryTranslation { Language = "en", Name = "Footwear" },
                        new CategoryTranslation { Language = "ar", Name = "الأحذية" }
                    },
-                    subcategories =
-                    [
-                        new Subcategory { Name = "Men's Shoes", Brands = [ new Brand { Name = "Nike" }, new Brand { Name = "Adidas" } ] },
-                        new Subcategory { Name = "Women's Shoes", Brands = [ new Brand { Name = "Puma" }, new Brand { Name = "Reebok" } ] }
-                    ]
+                    subcategories =new List<Subcategory>
+                    {
+                        new Subcategory
+                        {                           
+                            SubcategoryTranslations = new List<SubcategoryTranslation>
+                            {
+                                new SubcategoryTranslation { Language = "en", Name="Men's Shoes" },
+                                new SubcategoryTranslation { Language = "ar", Name="أحذية رجالية" },
+                                new SubcategoryTranslation { Language = "en", Name="Women's Shoes" },
+                                new SubcategoryTranslation { Language = "ar", Name="أحذية نسائية" },
+                            }
+
+                        }
+                    }                   
                 });
 
                 _context.Categories.Add(new Category
@@ -172,12 +215,22 @@ namespace Sale.Api.Data
                        new CategoryTranslation { Language = "en", Name = "Food" },
                        new CategoryTranslation { Language = "ar", Name = "طعام" }
                    },
-                    subcategories =
-                    [
-                        new Subcategory { Name = "Snacks", Brands = [ new Brand { Name = "Lay's" }, new Brand { Name = "Doritos" } ] },
-                        new Subcategory { Name = "Beverages", Brands = [ new Brand { Name = "Pepsi" }, new Brand { Name = "Coca-Cola" } ] },
-                        new Subcategory { Name = "Frozen Foods", Brands = [ new Brand { Name = "Nestle" }, new Brand { Name = "McCain" } ] }
-                    ]
+                    subcategories =new List<Subcategory>
+                    {
+                        new Subcategory
+                        {                          
+                            SubcategoryTranslations = new List<SubcategoryTranslation>
+                            {
+                                new SubcategoryTranslation { Language = "en", Name = "Snacks" },
+                                new SubcategoryTranslation { Language = "ar", Name = "وجبات خفيفة" },
+                                new SubcategoryTranslation { Language = "en", Name = "Beverages" },
+                                new SubcategoryTranslation { Language = "ar", Name = "مشروبات" },
+                                new SubcategoryTranslation { Language = "en", Name = "Frozen Foods" },
+                                new SubcategoryTranslation { Language = "ar", Name = "أطعمة مجمدة" }
+                            }
+                        }
+                    }
+                   
                 });
 
                 _context.Categories.Add(new Category
@@ -187,11 +240,20 @@ namespace Sale.Api.Data
                        new CategoryTranslation { Language = "en", Name = "Cosmetics" },
                        new CategoryTranslation { Language = "ar", Name = "مستحضرات التجميل" }
                    },
-                    subcategories =
-                    [
-                        new Subcategory { Name = "Lipstick", Brands = [ new Brand { Name = "Revlon" }, new Brand { Name = "Sephora" } ] },
-                        new Subcategory { Name = "Foundation", Brands = [ new Brand { Name = "Estee Lauder" }, new Brand { Name = "Fenty Beauty" } ] }
-                    ]
+                    subcategories =new List<Subcategory>
+                    {
+
+                        new Subcategory
+                        {                          
+                            SubcategoryTranslations = new List<SubcategoryTranslation>
+                            {
+                                new SubcategoryTranslation { Language = "en", Name = "Lipstick" },
+                                new SubcategoryTranslation { Language = "ar", Name = "أحمر شفاه" },
+                                new SubcategoryTranslation { Language = "en", Name = "Foundation" },
+                                new SubcategoryTranslation { Language = "ar", Name = "كريم أساس" }
+                            }
+                        }
+                    }                   
                 });
 
                 _context.Categories.Add(new Category
@@ -202,11 +264,20 @@ namespace Sale.Api.Data
                        new CategoryTranslation { Language = "en", Name = "Sports" },
                        new CategoryTranslation { Language = "ar", Name = "الرياضة" }
                    },
-                    subcategories =
-                    [
-                        new Subcategory { Name = "Fitness Equipment", Brands = [ new Brand { Name = "NordicTrack" }, new Brand { Name = "Bowflex" } ] },
-                        new Subcategory { Name = "Outdoor Sports", Brands = [ new Brand { Name = "Columbia" }, new Brand { Name = "The North Face" } ] }
-                    ]
+                    subcategories =new List<Subcategory>
+                    {
+                        new Subcategory
+                        {                           
+                            SubcategoryTranslations = new List<SubcategoryTranslation>
+                            {
+                                new SubcategoryTranslation { Language = "en", Name = "Fitness Equipment" },
+                                new SubcategoryTranslation { Language = "ar", Name = "معدات اللياقة البدنية" },
+                                new SubcategoryTranslation { Language = "en", Name = "Outdoor Sports" },
+                                new SubcategoryTranslation { Language = "ar", Name = "الرياضات الخارجية" }
+                            }
+                        }
+                    }
+                    
                 });
 
                 _context.Categories.Add(new Category
@@ -216,11 +287,20 @@ namespace Sale.Api.Data
                        new CategoryTranslation { Language = "en", Name = "Gaming" },
                        new CategoryTranslation { Language = "ar", Name = "الألعاب" }
                    },
-                    subcategories =
-                    [
-                        new Subcategory { Name = "Consoles", Brands = [ new Brand { Name = "Sony" }, new Brand { Name = "Microsoft" } ] },
-                         new Subcategory { Name = "Accessories", Brands = [ new Brand { Name = "Razer" }, new Brand { Name = "Logitech" } ] }
-                    ]
+                    subcategories =new List<Subcategory>
+                    {
+                        new Subcategory
+                        {
+                            SubcategoryTranslations=new List<SubcategoryTranslation>
+                            {
+                                new SubcategoryTranslation { Language = "en", Name = "Consoles" },
+                                new SubcategoryTranslation { Language = "ar", Name = "أجهزة الألعاب" },
+                                new SubcategoryTranslation { Language = "en", Name = "Accessories" },
+                                new SubcategoryTranslation { Language = "ar", Name = "ملحقات" }
+                            }
+                        }
+                    }
+                    
                 });
 
                 _context.Categories.Add(new Category
@@ -230,11 +310,20 @@ namespace Sale.Api.Data
                        new CategoryTranslation { Language = "en", Name = "Toys" },
                        new CategoryTranslation { Language = "ar", Name = "لعب اطفال" }
                    },
-                    subcategories =
-                    [
-                        new Subcategory { Name = "Educational Toys", Brands = [ new Brand { Name = "LeapFrog" }, new Brand { Name = "Fisher-Price" } ] },
-                        new Subcategory { Name = "Action Figures", Brands = [ new Brand { Name = "Hasbro" }, new Brand { Name = "Mattel" } ] }
-                    ]
+                    subcategories =new List<Subcategory>
+                    {
+                        new Subcategory
+                        {                          
+                            SubcategoryTranslations=new List<SubcategoryTranslation>
+                            {
+                                new SubcategoryTranslation { Language = "en", Name = "Educational Toys" },
+                                new SubcategoryTranslation { Language = "ar", Name = "ألعاب تعليمية" },
+                                new SubcategoryTranslation { Language = "en", Name = "Action Figures" },
+                                new SubcategoryTranslation { Language = "ar", Name = "شخصيات الحركة" }
+                            }
+                        }
+                    }
+                   
                 });
 
                 _context.Categories.Add(new Category
@@ -244,11 +333,20 @@ namespace Sale.Api.Data
                        new CategoryTranslation { Language = "en", Name = "Pets" },
                        new CategoryTranslation { Language = "ar", Name = "حيوانات أليفة" }
                    },
-                    subcategories =
-                    [
-                        new Subcategory { Name = "Pet Food", Brands = [ new Brand { Name = "Purina" }, new Brand { Name = "Pedigree" } ] },
-                        new Subcategory { Name = "Pet Accessories", Brands = [ new Brand { Name = "KONG" }, new Brand { Name = "Outward Hound" } ] }
-                    ]
+                    subcategories =new List<Subcategory>
+                    {
+                        new Subcategory
+                        {                           
+                            SubcategoryTranslations=new List<SubcategoryTranslation>
+                            {
+                                new SubcategoryTranslation { Language = "en", Name = "Pet Food" },
+                                new SubcategoryTranslation { Language = "ar", Name = "طعام الحيوانات الأليفة" },
+                                new SubcategoryTranslation { Language = "en", Name = "Pet Accessories" },
+                                new SubcategoryTranslation { Language = "ar", Name = "إكسسوارات الحيوانات الأليفة" }
+                            }
+
+                        }
+                    }                    
                 });
 
                 _context.Categories.Add(new Category
@@ -260,11 +358,20 @@ namespace Sale.Api.Data
                        new CategoryTranslation { Language = "ar", Name = "تَغذِيَة" }
                    },
 
-                    subcategories =
-                    [
-                        new Subcategory { Name = "Supplements", Brands = [ new Brand { Name = "Optimum Nutrition" }, new Brand { Name = "MuscleTech" } ] },
-                        new Subcategory { Name = "Vitamins", Brands = [ new Brand { Name = "Nature Made" }, new Brand { Name = "Centrum" } ] }
-                    ]
+                    subcategories =new List<Subcategory>
+                    {
+                        new Subcategory
+                        {                            
+                                               
+                            SubcategoryTranslations = new List<SubcategoryTranslation>
+                            {
+                                new SubcategoryTranslation { Language = "en", Name = "Supplements" },
+                                new SubcategoryTranslation { Language = "ar", Name = "مُكَمِّلَات" },
+                                new SubcategoryTranslation { Language = "en", Name = "Vitamins" },
+                                new SubcategoryTranslation { Language = "ar", Name = "فِيتَامِين" }
+                            }
+                        }
+                    }                    
                 });
 
                 _context.Categories.Add(new Category
@@ -275,11 +382,21 @@ namespace Sale.Api.Data
                        new CategoryTranslation { Language = "en", Name = "Clothing" },
                        new CategoryTranslation { Language = "ar", Name = "ملابس" }
                    },
-                    subcategories =
-                    [
-                        new Subcategory { Name = "Men's Clothing", Brands = [ new Brand { Name = "Levi's" }, new Brand { Name = "H&M" } ] },
-                        new Subcategory { Name = "Women's Clothing", Brands = [ new Brand { Name = "Zara" }, new Brand { Name = "Forever 21" } ] }
-                    ]
+                    subcategories =new List<Subcategory>
+                    {
+                        new Subcategory
+                        {
+                                                
+                            SubcategoryTranslations = new List<SubcategoryTranslation>
+                            {
+                                new SubcategoryTranslation { Language = "en", Name="Men's Clothing" },
+                                new SubcategoryTranslation { Language = "ar", Name="ملابس رجالية" },
+                                new SubcategoryTranslation { Language = "en", Name="Women's Clothing" },
+                                new SubcategoryTranslation { Language = "ar", Name="ملابس نسائية" }
+                            }
+                        }
+                    }
+                   
                 });
 
                 _context.Categories.Add(new Category
@@ -289,11 +406,21 @@ namespace Sale.Api.Data
                        new CategoryTranslation { Language = "en", Name = "Technology" },
                        new CategoryTranslation { Language = "ar", Name = "تكنولوجيا" }
                    },
-                    subcategories =
-                    [
-                        new Subcategory { Name = "Laptops", Brands = [ new Brand { Name = "Dell" }, new Brand { Name = "HP" } ] },
-                        new Subcategory { Name = "Smartphones", Brands = [ new Brand { Name = "Samsung" }, new Brand { Name = "Xiaomi" } ] }
-                    ]
+                    subcategories =new List<Subcategory>
+                    {
+                        new Subcategory
+                        {                           
+                           
+                            SubcategoryTranslations = new List<SubcategoryTranslation>
+                            {
+                                new SubcategoryTranslation { Language = "en", Name = "Laptops" },
+                                new SubcategoryTranslation { Language = "ar", Name = "أجهزة الكمبيوتر المحمولة" },
+                                new SubcategoryTranslation { Language = "en", Name = "Smartphones" },
+                                new SubcategoryTranslation { Language = "ar", Name = "الهواتف الذكية" }
+                            }
+                        }
+                    }
+                   
                 });
 
                 await _context.SaveChangesAsync();
@@ -342,6 +469,13 @@ namespace Sale.Api.Data
             decimal cost, decimal desiredProfit)
         {
             var barcode = Guid.NewGuid().ToString("N").Substring(0, 12).ToUpper();
+            var brand = await _context.brands.FirstOrDefaultAsync(b => b.Name == brandNames);
+            if (brand == null)
+            {
+                brand = new Brand { Name = brandNames };
+                _context.brands.Add(brand);
+                await _context.SaveChangesAsync(); // حفظ لإعطاء Brand Id
+            }
             Product product = new()
             {
                 Description = name,
@@ -361,11 +495,11 @@ namespace Sale.Api.Data
 
             foreach (var subcategoryName in Subcategories)
             {
-                var subcategory = await _context.subcategories.FirstOrDefaultAsync(sc => sc.Name == subcategoryName);
+                var subcategory = await _context.subcategories.FirstOrDefaultAsync(sc => sc.SubcategoryTranslations!.FirstOrDefault()!.Name == subcategoryName);
                 if (subcategory != null)
                 {
                     product.productsubCategories.Add(new ProductsubCategory { Category = subcategory });
-                    var brand = await _context.brands.FirstOrDefaultAsync(b => b.Name == brandNames);
+                     brand = await _context.brands.FirstOrDefaultAsync(b => b.Name == brandNames);
                     if (brand == null)
                     {
                         brand = new Brand
