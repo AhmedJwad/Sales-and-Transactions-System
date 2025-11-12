@@ -8,6 +8,7 @@ namespace Sale.Api.UnitsOfWork.Interfaces
     {
         Task<ActionResponse<int>> GetRecordsNumberAsync(PaginationDTO pagination);
         Task<ActionResponse<IEnumerable<Subcategory>>> GetAsync(PaginationDTO pagination);
+        Task<ActionResponse<Subcategory>> GetAsync(int id);
         Task<ActionResponse<int>> GetTotalPagesAsync(PaginationDTO pagination);
         Task<IEnumerable<SubcategoryDTO>> GetComboAsync(string lang = "en");
         Task<IEnumerable<SubcategoryDTO>> GetComboAsync(int categoryId, string lang = "en");

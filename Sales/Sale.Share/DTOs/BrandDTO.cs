@@ -9,6 +9,7 @@ namespace Sale.Share.DTOs
     public class BrandDTO
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public int SubcategoryId { get; set; }
+        public List<BrandTranslationDTO>? BrandTranslation { get; set; }
     }
 }

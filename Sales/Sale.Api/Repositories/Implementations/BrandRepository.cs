@@ -17,43 +17,69 @@ namespace Sale.Api.Repositories.Implementations
         {
            _context = context;
         }
-
+               
         public override async Task<ActionResponse<IEnumerable<Brand>>> GetAsync(PaginationDTO pagination)
         {
-            var queryable = _context.brands.Include(x=>x.Subcategory).AsQueryable();
-            if(!string.IsNullOrWhiteSpace(pagination.Filter))
+            var lang=pagination.Language!.ToLower()?? "en";
+            var queryable = _context.brands.Include(x => x.Subcategory)
+                .Include(b => b.BrandTranslations!.Where(t => t.Language.ToLower() == lang)).AsNoTracking().AsQueryable();
+            //Select(b => new Brand
+            //{
+            //    Id = b.Id,
+            //    SubcategoryId = b.SubcategoryId,
+            //    Subcategory = b.Subcategory,
+            //    BrandTranslations = b.BrandTranslations!.Where(t => t.Language.ToLower() == lang).ToList()
+            //}).AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(pagination.Filter))
             {
-               queryable=queryable.Where(x=>x.Name.ToLower().Contains(pagination.Filter.ToLower()));
+                queryable = queryable.Where(s => s.BrandTranslations!
+                .Any(t => t.Language.ToLower() == lang && t.Name.ToLower().Contains(pagination.Filter.ToLower())));
             }
             return new ActionResponse<IEnumerable<Brand>>
             {
                 WasSuccess = true,
-                Result = await queryable.OrderBy(x => x.Name).ToListAsync()
+                Result = await queryable.Paginate(pagination).ToListAsync()
             };
 
         }
 
-        public async Task<IEnumerable<Brand>> GetComboAsync(int subcategoryId)
+        public async Task<IEnumerable<Brand>> GetComboAsync(int subcategoryId , string lang = "en")
         {
-            return await _context.brands.Where(x=>x.SubcategoryId==subcategoryId).OrderBy(x=>x.Name).ToListAsync();
+            lang = lang.ToLower();
+            var brands = await _context.brands
+                .Where(b => b.SubcategoryId == subcategoryId)
+                .Include(b => b.Subcategory)               
+                .Include(b => b.BrandTranslations!.Where(t => t.Language == lang))
+                .AsNoTracking()
+                .ToListAsync();
+            return brands;
         }
 
-        public async Task<IEnumerable<Brand>> GetComboAsync()
+        public async Task<IEnumerable<Brand>> GetComboAsync(string lang = "en")
         {
-            return await _context.brands.OrderBy(b => b.Name).ToListAsync();
+            lang = lang.ToLower();
+
+            var brands = await _context.brands
+                .Include(b => b.Subcategory)
+                .Include(b => b.BrandTranslations!.Where(t => t.Language == lang)) 
+                .ToListAsync();
+
+            return brands;
         }
 
-
+       
         public override async Task<ActionResponse<int>> GetRecordsNumberAsync(PaginationDTO pagination)
         {
-            var queryable=_context.brands.AsQueryable();
+            var queryable=_context.brands.Include(t=>t.BrandTranslations).AsQueryable();
             if(pagination.Id!=0)
             {
                 queryable=queryable.Where(x=>x.Subcategory!.Id==pagination.Id).AsQueryable();
             }
             if(!string.IsNullOrWhiteSpace(pagination.Filter))
             {
-                queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
+                queryable = queryable.Where(s => s.BrandTranslations!
+               .Any(t => t.Language.ToLower() == pagination.Language!.ToLower() && t.Name.ToLower().Contains(pagination.Filter.ToLower())));
             }
             int recordNumber=await queryable.CountAsync();
             return new ActionResponse<int>
@@ -66,10 +92,11 @@ namespace Sale.Api.Repositories.Implementations
 
         public override async Task<ActionResponse<int>> GetTotalPagesAsync(PaginationDTO pagination)
         {
-            var queryable = _context.brands.AsQueryable();
+            var queryable = _context.brands.Include(b=>b.BrandTranslations).AsQueryable();
             if(!string.IsNullOrWhiteSpace(pagination.Filter))
             {
-              queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
+                queryable = queryable.Where(s => s.BrandTranslations!
+                .Any(t => t.Language.ToLower() == pagination.Language!.ToLower() && t.Name.ToLower().Contains(pagination.Filter.ToLower())));
             }
            double count = await queryable.CountAsync();
             int totlaPage = (int)Math.Ceiling(count / pagination.RecordsNumber);
@@ -80,6 +107,120 @@ namespace Sale.Api.Repositories.Implementations
                 Result = totlaPage,
             };
 
+        }
+        public async Task<ActionResponse<Brand>> AddFullAsync(BrandDTO brandDTO)
+        {
+            try
+            {
+                var brand = new Brand
+                {
+                    SubcategoryId = brandDTO.SubcategoryId!,
+                    BrandTranslations = brandDTO.BrandTranslation!.GroupBy(bt=>bt.Language)
+                    .Select(g=>g.First()).Select(bt => new BrandTranslation
+                    {
+                        Language = bt.Language,
+                        Name = bt.Name,
+                    }).ToList(),
+                };
+                _context.brands.Add(brand);
+                await _context.SaveChangesAsync();
+                return new ActionResponse<Brand>
+                {
+                    WasSuccess = true,
+                    Result = brand,
+                };
+            }
+            catch (Exception ex)
+            {
+
+                return new ActionResponse<Brand>
+                {
+                    WasSuccess = false,
+                    Message = ex.Message,
+                };
+            }
+        }
+
+        public async Task<ActionResponse<Brand>> UpdateFullAsync(BrandDTO brandDTO)
+        {
+            try
+            {
+                var brand = await _context.brands.Include(bt => bt.BrandTranslations).FirstOrDefaultAsync(b => b.Id == brandDTO.Id);
+                if(brand == null)
+                {
+                    return new ActionResponse<Brand>
+                    {
+                        WasSuccess = false,
+                        Message = "Brand not found.",
+                    };
+                }
+                _context.brandTranslations.RemoveRange(brand.BrandTranslations!);
+                brand.SubcategoryId = brandDTO.SubcategoryId;
+                brand.BrandTranslations = brandDTO.BrandTranslation!
+                                    .GroupBy(bt => bt.Language)
+                                     .Select(g => g.First())
+                                     .Select(bt => new BrandTranslation
+                                     {
+                                         Language = bt.Language,
+                                         Name = bt.Name
+                                     })
+                                     .ToList();
+                _context.brands.Update(brand);
+                await _context.SaveChangesAsync();
+                return new ActionResponse<Brand>
+                {
+                    WasSuccess = true,
+                    Result = brand,
+                };
+
+            }
+            catch (Exception ex)
+            {
+                return new ActionResponse<Brand>
+                {
+                    WasSuccess = false,
+                    Message = ex.Message,
+                };
+
+            }
+        }
+        public override async Task<ActionResponse<Brand>> DeleteAsync(int Id)
+        {
+            try
+            {
+                var brand = await _context.brands.Include(x => x.BrandTranslations)
+                  .FirstOrDefaultAsync(x => x.Id == Id);
+                if (brand == null)
+                {
+                    return new ActionResponse<Brand>
+                    {
+                        WasSuccess = false,
+                        Message = "category does not exist"
+                    };
+                }
+               
+                if (brand.BrandTranslations != null && brand.BrandTranslations.Any())
+                {
+                    _context.brandTranslations.RemoveRange(brand.BrandTranslations);
+                }
+
+
+                _context.Remove(brand);
+                await _context.SaveChangesAsync();
+                return new ActionResponse<Brand>
+                {
+                    WasSuccess = true
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ActionResponse<Brand>
+                {
+                    WasSuccess = false,
+                    Message = ex.Message,
+                };
+
+            }
         }
     }
 }

@@ -32,9 +32,9 @@ namespace Sale.Api.Controllers
         }
         [AllowAnonymous]
         [HttpGet("combo/{categoryId:int}")]
-        public async Task<IActionResult> GetComboAsync(int subcategoryId)
+        public async Task<IActionResult> GetComboAsync(int subcategoryId, string lang = "en")
         {
-            return Ok(await _brandUnitofWork.GetComboAsync(subcategoryId));
+            return Ok(await _brandUnitofWork.GetComboAsync(subcategoryId, lang));
         }
 
         [HttpGet]       
@@ -60,9 +60,41 @@ namespace Sale.Api.Controllers
         }
         [AllowAnonymous]
         [HttpGet("combo")]
-        public async Task<IActionResult> GetComboAsync()
+        public async Task<IActionResult> GetComboAsync(string lang = "en")
         {
-            return Ok(await _brandUnitofWork.GetComboAsync());
+            return Ok(await _brandUnitofWork.GetComboAsync(lang));
         }
+        [HttpPost("full")]
+        public async Task<IActionResult> PostFullAsync(BrandDTO brandDTO)
+        {
+            var action = await _brandUnitofWork.AddFullAsync(brandDTO);
+            if (action.WasSuccess)
+            {
+                return Ok(action.Result);
+            }
+            return NotFound(action.Message);
+        }
+
+        [HttpPut("full")]
+        public async Task<IActionResult> PutFullAsync(BrandDTO brandDTO)
+        {
+            var action = await _brandUnitofWork.UpdateFullAsync(brandDTO);
+            if (action.WasSuccess)
+            {
+                return Ok(action.Result);
+            }
+            return NotFound(action.Message);
+        }
+        [HttpDelete("{id}")]
+        public override async Task<IActionResult> DeleteAsync(int id)
+        {
+            var action = await _brandUnitofWork.DeleteAsync(id);
+            if (!action.WasSuccess)
+            {
+                return NotFound();
+            }
+            return NoContent();
+        }
+
     }
 }

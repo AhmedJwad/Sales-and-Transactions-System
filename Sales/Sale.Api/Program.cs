@@ -25,7 +25,6 @@ builder.Services.AddControllers()
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole(); 
 
-
 //.AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
@@ -135,7 +134,7 @@ app.UseStaticFiles(new StaticFileOptions
            Path.Combine(builder.Environment.ContentRootPath, "images/subcategories")),
     RequestPath = "/images/subcategories"
 });
-app.UseCors(x => x
+app.UseCors(x => x          
            .AllowAnyMethod()
            .AllowAnyHeader()
            .SetIsOriginAllowed(origin => true)

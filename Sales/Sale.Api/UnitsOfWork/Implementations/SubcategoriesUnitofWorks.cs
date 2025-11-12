@@ -28,6 +28,9 @@ namespace Sale.Api.UnitsOfWork.Implementations
         public override async Task<ActionResponse<int>> GetRecordsNumberAsync(PaginationDTO pagination)
         => await _subcategoryRepository.GetRecordsNumberAsync(pagination);
 
+        public override async Task<ActionResponse<Subcategory>> GetAsync(int id)
+            => await _subcategoryRepository.GetAsync(id);
+
         public override async Task<ActionResponse<int>> GetTotalPagesAsync(PaginationDTO pagination)
         => await _subcategoryRepository.GetTotalPagesAsync(pagination);
         public async Task<ActionResponse<Subcategory>> AddFullAsync(SubcategoryDTO subcategoryDTO)

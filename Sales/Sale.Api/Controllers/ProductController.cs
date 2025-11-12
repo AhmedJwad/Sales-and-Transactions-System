@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Sale.Api.UnitsOfWork.Implementations;
 using Sale.Api.UnitsOfWork.Interfaces;
 using Sale.Share.DTOs;
@@ -104,12 +105,19 @@ namespace Sale.Api.Controllers
         }
 
         [AllowAnonymous]
-        private BrandDTO tobranddto(Brand? brand)
+        private BrandDTO tobranddto(Brand? brand, string lang="en")
         {
             return new BrandDTO
             {
                 Id = brand!.Id,
-                Name = brand.Name,
+               BrandTranslation=new List<BrandTranslationDTO>
+               {
+                new BrandTranslationDTO
+                {
+                    Language=lang,
+                    Name=brand.BrandTranslations!.FirstOrDefault(bt=>bt.Language==lang)?.Name??""
+                }
+               }
             };
         }
 

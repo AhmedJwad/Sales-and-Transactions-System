@@ -636,7 +636,7 @@ namespace Sale.Api.Repositories.Implementations
             return new BrandDTO
             {
                 Id = brand!.Id,
-                Name = brand.Name
+                Name = brand.BrandTranslations!.FirstOrDefault(t=>t.Language=="en")!.Name
             };
         }
 
@@ -657,7 +657,7 @@ namespace Sale.Api.Repositories.Implementations
                 brand = p.brand != null ? new BrandDTO
                 {
                     Id=p.brand.Id,
-                    Name=p.brand.Name,
+                    Name=p.brand.BrandTranslations!.FirstOrDefault(t=>t.Language=="en")!.Name,
                 } : null,
                 ProductSubCategories=p.productsubCategories!.Where
                 (sc=>sc.Category != null).SelectMany(sc=>sc.Category!.SubcategoryTranslations!).Select(s=>s.Name).ToList(),

@@ -29,12 +29,11 @@ namespace Sale.Api.Data
         public DbSet<ProductDiscount> productDiscounts { get; set; }
         public DbSet<Rating> ratings { get; set; }
         public DbSet<ProductColorImage> productColorImages { get; set; }
-        public DbSet<Order> orders { get; set; }    
-
+        public DbSet<Order> orders { get; set; }  
         public DbSet<OrderDetail> ordersDetail { get; set; }
-
         public DbSet<CategoryTranslation> categoryTranslations { get; set; }
         public DbSet<SubcategoryTranslation> subcategoryTranslations { get; set; }
+        public DbSet<BrandTranslation> brandTranslations { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -119,8 +118,16 @@ namespace Sale.Api.Data
                     .HasMany(pi => pi.productColorImages)
                     .WithOne(pci => pci.productImage)
                     .HasForeignKey(pci => pci.ProductImageId)
-                    .OnDelete(DeleteBehavior.Cascade);                    
-          
+                    .OnDelete(DeleteBehavior.Cascade);
+            // =============================
+            // 🔹 Brand - Related Collections
+            // =============================
+            modelBuilder.Entity<Brand>()
+                     .HasMany(b => b.BrandTranslations)
+                     .WithOne(p => p.brand)
+                     .HasForeignKey(p => p.BrandId)
+                     .OnDelete(DeleteBehavior.Cascade);
+
         }
     }
 }

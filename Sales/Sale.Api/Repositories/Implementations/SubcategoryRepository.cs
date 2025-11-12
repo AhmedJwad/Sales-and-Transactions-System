@@ -19,24 +19,44 @@ namespace Sale.Api.Repositories.Implementations
            _fileStorage = fileStorage;
         }
        
-        public override async Task<ActionResponse<IEnumerable<Subcategory>>> GetAsync(PaginationDTO pagination)
+        public override  async Task<ActionResponse<IEnumerable<Subcategory>>> GetAsync(PaginationDTO pagination)
         {
             var lang = pagination.Language?.ToLower() ?? "en";
-            var queryable = _context.subcategories.Include(st=>st.SubcategoryTranslations!
-            .Where(t=>t.Language.ToLower()==lang)).AsQueryable();
+            var queryable = _context.subcategories.Include(c=>c.Category).
+                ThenInclude(ct=>ct.categoryTranslations!.Where(t=>t.Language.ToLower()==lang)).Include(st=>st.SubcategoryTranslations!
+            .Where(t=>t.Language.ToLower()==lang)).AsNoTracking().AsQueryable();
             if (!string.IsNullOrWhiteSpace(pagination.Filter))
             {
                 queryable = queryable.Where(s => s.SubcategoryTranslations!.Any(t => t.Language.ToLower()==lang && t.Name.ToLower().Contains(pagination.Filter.ToLower())));
             }
+            var query = await queryable.OrderBy(s => s.SubcategoryTranslations!.FirstOrDefault(s => s.Language == lang)!.Name)
+                .Paginate(pagination).ToListAsync();
+          
             return new ActionResponse<IEnumerable<Subcategory>>
             {
                 WasSuccess = true,
-                Result = await queryable.OrderBy(s => s.SubcategoryTranslations!.FirstOrDefault(s=>s.Language==lang)!.Name)
-                .Paginate(pagination).ToListAsync(),
+                Result = query
             };
         }
-        
 
+        public override async Task<ActionResponse<Subcategory>> GetAsync(int Id)
+        {
+            var subcategory = await _context.subcategories.Include(s => s.SubcategoryTranslations)
+                .Include(s => s.Brands).AsNoTracking().FirstOrDefaultAsync(s => s.Id == Id);
+            if (subcategory == null)
+            {
+                return new ActionResponse<Subcategory>
+                {
+                    WasSuccess = false,
+                    Message = "subcategory does not exist"
+                };
+            }
+            return new ActionResponse<Subcategory>
+            {
+                WasSuccess = true,
+                Result = subcategory
+            };
+         }
         public async Task<IEnumerable<SubcategoryDTO>> GetComboAsync(string lang = "en")
         {
             lang = lang.ToLower();
@@ -149,7 +169,7 @@ namespace Sale.Api.Repositories.Implementations
                 if (!string.IsNullOrEmpty(subcategoryDTO.Photo))
                 {
                     var productPhoto = Convert.FromBase64String(subcategoryDTO!.Photo!);
-                    subcategory.Photo = await _fileStorage.SaveFileAsync(productPhoto, ".jpg", "categories");
+                    subcategory.Photo = await _fileStorage.SaveFileAsync(productPhoto, ".jpg", "subcategories");
                 }
                 _context.Add(subcategory);
                 await _context.SaveChangesAsync();
@@ -173,7 +193,7 @@ namespace Sale.Api.Repositories.Implementations
         {
             try
             {
-                var subCategory = await _context.subcategories.FirstOrDefaultAsync(x => x.Id == subcategoryDTO.Id);
+                var subCategory = await _context.subcategories.Include(S=>S.SubcategoryTranslations).FirstOrDefaultAsync(x => x.Id == subcategoryDTO.Id);
                 if (subCategory == null)
                 {
                     return new ActionResponse<Subcategory>
@@ -184,10 +204,17 @@ namespace Sale.Api.Repositories.Implementations
                 }
                 if (!string.IsNullOrEmpty(subcategoryDTO.Photo))
                 {
-                    var productPhoto = Convert.FromBase64String(subcategoryDTO!.Photo!);
-                    subCategory.Photo = await _fileStorage.SaveFileAsync(productPhoto, ".jpg", "subcategories");
-                }              
-                subCategory.CategoryId= subcategoryDTO.CategoryId;
+                    if (!subcategoryDTO.Photo.StartsWith("images/subcategories"))
+                    {
+                       var productPhoto = Convert.FromBase64String(subcategoryDTO!.Photo!);
+                        subCategory.Photo = await _fileStorage.SaveFileAsync(productPhoto, ".jpg", "subcategories");
+                    }else
+                    {
+                        subCategory.Photo = subcategoryDTO.Photo;
+                    }                   
+                }
+                _context.subcategoryTranslations.RemoveRange(subCategory.SubcategoryTranslations!);
+                subCategory.CategoryId= subcategoryDTO.CategoryId;              
                 subCategory.SubcategoryTranslations= subcategoryDTO.SubcategoryTranslations!.Select(s => new SubcategoryTranslation
                 {
                     Language = s.Language,
@@ -217,7 +244,7 @@ namespace Sale.Api.Repositories.Implementations
             try
             {
                 var subCategory = await _context.subcategories.Include(x=>x.SubcategoryTranslations)
-                    .Include(b=>b.Brands).FirstOrDefaultAsync(x => x.Id == Id);
+                  .FirstOrDefaultAsync(x => x.Id == Id);
                 if (subCategory == null)
                 {
                     return new ActionResponse<Subcategory>
@@ -230,7 +257,12 @@ namespace Sale.Api.Repositories.Implementations
                 {
                     await _fileStorage.RemoveFileAsync(subCategory.Photo!, "subcategories");
 
-                }           
+                }
+                if (subCategory.SubcategoryTranslations != null && subCategory.SubcategoryTranslations.Any())
+                {
+                    _context.subcategoryTranslations.RemoveRange(subCategory.SubcategoryTranslations);
+                }
+
 
                 _context.Remove(subCategory);
                 await _context.SaveChangesAsync();

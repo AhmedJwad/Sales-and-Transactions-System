@@ -9,8 +9,11 @@ namespace Sale.Api.UnitsOfWork.Interfaces
         Task<ActionResponse<int>> GetRecordsNumberAsync(PaginationDTO pagination);
         Task<ActionResponse<IEnumerable<Brand>>> GetAsync(PaginationDTO pagination);
         Task<ActionResponse<int>> GetTotalPagesAsync(PaginationDTO pagination);
-        Task<IEnumerable<Brand>> GetComboAsync(int subcategoryId);
-        Task<IEnumerable<Brand>> GetComboAsync();
+        Task<IEnumerable<Brand>> GetComboAsync(int subcategoryId, string lang = "en");
+        Task<IEnumerable<Brand>> GetComboAsync(string lang = "en");
+        Task<ActionResponse<Brand>> AddFullAsync(BrandDTO brandDTO);
+        Task<ActionResponse<Brand>> UpdateFullAsync(BrandDTO brandDTO);
+        Task<ActionResponse<Brand>> DeleteAsync(int id);
 
     }
 }

@@ -15,19 +15,27 @@ namespace Sale.Api.UnitsOfWork.Implementations
           _brandRepository = brandRepository;
         }
 
+        public async Task<ActionResponse<Brand>> AddFullAsync(BrandDTO brandDTO)
+         => await _brandRepository.AddFullAsync(brandDTO);
+
         public override async Task<ActionResponse<IEnumerable<Brand>>> GetAsync(PaginationDTO pagination)
         => await _brandRepository.GetAsync(pagination);
 
-        public async Task<IEnumerable<Brand>> GetComboAsync(int subcategoryId)
-        => await _brandRepository.GetComboAsync(subcategoryId);
+        public async Task<IEnumerable<Brand>> GetComboAsync(int subcategoryId, string lang = "en")
+        => await _brandRepository.GetComboAsync(subcategoryId, lang);
 
-        public async Task<IEnumerable<Brand>> GetComboAsync()
-        =>await _brandRepository.GetComboAsync();
+        public async Task<IEnumerable<Brand>> GetComboAsync(string lang = "en")
+        =>await _brandRepository.GetComboAsync(lang);
 
         public override async Task<ActionResponse<int>> GetRecordsNumberAsync(PaginationDTO pagination)
         => await _brandRepository.GetRecordsNumberAsync(pagination);
 
         public override async Task<ActionResponse<int>> GetTotalPagesAsync(PaginationDTO pagination)
         => await _brandRepository.GetTotalPagesAsync(pagination);
+
+        public async Task<ActionResponse<Brand>> UpdateFullAsync(BrandDTO brandDTO)
+        => await _brandRepository.UpdateFullAsync(brandDTO);
+        public async Task<ActionResponse<Brand>> DeleteAsync(int id)
+        => await _brandRepository.DeleteAsync(id);
     }
 }

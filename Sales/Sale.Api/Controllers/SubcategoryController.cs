@@ -95,5 +95,15 @@ namespace Sale.Api.Controllers
             }
             return NoContent();
         }
+        [HttpGet("{id}")]
+        public override async Task<IActionResult> GetAsync(int id)
+        {
+            var action = await _iSubcategoriesUnitofWorks.GetAsync(id);
+            if (action.WasSuccess)
+            {
+                return Ok(action.Result);
+            }
+            return NotFound(action.Message);
+        }
     }
 }

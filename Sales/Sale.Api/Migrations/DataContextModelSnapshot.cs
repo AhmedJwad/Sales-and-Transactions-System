@@ -163,10 +163,6 @@ namespace Sale.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("SubcategoryId")
                         .HasColumnType("int");
 
@@ -175,6 +171,33 @@ namespace Sale.Api.Migrations
                     b.HasIndex("SubcategoryId");
 
                     b.ToTable("brands");
+                });
+
+            modelBuilder.Entity("Sale.Share.Entities.BrandTranslation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BrandId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BrandId");
+
+                    b.ToTable("brandTranslations");
                 });
 
             modelBuilder.Entity("Sale.Share.Entities.Category", b =>
@@ -918,6 +941,17 @@ namespace Sale.Api.Migrations
                     b.Navigation("Subcategory");
                 });
 
+            modelBuilder.Entity("Sale.Share.Entities.BrandTranslation", b =>
+                {
+                    b.HasOne("Sale.Share.Entities.Brand", "brand")
+                        .WithMany("BrandTranslations")
+                        .HasForeignKey("BrandId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("brand");
+                });
+
             modelBuilder.Entity("Sale.Share.Entities.CategoryTranslation", b =>
                 {
                     b.HasOne("Sale.Share.Entities.Category", "Category")
@@ -1162,6 +1196,8 @@ namespace Sale.Api.Migrations
 
             modelBuilder.Entity("Sale.Share.Entities.Brand", b =>
                 {
+                    b.Navigation("BrandTranslations");
+
                     b.Navigation("Products");
                 });
 
