@@ -14,6 +14,7 @@ namespace Sale.Api.UnitsOfWork.Interfaces
         Task<ActionResponse<Brand>> AddFullAsync(BrandDTO brandDTO);
         Task<ActionResponse<Brand>> UpdateFullAsync(BrandDTO brandDTO);
         Task<ActionResponse<Brand>> DeleteAsync(int id);
+        Task<ActionResponse<Brand>> GetAsync(int id);
 
     }
 }

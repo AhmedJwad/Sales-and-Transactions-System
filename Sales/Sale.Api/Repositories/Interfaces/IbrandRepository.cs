@@ -8,6 +8,7 @@ namespace Sale.Api.Repositories.Interfaces
     {
         Task<ActionResponse<int>> GetRecordsNumberAsync(PaginationDTO pagination);
         Task<ActionResponse<IEnumerable<Brand>>> GetAsync(PaginationDTO pagination);
+        Task<ActionResponse<Brand>> GetAsync(int id);
         Task<ActionResponse<int>> GetTotalPagesAsync(PaginationDTO pagination);
         Task<IEnumerable<Brand>> GetComboAsync(int subcategoryId, string lang = "en");
         Task<IEnumerable<Brand>> GetComboAsync(string lang = "en");

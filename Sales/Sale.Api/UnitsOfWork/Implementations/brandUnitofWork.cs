@@ -35,7 +35,10 @@ namespace Sale.Api.UnitsOfWork.Implementations
 
         public async Task<ActionResponse<Brand>> UpdateFullAsync(BrandDTO brandDTO)
         => await _brandRepository.UpdateFullAsync(brandDTO);
-        public async Task<ActionResponse<Brand>> DeleteAsync(int id)
+        public override async Task<ActionResponse<Brand>> DeleteAsync(int id)
         => await _brandRepository.DeleteAsync(id);
+
+        public override async Task<ActionResponse<Brand>> GetAsync(int id) 
+        => await _brandRepository.GetAsync(id);
     }
 }

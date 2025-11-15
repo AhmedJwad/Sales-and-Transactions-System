@@ -21,8 +21,8 @@ namespace Sale.Api.Repositories.Implementations
         public override async Task<ActionResponse<IEnumerable<Brand>>> GetAsync(PaginationDTO pagination)
         {
             var lang=pagination.Language!.ToLower()?? "en";
-            var queryable = _context.brands.Include(x => x.Subcategory)
-                .Include(b => b.BrandTranslations!.Where(t => t.Language.ToLower() == lang)).AsNoTracking().AsQueryable();
+            var queryable = _context.brands.Include(x => x.Subcategory).ThenInclude(st=>st.SubcategoryTranslations!
+                             .Where(t=>t.Language.ToLower()==lang)).Include(b => b.BrandTranslations!.Where(t => t.Language.ToLower() == lang)).AsNoTracking().AsQueryable();
             //Select(b => new Brand
             //{
             //    Id = b.Id,
@@ -108,6 +108,24 @@ namespace Sale.Api.Repositories.Implementations
             };
 
         }
+        public override async Task<ActionResponse<Brand>> GetAsync(int Id)
+        {
+            var brand = await _context.brands.Include(s => s.BrandTranslations)
+                .Include(s => s.Products).AsNoTracking().FirstOrDefaultAsync(s => s.Id == Id);
+            if (brand == null)
+            {
+                return new ActionResponse<Brand>
+                {
+                    WasSuccess = false,
+                    Message = "subcategory does not exist"
+                };
+            }
+            return new ActionResponse<Brand>
+            {
+                WasSuccess = true,
+                Result = brand
+            };
+        }
         public async Task<ActionResponse<Brand>> AddFullAsync(BrandDTO brandDTO)
         {
             try
@@ -115,7 +133,7 @@ namespace Sale.Api.Repositories.Implementations
                 var brand = new Brand
                 {
                     SubcategoryId = brandDTO.SubcategoryId!,
-                    BrandTranslations = brandDTO.BrandTranslation!.GroupBy(bt=>bt.Language)
+                    BrandTranslations = brandDTO.brandTranslations!.GroupBy(bt=>bt.Language)
                     .Select(g=>g.First()).Select(bt => new BrandTranslation
                     {
                         Language = bt.Language,
@@ -156,7 +174,7 @@ namespace Sale.Api.Repositories.Implementations
                 }
                 _context.brandTranslations.RemoveRange(brand.BrandTranslations!);
                 brand.SubcategoryId = brandDTO.SubcategoryId;
-                brand.BrandTranslations = brandDTO.BrandTranslation!
+                brand.BrandTranslations = brandDTO.brandTranslations!
                                     .GroupBy(bt => bt.Language)
                                      .Select(g => g.First())
                                      .Select(bt => new BrandTranslation
@@ -188,7 +206,7 @@ namespace Sale.Api.Repositories.Implementations
         {
             try
             {
-                var brand = await _context.brands.Include(x => x.BrandTranslations)
+                var brand = await _context.brands.Include(x => x.BrandTranslations).Include(x => x.Products)
                   .FirstOrDefaultAsync(x => x.Id == Id);
                 if (brand == null)
                 {
@@ -203,7 +221,10 @@ namespace Sale.Api.Repositories.Implementations
                 {
                     _context.brandTranslations.RemoveRange(brand.BrandTranslations);
                 }
-
+                if (brand.Products != null && brand.Products.Any())
+                {
+                    _context.Products.RemoveRange(brand.Products);
+                }
 
                 _context.Remove(brand);
                 await _context.SaveChangesAsync();

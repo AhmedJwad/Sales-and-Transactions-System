@@ -110,7 +110,7 @@ namespace Sale.Api.Controllers
             return new BrandDTO
             {
                 Id = brand!.Id,
-               BrandTranslation=new List<BrandTranslationDTO>
+               brandTranslations=new List<BrandTranslationDTO>
                {
                 new BrandTranslationDTO
                 {
