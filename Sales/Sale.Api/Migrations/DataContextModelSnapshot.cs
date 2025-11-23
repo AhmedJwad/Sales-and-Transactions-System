@@ -433,21 +433,11 @@ namespace Sale.Api.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
                     b.Property<decimal>("DesiredProfit")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("HasSerial")
                         .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
@@ -551,6 +541,38 @@ namespace Sale.Api.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("ProductImages");
+                });
+
+            modelBuilder.Entity("Sale.Share.Entities.ProductTranslation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("productTranslations");
                 });
 
             modelBuilder.Entity("Sale.Share.Entities.ProductsubCategory", b =>
@@ -1081,6 +1103,17 @@ namespace Sale.Api.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("Sale.Share.Entities.ProductTranslation", b =>
+                {
+                    b.HasOne("Sale.Share.Entities.Product", "Product")
+                        .WithMany("ProductTranslations")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("Sale.Share.Entities.ProductsubCategory", b =>
                 {
                     b.HasOne("Sale.Share.Entities.Product", "Product")
@@ -1238,6 +1271,8 @@ namespace Sale.Api.Migrations
             modelBuilder.Entity("Sale.Share.Entities.Product", b =>
                 {
                     b.Navigation("ProductImages");
+
+                    b.Navigation("ProductTranslations");
 
                     b.Navigation("orderDetail");
 

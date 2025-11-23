@@ -27,7 +27,7 @@ namespace Sale.Api.Controllers
         {
             return Ok(await _productsUnitOfWork.GetComboAsync());
         }
-
+        [AllowAnonymous]
         [HttpGet("recordsNumber")]        
         public override async Task<IActionResult> GetRecordsNumberAsync([FromQuery] PaginationDTO pagination)
         {
@@ -78,48 +78,12 @@ namespace Sale.Api.Controllers
         {
             var response = await _productsUnitOfWork.GetAsync(pagination);
             if (response.WasSuccess)
-            {
-                var dtoList = response.Result!.Select(p => new ProductResponseDTO
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Barcode = p.Barcode,
-                    Description = p.Description,
-                    Price = p.Price,
-                    Cost = p.Cost,
-                    DesiredProfit = p.DesiredProfit,
-                    Stock = p.Stock,
-                    BrandId = p.BrandId,
-                    HasSerial = p.HasSerial,                    
-                    ProductColor = p.productColor?.Where(c=>c.color!=null).Select(c => c.color!.HexCode).ToList(),
-                    ProductSize = p.productSize?.Where(s=>s.size!=null).Select(s => s.size!.Name).ToList(),
-                    ProductImages = p.ProductImages?.Select(img => img.Image).ToList(),
-                    SerialNumbers = p.serialNumbers?.Where(sn=>sn.SerialNumberValue!=null).Select(sn => sn.SerialNumberValue).ToList(),
-                    brand=tobranddto(p.brand)
-                    
-                }).ToList();
-
-                return Ok(dtoList);
+            {        
+                return Ok(response.Result);
             }
             return BadRequest();
         }
-
-        [AllowAnonymous]
-        private BrandDTO tobranddto(Brand? brand, string lang="en")
-        {
-            return new BrandDTO
-            {
-                Id = brand!.Id,
-               brandTranslations=new List<BrandTranslationDTO>
-               {
-                new BrandTranslationDTO
-                {
-                    Language=lang,
-                    Name=brand.BrandTranslations!.FirstOrDefault(bt=>bt.Language==lang)?.Name??""
-                }
-               }
-            };
-        }
+      
 
         [AllowAnonymous]
         [HttpGet("totalPages")]        

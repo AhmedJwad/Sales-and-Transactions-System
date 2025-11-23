@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sale.Api.Data;
+using Sale.Api.Helpers;
 using Sale.Api.Repositories.Interfaces;
 using Sale.Share.DTOs;
 using Sale.Share.Entities;
@@ -62,7 +63,7 @@ namespace Sale.Api.Repositories.Implementations
             return new ActionResponse<IEnumerable<Sizep>>
             {
                 WasSuccess = true,
-                Result =await queryable.OrderBy(x=>x.Name).ToListAsync(),
+                Result =await queryable.OrderBy(x=>x.Name).Paginate(pagination).ToListAsync(),
             };
         }
 

@@ -34,6 +34,7 @@ namespace Sale.Api.Data
         public DbSet<CategoryTranslation> categoryTranslations { get; set; }
         public DbSet<SubcategoryTranslation> subcategoryTranslations { get; set; }
         public DbSet<BrandTranslation> brandTranslations { get; set; }
+        public DbSet<ProductTranslation> productTranslations { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -127,6 +128,11 @@ namespace Sale.Api.Data
                      .WithOne(p => p.brand)
                      .HasForeignKey(p => p.BrandId)
                      .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Product>()
+                .HasMany(p => p.ProductTranslations)
+                .WithOne(t => t.Product)
+                .HasForeignKey(t => t.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
 
         }
     }

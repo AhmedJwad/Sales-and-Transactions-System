@@ -100,13 +100,10 @@ namespace Sale.Api.Repositories.Implementations
                                 .ToList(),
                     Photo = s.Photo,
                     Products = s.Prosubcategories!
-                        .Select(ps => ps.Product)
-                        .OrderBy(p => p.Name)
+                        .Select(ps => ps.Product)                      
                         .Select(p => new ProductDTO
                         {
-                            Id = p.Id,
-                            Name = p.Name,
-                            Description = p.Description,
+                            Id = p.Id,                            
                             Price = p.Price
                         })
                         .ToList()

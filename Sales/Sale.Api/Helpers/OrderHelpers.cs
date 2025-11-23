@@ -74,7 +74,7 @@ namespace Sale.Api.Helpers
                     return new ActionResponse<bool>
                     {
                         WasSuccess = false,
-                        Message = $"Sorry we do not have enough stock of the product {product.Name}. " +
+                        Message = $"Sorry we do not have enough stock of the product {product.ProductTranslations!.FirstOrDefault()!.Name}. " +
                         $"Please reduce the quantity or replace it with another."
                     };
                 product.Stock -= (decimal)detail.Quantity;
@@ -92,9 +92,7 @@ namespace Sale.Api.Helpers
                     var product = products.First(p => p.Id == item.ProductId);
                     return new OrderDetail
                     {
-                        Price = product.Price,
-                        Description = product.Description!,
-                        Name = product.Name!,
+                        Price = product.Price,                       
                         Image = product.MainImage!,
                         Quantity = item.Quantity,
                         Remarks = orderDTO.Remarks,

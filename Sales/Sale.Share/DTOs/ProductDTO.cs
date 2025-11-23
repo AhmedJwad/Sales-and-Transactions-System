@@ -50,12 +50,17 @@ namespace Sale.Share.DTOs
         [Required(ErrorMessage = "Field {0} is required.")]
         public decimal Stock { get; set; }
         public int BrandId { get; set; }
-
         public bool HasSerial { get; set; }
+        public DateTime CreatedAt { get; set; }
         public List<int>? ProductCategoryIds { get; set; }
         public List<int>? ProductColorIds { get; set; }
         public List<int>? ProductSizeIds { get; set; }
         public List<string>? ProductImages { get; set; }
         public List<string>? SerialNumbers { get; set; }
+        public List<ProductionTranslationsDTO>? productionTranslations{ get; set; }
+        public List<SubcategoryDTO>? Categories { get; set; }
+        public List<ColorDTO>? Colors { get; set; }
+        public List<SizeDTO>? Sizes { get; set; }
+        public BrandDTO? Brand { get; set; }
     }
 }

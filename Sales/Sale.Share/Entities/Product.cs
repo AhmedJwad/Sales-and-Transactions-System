@@ -10,23 +10,12 @@ namespace Sale.Share.Entities
 {
     public class Product
     {
-        public int Id { get; set; }
-
-        [Display(Name = "Name")]
-        [MaxLength(50, ErrorMessage = "Field {0} must have a maximum of {1} characters.")]
-        [Required(ErrorMessage = "Field {0} is required.")]
-        public string Name { get; set; } = null!;
+        public int Id { get; set; }    
 
         [Display(Name = "Barcode")]
         [MaxLength(20, ErrorMessage = "Field {0} must have a maximum of {1} characters.")]
         [Required(ErrorMessage = "Field {0} is required.")]
-        public string Barcode { get; set; } = null!;
-
-        [DataType(DataType.MultilineText)]
-        [Display(Name = "Description")]
-        [MaxLength(500, ErrorMessage = "Field {0} must have a maximum of {1} characters.")]
-        public string Description { get; set; } = null!;
-
+        public string Barcode { get; set; } = null!;  
         [Column(TypeName = "decimal(18,2)")]
         [DisplayFormat(DataFormatString = "{0:C2}")]
         [Display(Name = "Price")]
@@ -63,7 +52,7 @@ namespace Sale.Share.Entities
         [DisplayFormat(DataFormatString = "{0:N2}")]
         [Display(Name = "Inventory")]
         [Required(ErrorMessage = "Field {0} is required.")]
-        public decimal Stock { get; set; }        
+        public decimal Stock { get; set; }
         public bool HasSerial { get; set; }
         public DateTime CreatedAt { get; set; }
         public ICollection<ProductsubCategory>? productsubCategories { get; set; }
@@ -83,7 +72,8 @@ namespace Sale.Share.Entities
         public ICollection<ProductColor>? productColor { get; set; }
         public ICollection<productSize>? productSize { get; set; }
         public ICollection<ProductDiscount>? productDiscount { get; set; }
-        public ICollection<Rating>? rating { get; set; }   
+        public ICollection<Rating>? rating { get; set; }
         public ICollection<OrderDetail>? orderDetail { get; set; }
+        public ICollection<ProductTranslation>? ProductTranslations { get; set; }
     }
-}
+ }
