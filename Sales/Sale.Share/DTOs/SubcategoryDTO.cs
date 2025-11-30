@@ -16,6 +16,6 @@ namespace Sale.Share.DTOs
         public int CategoryId { get; set; }
         public List<string>? category { get; set; }
         public List<ProductDTO> Products { get; set; } = new();
-        public List<SubcategoryTranslationDto>? SubcategoryTranslations { get; set; } 
+        public List<SubcategoryTranslationDto>? SubcategoryTranslations { get; set; }        
     }
 }

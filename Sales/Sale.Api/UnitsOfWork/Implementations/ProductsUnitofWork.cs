@@ -23,7 +23,7 @@ namespace Sale.Api.UnitsOfWork.Implementations
         => await _productRepository.DeleteAsync(id);
 
         
-        public override async Task<ActionResponse<Product>> GetAsync(int id)
+        public async Task<ActionResponse<Product>> GetAsync(int id )
         => await _productRepository.GetAsync(id);
         public  async Task<ActionResponse<IEnumerable<ProductDTO>>> GetAsync(PaginationDTO pagination)
         => await _productRepository.GetAsync(pagination);

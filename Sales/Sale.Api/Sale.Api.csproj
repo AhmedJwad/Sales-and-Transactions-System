@@ -32,7 +32,6 @@
     <Folder Include="images\subcategories\" />
     <Folder Include="images\users\" />
     <Folder Include="images\products\" />
-    <Folder Include="Migrations\" />
   </ItemGroup>
 
 </Project>

@@ -91,9 +91,9 @@ namespace Sale.Api.Controllers
             var action = await _iSubcategoriesUnitofWorks.DeleteAsync(id);
             if (!action.WasSuccess)
             {
-                return NotFound();
+                return NotFound(action.Message);
             }
-            return NoContent();
+            return Ok(action);
         }
         [HttpGet("{id}")]
         public override async Task<IActionResult> GetAsync(int id)

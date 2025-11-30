@@ -133,6 +133,7 @@ namespace Sale.Api.Data
                 .WithOne(t => t.Product)
                 .HasForeignKey(t => t.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
+           
 
         }
     }

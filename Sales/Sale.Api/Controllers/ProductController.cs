@@ -45,9 +45,9 @@ namespace Sale.Api.Controllers
             var action = await _productsUnitOfWork.DeleteAsync(id);
             if (!action.WasSuccess)
             {
-                return NotFound();
+                return NotFound(action.Message);
             }
-            return NoContent();
+            return Ok(action);
         }
 
         [HttpPost("addImages")]
@@ -98,8 +98,8 @@ namespace Sale.Api.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("{id}")]
-        public override async Task<IActionResult> GetAsync(int id)
+        [HttpGet("get/{id}")]
+        public async Task<IActionResult> GetAsync(int id)
         {
             var action = await _productsUnitOfWork.GetAsync(id);
             if (action.WasSuccess)

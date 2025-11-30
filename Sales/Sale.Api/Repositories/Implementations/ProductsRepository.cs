@@ -87,24 +87,17 @@ namespace Sale.Api.Repositories.Implementations
                     product.ProductImages!.Add(productImage);
                 }
                 var subCategories = await _context.subcategories!
-                                        .Include(x => x.Brands)
-                                        .Include(x=>x.SubcategoryTranslations)
-                                        .Where(x => productDTO.ProductCategoryIds!.Contains(x.Id))
-                                        .ToListAsync();
+                                         .Include(x => x.Brands)
+                                         .Include(x => x.SubcategoryTranslations)
+                                         .Where(x => productDTO.ProductCategoryIds!.Contains(x.Id))
+                                         .ToListAsync();
                 foreach (var subcategory in subCategories!)
                 {
-                    
-                    product.productsubCategories.Add(new ProductsubCategory { Category = subcategory });
+                   
+                    product.productsubCategories.Add(new ProductsubCategory {subcategoryId=subcategory.Id});
                    
                 }
-                var brands = subCategories
-                            .SelectMany(sc => sc.Brands!)
-                            .Distinct() 
-                            .ToList();
-                if (brands.Any())
-                {
-                    product.BrandId = brands.First().Id; 
-                }
+                
 
                 if (product.HasSerial && product.Stock > 0)
                 {
@@ -132,9 +125,9 @@ namespace Sale.Api.Repositories.Implementations
                 product.ProductTranslations=productDTO.productionTranslations!.Select(t=> new ProductTranslation
                 {
                     ProductId=product.Id,
-                    Language =t.Language,
-                    Name=t.Name,
-                    Description=t.Description,
+                    Language =t.language,
+                    Name=t.name,
+                    Description=t.description,
                 }).ToList();
                 _context.Add(product);
                 await _context.SaveChangesAsync();
@@ -267,11 +260,11 @@ namespace Sale.Api.Repositories.Implementations
 
         public override async Task<ActionResponse<Product>> GetAsync(int id)
         {
-            var product=await _context.Products!.Include(x=>x.ProductImages!)
-                .Include(x=>x.productsubCategories!).ThenInclude(x=>x.Category).ThenInclude(x=>x.Category).Include(x=>x.serialNumbers)
-                .Include(x=>x.productColor!).ThenInclude(x=>x.color).Include(x=>x.productSize!).ThenInclude(x=>x.size)
-                .Include(x=>x.brand).FirstOrDefaultAsync(x=>x.Id == id);
-            if(product == null)
+            var product = await _context.Products!.Include(p => p.ProductTranslations).Include(x => x.ProductImages!)
+                .Include(x => x.productsubCategories!).ThenInclude(x => x.Category).ThenInclude(x => x.SubcategoryTranslations).Include(x => x.serialNumbers)
+                .Include(x => x.productColor!).ThenInclude(x => x.color).Include(x => x.productSize!).ThenInclude(x => x.size)
+                .Include(x => x.brand).ThenInclude(bt=>bt.BrandTranslations).AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+            if (product == null)
             {
                 return new ActionResponse<Product>
                 {
@@ -284,14 +277,101 @@ namespace Sale.Api.Repositories.Implementations
                 WasSuccess = true,
                 Result = product,
             };
+            //var product = await _context.Products
+            //    .Where(p => p.Id == id)
+            //    .Select(p => new ProductDTO
+            //    {
+            //        Id = p.Id,
+            //        Barcode = p.Barcode,
+            //        Price = p.Price,
+            //        Cost = p.Cost,
+            //        DesiredProfit = p.DesiredProfit,
+            //        Stock = p.Stock,
+            //        BrandId = p.BrandId,
+            //        HasSerial = p.HasSerial,
+            //        CreatedAt = p.CreatedAt,
+
+            //        // Images
+            //        ProductImages = p.ProductImages!.Select(img => img.Image).ToList(),
+
+            //        // Serial Numbers
+            //        SerialNumbers = p.serialNumbers!.Select(sn => sn.SerialNumberValue).ToList(),
+
+            //        // Translations (default language = "en")
+            //        productionTranslations = p.ProductTranslations!.Select(t=> new ProductionTranslationsDTO
+            //        {
+            //            language=t.Language,
+            //            name=t.Name,
+            //            description=t.Description,
+            //        }).ToList(),                      
+            //        // Categories
+            //        Categories = p.productsubCategories!.Select(psc => new SubcategoryDTO
+            //        {
+            //            Id = psc.Category!.Id,
+            //            category = psc.Category!
+            //                .SubcategoryTranslations!
+            //                .Where(t => t.Language.ToLower() == lang.ToLower())
+            //                .Select(t => t.Name)
+            //                .ToList()
+            //        }).ToList(),
+
+            //        // Colors
+            //        Colors = p.productColor!.Select(pc => new ColorDTO
+            //        {
+            //            Id = pc.color!.Id,
+            //            Name = pc.color!.Name,
+            //            HexCode = pc.color!.HexCode
+            //        }).ToList(),
+
+            //        // Sizes
+            //        Sizes = p.productSize!.Select(ps => new SizeDTO
+            //        {
+            //            Id = ps.size!.Id,
+            //            Name = ps.size!.Name
+            //        }).ToList(),
+
+            //        // Brand
+            //        Brand = new BrandDTO
+            //        {
+            //            Id = p.brand!.Id,
+            //            brandTranslations = p.brand.BrandTranslations!
+            //                .Where(t => t.Language.ToLower() == lang.ToLower())
+            //                .Select(t => new BrandTranslationDTO
+            //                {
+            //                    Language = t.Language,
+            //                    Name = t.Name
+            //                })
+            //                .ToList()
+            //        }
+            //    })
+            //    .AsNoTracking()
+            //    .FirstOrDefaultAsync();
+
+            //if (product == null)
+            //{
+            //    return new ActionResponse<ProductDTO>
+            //    {
+            //        WasSuccess = false,
+            //        Message = "Product does not exist"
+            //    };
+            //}
+
+            //return new ActionResponse<ProductDTO>
+            //{
+            //    WasSuccess = true,
+            //    Result = product
+            //};
         }
 
-        public  async Task<ActionResponse<IEnumerable<ProductDTO>>> GetAsync(PaginationDTO pagination)
+        public async Task<ActionResponse<IEnumerable<ProductDTO>>> GetAsync(PaginationDTO pagination)
         {
-            var queryable = _context.Products.AsNoTracking().Include(pt=>pt.ProductTranslations!.Where(t=>t.Language.ToLower()==pagination.Language!.ToLower()))
-                .Include(x => x.productsubCategories!).ThenInclude(x=>x.Category!.SubcategoryTranslations!.Where(t=>t.Language.ToLower()==pagination.Language!.ToLower())).Include(x=>x.productColor!)
-                .ThenInclude(x=>x.color).Include(x => x.ProductImages).Include(x => x.brand).ThenInclude(b=>b.BrandTranslations!.Where(t=>t.Language.ToLower()==pagination.Language!.ToLower())).Include(x => x.serialNumbers).Include(x=>x.productSize!).ThenInclude(x=>x.size).AsQueryable();
-            if(!string.IsNullOrWhiteSpace(pagination.Filter))
+            var queryable = _context.Products.Include(pt => pt.ProductTranslations!.Where(t => t.Language.ToLower() == pagination.Language!.ToLower()))
+                .Include(x => x.productsubCategories!).ThenInclude(x => x.Category!.SubcategoryTranslations!.Where(t => t.Language.ToLower() == pagination.Language!.ToLower())).Include(x => x.productColor!)
+                .ThenInclude(x => x.color).Include(x => x.ProductImages).Include(x => x.brand).ThenInclude(b => b.BrandTranslations!.Where(t => t.Language.ToLower() == pagination.Language!.ToLower())).Include(x => x.serialNumbers).Include(x => x.productSize!).ThenInclude(x => x.size)
+               .AsQueryable();
+
+
+            if (!string.IsNullOrWhiteSpace(pagination.Filter))
             {
                queryable = queryable.Where(x => x.ProductTranslations!.Any(t=>t.Language.ToLower()==pagination!.Language!.ToLower() && t.Name.ToLower().Contains(pagination.Filter.ToLower())));
             }
@@ -324,7 +404,8 @@ namespace Sale.Api.Repositories.Implementations
                             Id = psc.Category!.Id,
                             category = psc.Category!.SubcategoryTranslations!
                             .Where(t => t.Language.ToLower() == pagination.Language!.ToLower())
-                            .Select(t => t.Name).ToList(),
+                            .Select(t => t.Name).ToList(),                           
+                             
                      }).ToList(),
                     Colors=p.productColor!.Select(pc=> new ColorDTO
                     {
@@ -337,7 +418,18 @@ namespace Sale.Api.Repositories.Implementations
                         Id=ps.size!.Id,
                         Name=ps.size!.Name,
                     }).ToList(),
-                    Brand=tobrand(p.brand, pagination.Language!),
+                    Brand = new BrandDTO
+                    {
+                        Id = p.brand!.Id,
+                        brandTranslations = p.brand.BrandTranslations!
+                                                .Where(t => t.Language.ToLower() == pagination.Language!.ToLower())
+                                                .Select(t => new BrandTranslationDTO
+                                                {
+                                                    Language = t.Language,
+                                                    Name = t.Name
+                                                })
+                                                .ToList()
+                    },
                 }).ToListAsync();
            
 
@@ -455,9 +547,9 @@ namespace Sale.Api.Repositories.Implementations
         {
             try
             {
-                var product = await _context.Products.Include(x => x.productsubCategories!).ThenInclude(x => x.Category).ThenInclude(x => x.Category)
-                    .Include(x => x.brand).Include(x => x.serialNumbers).Include(x=>x.productColor).Include(x=>x.productSize)
-                    .FirstOrDefaultAsync(x => x.Id == productDTO.Id);
+                var product = await _context.Products.Include(pt=>pt.ProductTranslations).Include(pc=> pc.productsubCategories!).ThenInclude(c => c.Category)
+                    .Include(x => x.brand).Include(x => x.serialNumbers).Include(x=>x.productColor!).ThenInclude(c=>c.color)
+                    .Include(x=>x.productSize!).ThenInclude(s=>s.size).FirstOrDefaultAsync(x => x.Id == productDTO.Id);
                 if (product == null)
                 {
                     return new ActionResponse<Product>
@@ -477,6 +569,7 @@ namespace Sale.Api.Repositories.Implementations
                 product.productColor = new List<ProductColor>();
                 _context.productSizes.RemoveRange(product.productSize!);
                 product.productSize = new List<productSize>();
+                _context.productTranslations.RemoveRange(product.ProductTranslations);
                 var subcategories = await _context.subcategories
                                   .Include(x => x.Brands)
                                   .Where(x => productDTO.ProductCategoryIds!.Contains(x.Id))
@@ -511,6 +604,12 @@ namespace Sale.Api.Repositories.Implementations
                         });
                     }
                 }
+                product.ProductTranslations = productDTO.productionTranslations!.Select(t => new ProductTranslation
+                {
+                    Language=t.language,
+                    Name=t.name,
+                    Description=t.description,                   
+                }).ToList();
                 _context.Update(product);
                 await _context.SaveChangesAsync();
                 return new ActionResponse<Product>

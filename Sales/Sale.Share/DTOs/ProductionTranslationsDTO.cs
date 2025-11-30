@@ -8,9 +8,9 @@ namespace Sale.Share.DTOs
 {
    public class ProductionTranslationsDTO
     {
-        public string Language { get; set; } = null!;
+        public string language { get; set; } = null!;
 
-        public string Description { get; set; } = null!;
-        public string Name { get; set; } = null!;
+        public string description { get; set; } = null!;
+        public string name { get; set; } = null!;
     }
 }

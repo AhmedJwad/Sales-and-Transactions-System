@@ -27,12 +27,12 @@ namespace Sale.Api.Data
         public async Task SeedAsync()
         {
             await _context.Database.EnsureCreatedAsync();        
-            await CheckCategoriesAsync();
-            await CheckProductsAsync();
+            await CheckCategoriesAsync();          
             await CheckCountriesAsync();
             await CheckRolesAsync();
             await CheckUsersAsync();
             await CheckBrandAsunc();
+            await CheckProductsAsync();
         }
 
       
@@ -123,10 +123,7 @@ namespace Sale.Api.Data
                                 {
                                     new SubcategoryTranslation { Language = "en", Name = "iPhone 16" },
                                     new SubcategoryTranslation { Language = "ar", Name = "ايفون 16" },
-                                    new SubcategoryTranslation { Language = "en", Name = "MacBook Pro" },
-                                    new SubcategoryTranslation { Language = "ar", Name = "ماك بوك برو" },
-                                    new SubcategoryTranslation { Language = "en", Name = "iPad Air" },
-                                    new SubcategoryTranslation { Language = "ar", Name = "ايباد اير" },
+                                   
 
                                 },
                             }
@@ -150,10 +147,7 @@ namespace Sale.Api.Data
 
                             new SubcategoryTranslation { Language = "en", Name = "Electric Cars" },
                             new SubcategoryTranslation { Language = "ar", Name = "سيارات كهربائية" },
-                            new SubcategoryTranslation { Language = "en", Name = "Luxury Cars" },
-                            new SubcategoryTranslation { Language = "ar", Name = "سيارات فاخرة" },
-                            new SubcategoryTranslation { Language = "en", Name = "SUV" },
-                            new SubcategoryTranslation { Language = "ar", Name = "دفع رباعي" }
+                           
                         }
                     }
                   }
@@ -176,10 +170,7 @@ namespace Sale.Api.Data
                             {
                                 new SubcategoryTranslation { Language = "en", Name = "Skincare" },
                                 new SubcategoryTranslation { Language = "ar", Name = "العناية بالبشرة" },
-                                new SubcategoryTranslation { Language = "en", Name = "Makeup" },
-                                new SubcategoryTranslation { Language = "ar", Name = "مكياج" },
-                                new SubcategoryTranslation { Language = "en", Name = "Haircare" },
-                                new SubcategoryTranslation { Language = "ar", Name = "العناية بالشعر" }
+                              
 
                         }
                     }
@@ -203,8 +194,7 @@ namespace Sale.Api.Data
                             {
                                 new SubcategoryTranslation { Language = "en", Name="Men's Shoes" },
                                 new SubcategoryTranslation { Language = "ar", Name="أحذية رجالية" },
-                                new SubcategoryTranslation { Language = "en", Name="Women's Shoes" },
-                                new SubcategoryTranslation { Language = "ar", Name="أحذية نسائية" },
+                               
                             }
 
                         }
@@ -225,11 +215,7 @@ namespace Sale.Api.Data
                             SubcategoryTranslations = new List<SubcategoryTranslation>
                             {
                                 new SubcategoryTranslation { Language = "en", Name = "Snacks" },
-                                new SubcategoryTranslation { Language = "ar", Name = "وجبات خفيفة" },
-                                new SubcategoryTranslation { Language = "en", Name = "Beverages" },
-                                new SubcategoryTranslation { Language = "ar", Name = "مشروبات" },
-                                new SubcategoryTranslation { Language = "en", Name = "Frozen Foods" },
-                                new SubcategoryTranslation { Language = "ar", Name = "أطعمة مجمدة" }
+                                new SubcategoryTranslation { Language = "ar", Name = "وجبات خفيفة" },                               
                             }
                         }
                     }
@@ -252,8 +238,7 @@ namespace Sale.Api.Data
                             {
                                 new SubcategoryTranslation { Language = "en", Name = "Lipstick" },
                                 new SubcategoryTranslation { Language = "ar", Name = "أحمر شفاه" },
-                                new SubcategoryTranslation { Language = "en", Name = "Foundation" },
-                                new SubcategoryTranslation { Language = "ar", Name = "كريم أساس" }
+                               
                             }
                         }
                     }
@@ -274,9 +259,7 @@ namespace Sale.Api.Data
                             SubcategoryTranslations = new List<SubcategoryTranslation>
                             {
                                 new SubcategoryTranslation { Language = "en", Name = "Fitness Equipment" },
-                                new SubcategoryTranslation { Language = "ar", Name = "معدات اللياقة البدنية" },
-                                new SubcategoryTranslation { Language = "en", Name = "Outdoor Sports" },
-                                new SubcategoryTranslation { Language = "ar", Name = "الرياضات الخارجية" }
+                                new SubcategoryTranslation { Language = "ar", Name = "معدات اللياقة البدنية" },                               
                             }
                         }
                     }
@@ -297,9 +280,7 @@ namespace Sale.Api.Data
                             SubcategoryTranslations=new List<SubcategoryTranslation>
                             {
                                 new SubcategoryTranslation { Language = "en", Name = "Consoles" },
-                                new SubcategoryTranslation { Language = "ar", Name = "أجهزة الألعاب" },
-                                new SubcategoryTranslation { Language = "en", Name = "Accessories" },
-                                new SubcategoryTranslation { Language = "ar", Name = "ملحقات" }
+                                new SubcategoryTranslation { Language = "ar", Name = "أجهزة الألعاب" },                              
                             }
                         }
                     }
@@ -320,9 +301,7 @@ namespace Sale.Api.Data
                             SubcategoryTranslations=new List<SubcategoryTranslation>
                             {
                                 new SubcategoryTranslation { Language = "en", Name = "Educational Toys" },
-                                new SubcategoryTranslation { Language = "ar", Name = "ألعاب تعليمية" },
-                                new SubcategoryTranslation { Language = "en", Name = "Action Figures" },
-                                new SubcategoryTranslation { Language = "ar", Name = "شخصيات الحركة" }
+                                new SubcategoryTranslation { Language = "ar", Name = "ألعاب تعليمية" },                              
                             }
                         }
                     }
@@ -343,9 +322,7 @@ namespace Sale.Api.Data
                             SubcategoryTranslations=new List<SubcategoryTranslation>
                             {
                                 new SubcategoryTranslation { Language = "en", Name = "Pet Food" },
-                                new SubcategoryTranslation { Language = "ar", Name = "طعام الحيوانات الأليفة" },
-                                new SubcategoryTranslation { Language = "en", Name = "Pet Accessories" },
-                                new SubcategoryTranslation { Language = "ar", Name = "إكسسوارات الحيوانات الأليفة" }
+                                new SubcategoryTranslation { Language = "ar", Name = "طعام الحيوانات الأليفة" },                               
                             }
 
                         }
@@ -369,9 +346,7 @@ namespace Sale.Api.Data
                             SubcategoryTranslations = new List<SubcategoryTranslation>
                             {
                                 new SubcategoryTranslation { Language = "en", Name = "Supplements" },
-                                new SubcategoryTranslation { Language = "ar", Name = "مُكَمِّلَات" },
-                                new SubcategoryTranslation { Language = "en", Name = "Vitamins" },
-                                new SubcategoryTranslation { Language = "ar", Name = "فِيتَامِين" }
+                                new SubcategoryTranslation { Language = "ar", Name = "مُكَمِّلَات" },                               
                             }
                         }
                     }
@@ -393,9 +368,7 @@ namespace Sale.Api.Data
                             SubcategoryTranslations = new List<SubcategoryTranslation>
                             {
                                 new SubcategoryTranslation { Language = "en", Name="Men's Clothing" },
-                                new SubcategoryTranslation { Language = "ar", Name="ملابس رجالية" },
-                                new SubcategoryTranslation { Language = "en", Name="Women's Clothing" },
-                                new SubcategoryTranslation { Language = "ar", Name="ملابس نسائية" }
+                                new SubcategoryTranslation { Language = "ar", Name="ملابس رجالية" },                               
                             }
                         }
                     }
@@ -418,8 +391,7 @@ namespace Sale.Api.Data
                             {
                                 new SubcategoryTranslation { Language = "en", Name = "Laptops" },
                                 new SubcategoryTranslation { Language = "ar", Name = "أجهزة الكمبيوتر المحمولة" },
-                                new SubcategoryTranslation { Language = "en", Name = "Smartphones" },
-                                new SubcategoryTranslation { Language = "ar", Name = "الهواتف الذكية" }
+                              
                             }
                         }
                     }
@@ -538,10 +510,14 @@ namespace Sale.Api.Data
 
             foreach (var subcategoryName in Subcategories)
             {
+                //var subcategory = await _context.subcategories
+                //                         .Include(sc => sc.SubcategoryTranslations)
+                //                         .FirstOrDefaultAsync(sc => sc.SubcategoryTranslations!
+                //                         .Any(t => t.Name == subcategoryName));
                 var subcategory = await _context.subcategories
-                                         .Include(sc => sc.SubcategoryTranslations)
-                                         .FirstOrDefaultAsync(sc => sc.SubcategoryTranslations!
-                                         .Any(t => t.Name == subcategoryName));
+                                        .Include(sc => sc.SubcategoryTranslations)
+                                        .FirstOrDefaultAsync(sc => sc.SubcategoryTranslations!
+                                        .Any(t => t.Name == subcategoryName));
                 if (subcategory == null)
                 {
                     Console.WriteLine($"⚠️ Subcategory '{subcategoryName}' not found in database!");
@@ -551,20 +527,28 @@ namespace Sale.Api.Data
                 {
                     product.productsubCategories.Add(new ProductsubCategory { Category = subcategory });
 
-                }
-                var brand = await _context.brands.Include(b=>b.BrandTranslations).FirstOrDefaultAsync(b => b.BrandTranslations!.Any(t=>t.Name==brandNames));
-                if (brand == null)
-                {
-                    brand = new Brand {  SubcategoryId=subcategory!.Id, Subcategory=subcategory, 
-                        BrandTranslations =new List<BrandTranslation>
-                        {
-                            new BrandTranslation { Language="en", Name=brandNames }
-                        }
-                    };
-                }
-                product.brand = brand;
+                }              
+                
             }
-                foreach (string image in images)
+            var brand = await _context.brands.Include(b => b.BrandTranslations).FirstOrDefaultAsync(b => b.BrandTranslations!.Any(t => t.Name == brandNames));
+            var subcategorybrand = await _context.subcategories.Include(t => t.SubcategoryTranslations).FirstOrDefaultAsync();
+            if (brand == null)
+            {
+                brand = new Brand
+                {
+                    SubcategoryId = subcategorybrand!.Id,
+                    Subcategory = subcategorybrand,
+                    BrandTranslations = new List<BrandTranslation>
+                        {
+                            new BrandTranslation { Language="en", Name=brandNames },
+                            new BrandTranslation { Language="ar", Name=brandNames }
+                        }
+                };
+
+            }
+
+            product.brand = brand;
+            foreach (string image in images)
                 {
                     string filePath = _runtimeInformationWrapper.IsOSPlatform(OSPlatform.Windows)
                         ? $"{Environment.CurrentDirectory}\\images\\products\\{image}"
@@ -734,46 +718,131 @@ namespace Sale.Api.Data
             }
         private async Task CheckBrandAsunc()
         {
-            if(!_context.brands.Any())
+            if (!_context.brands.Any())
             {
-                    var subcategory = await _context.subcategories
-                                      .FirstOrDefaultAsync();
-                    var brand = new Brand
+                var subcategory = await _context.subcategories.FirstOrDefaultAsync();
+
+                var brands = new List<Brand>
+                {
+                    new Brand
                     {
                         SubcategoryId = subcategory!.Id,
-                        Subcategory=subcategory,
                         BrandTranslations = new List<BrandTranslation>
                         {
                             new BrandTranslation { Language = "en", Name = "Apple" },
                             new BrandTranslation { Language = "ar", Name = "آبل" }
                         }
-                    };
+                    },
                     new Brand
                     {
                         SubcategoryId = subcategory.Id,
-                        Subcategory = subcategory,
                         BrandTranslations = new List<BrandTranslation>
-                    {
-                        new BrandTranslation { Language = "en", Name = "Samsung" },
-                        new BrandTranslation { Language = "ar", Name = "سامسونج" }
-                    }
-                    };
+                        {
+                            new BrandTranslation { Language = "en", Name = "Samsung" },
+                            new BrandTranslation { Language = "ar", Name = "سامسونج" }
+                        }
+                    },
                     new Brand
                     {
                         SubcategoryId = subcategory.Id,
-                        Subcategory = subcategory,
                         BrandTranslations = new List<BrandTranslation>
-                    {
-                        new BrandTranslation { Language = "en", Name = "Xiaomi" },
-                        new BrandTranslation { Language = "ar", Name = "شاومي" }
-                    }
-                    };               
-            
+                        {
+                            new BrandTranslation { Language = "en", Name = "Xiaomi" },
+                            new BrandTranslation { Language = "ar", Name = "شاومي" }
+                        }
+                    },
 
-               _context.brands.Add(brand);
+                    // البراندات التي طلبتها
+                    new Brand
+                    {
+                        SubcategoryId = subcategory.Id,
+                        BrandTranslations = new List<BrandTranslation>
+                        {
+                            new BrandTranslation { Language = "en", Name = "Adidas" },
+                            new BrandTranslation { Language = "ar", Name = "أديداس" }
+                        }
+                    },
+                    new Brand
+                    {
+                        SubcategoryId = subcategory.Id,
+                        BrandTranslations = new List<BrandTranslation>
+                        {
+                            new BrandTranslation { Language = "en", Name = "Nature Made" },
+                            new BrandTranslation { Language = "ar", Name = "نيتشر ميد" }
+                        }
+                    },
+                    new Brand
+                    {
+                        SubcategoryId = subcategory.Id,
+                        BrandTranslations = new List<BrandTranslation>
+                        {
+                            new BrandTranslation { Language = "en", Name = "Akai" },
+                            new BrandTranslation { Language = "ar", Name = "أكاي" }
+                        }
+                    },
+                    new Brand
+                    {
+                        SubcategoryId = subcategory.Id,
+                        BrandTranslations = new List<BrandTranslation>
+                        {
+                            new BrandTranslation { Language = "en", Name = "Bose" },
+                            new BrandTranslation { Language = "ar", Name = "بوز" }
+                        }
+                    },
+                    new Brand
+                    {
+                        SubcategoryId = subcategory.Id,
+                        BrandTranslations = new List<BrandTranslation>
+                        {
+                            new BrandTranslation { Language = "en", Name = "Ribble" },
+                            new BrandTranslation { Language = "ar", Name = "ريبّل" }
+                        }
+                    },
+                    new Brand
+                    {
+                        SubcategoryId = subcategory.Id,
+                        BrandTranslations = new List<BrandTranslation>
+                        {
+                            new BrandTranslation { Language = "en", Name = "H&M" },
+                            new BrandTranslation { Language = "ar", Name = "اتش آند ام" }
+                        }
+                    },
+                    new Brand
+                    {
+                        SubcategoryId = subcategory.Id,
+                        BrandTranslations = new List<BrandTranslation>
+                        {
+                            new BrandTranslation { Language = "en", Name = "Outward Hound" },
+                            new BrandTranslation { Language = "ar", Name = "اوتوارد هاوند" }
+                        }
+                    },
+                    new Brand
+                    {
+                        SubcategoryId = subcategory.Id,
+                        BrandTranslations = new List<BrandTranslation>
+                        {
+                            new BrandTranslation { Language = "en", Name = "Columbia" },
+                            new BrandTranslation { Language = "ar", Name = "كولومبيا" }
+                        }
+                    },
+                    new Brand
+                    {
+                        SubcategoryId = subcategory.Id,
+                        BrandTranslations = new List<BrandTranslation>
+                        {
+                            new BrandTranslation { Language = "en", Name = "Nestle" },
+                            new BrandTranslation { Language = "ar", Name = "نستله" }
+                        }
+                    }
+                };
+
+                _context.brands.AddRange(brands);
                 await _context.SaveChangesAsync();
             }
         }
 
+
     }
+
 }
+

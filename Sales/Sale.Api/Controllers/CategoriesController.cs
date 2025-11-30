@@ -82,11 +82,11 @@ namespace Sale.Api.Controllers
         public override async Task<IActionResult> DeleteAsync(int id)
         {
             var action = await _categoriesUnitOfWork.DeleteAsync(id);
-            if (!action.WasSuccess)
+            if (action.WasSuccess)
             {
-                return NotFound();
-            }
-            return NoContent();
+                return Ok(action);
+            }           
+            return NotFound(action.Message);
         }
 
         [HttpGet("{id}")]

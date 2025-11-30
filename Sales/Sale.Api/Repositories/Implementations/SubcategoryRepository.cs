@@ -259,13 +259,11 @@ namespace Sale.Api.Repositories.Implementations
                 {
                     _context.subcategoryTranslations.RemoveRange(subCategory.SubcategoryTranslations);
                 }
-
-
                 _context.Remove(subCategory);
                 await _context.SaveChangesAsync();
                 return new ActionResponse<Subcategory>
                 {
-                    WasSuccess = true
+                  WasSuccess=true,
                 };
             }
             catch (Exception ex)
