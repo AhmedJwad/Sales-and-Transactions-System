@@ -313,6 +313,29 @@ namespace Sale.Api.Migrations
                     b.ToTable("countries");
                 });
 
+            modelBuilder.Entity("Sale.Share.Entities.Currency", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("currencies");
+                });
+
             modelBuilder.Entity("Sale.Share.Entities.Discount", b =>
                 {
                     b.Property<int>("Id")
@@ -336,6 +359,44 @@ namespace Sale.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("discounts");
+                });
+
+            modelBuilder.Entity("Sale.Share.Entities.ExchangeRate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BaseCurrencyId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("Rate")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TargetCurrencyId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BaseCurrencyId");
+
+                    b.HasIndex("TargetCurrencyId");
+
+                    b.ToTable("exchangeRates");
                 });
 
             modelBuilder.Entity("Sale.Share.Entities.Order", b =>
@@ -427,20 +488,11 @@ namespace Sale.Api.Migrations
                     b.Property<int>("BrandId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("Cost")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("DesiredProfit")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<bool>("HasSerial")
                         .HasColumnType("bit");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("Stock")
                         .HasColumnType("decimal(18,2)");
@@ -541,6 +593,39 @@ namespace Sale.Api.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("ProductImages");
+                });
+
+            modelBuilder.Entity("Sale.Share.Entities.ProductPrice", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Cost")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CurrencyId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CurrencyId");
+
+                    b.HasIndex("ProductId", "CurrencyId")
+                        .IsUnique();
+
+                    b.ToTable("productPrices");
                 });
 
             modelBuilder.Entity("Sale.Share.Entities.ProductTranslation", b =>
@@ -996,6 +1081,25 @@ namespace Sale.Api.Migrations
                     b.Navigation("State");
                 });
 
+            modelBuilder.Entity("Sale.Share.Entities.ExchangeRate", b =>
+                {
+                    b.HasOne("Sale.Share.Entities.Currency", "BaseCurrency")
+                        .WithMany("ExchangeRatesAsBase")
+                        .HasForeignKey("BaseCurrencyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Sale.Share.Entities.Currency", "TargetCurrency")
+                        .WithMany("ExchangeRatesAsTarget")
+                        .HasForeignKey("TargetCurrencyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("BaseCurrency");
+
+                    b.Navigation("TargetCurrency");
+                });
+
             modelBuilder.Entity("Sale.Share.Entities.Order", b =>
                 {
                     b.HasOne("Sale.Share.Entities.User", "User")
@@ -1099,6 +1203,25 @@ namespace Sale.Api.Migrations
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("Sale.Share.Entities.ProductPrice", b =>
+                {
+                    b.HasOne("Sale.Share.Entities.Currency", "Currency")
+                        .WithMany("ProductPrices")
+                        .HasForeignKey("CurrencyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Sale.Share.Entities.Product", "Product")
+                        .WithMany("ProductPrices")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Currency");
 
                     b.Navigation("Product");
                 });
@@ -1258,6 +1381,15 @@ namespace Sale.Api.Migrations
                     b.Navigation("states");
                 });
 
+            modelBuilder.Entity("Sale.Share.Entities.Currency", b =>
+                {
+                    b.Navigation("ExchangeRatesAsBase");
+
+                    b.Navigation("ExchangeRatesAsTarget");
+
+                    b.Navigation("ProductPrices");
+                });
+
             modelBuilder.Entity("Sale.Share.Entities.Discount", b =>
                 {
                     b.Navigation("productDiscounts");
@@ -1271,6 +1403,8 @@ namespace Sale.Api.Migrations
             modelBuilder.Entity("Sale.Share.Entities.Product", b =>
                 {
                     b.Navigation("ProductImages");
+
+                    b.Navigation("ProductPrices");
 
                     b.Navigation("ProductTranslations");
 

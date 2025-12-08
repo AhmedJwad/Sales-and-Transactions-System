@@ -104,7 +104,7 @@ namespace Sale.Api.Repositories.Implementations
                         .Select(p => new ProductDTO
                         {
                             Id = p.Id,                            
-                            Price = p.Price
+                           // Price = p.Price
                         })
                         .ToList()
                 })

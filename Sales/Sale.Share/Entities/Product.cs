@@ -15,43 +15,7 @@ namespace Sale.Share.Entities
         [Display(Name = "Barcode")]
         [MaxLength(20, ErrorMessage = "Field {0} must have a maximum of {1} characters.")]
         [Required(ErrorMessage = "Field {0} is required.")]
-        public string Barcode { get; set; } = null!;  
-        [Column(TypeName = "decimal(18,2)")]
-        [DisplayFormat(DataFormatString = "{0:C2}")]
-        [Display(Name = "Price")]
-        [Required(ErrorMessage = "Field {0} is required.")]
-        public decimal Price { get; set; }
-
-        [Column(TypeName = "decimal(18,2)")]
-        [DisplayFormat(DataFormatString = "{0:C2}")]
-        [Display(Name = "Cost")]
-        [Required(ErrorMessage = "Field {0} is required.")]
-        public decimal Cost { get; set; }
-
-        [DisplayFormat(DataFormatString = "{0:C2}")]
-        [Display(Name = "Profit")]
-        public decimal Profit => Price - Cost;
-
-        [DisplayFormat(DataFormatString = "{0:C2}")]
-        [Display(Name = "Value of Cost")]
-        public decimal CostValue => Cost * Stock;
-
-        [DisplayFormat(DataFormatString = "{0:C2}")]
-        [Display(Name = "Value of Price")]
-        public decimal PriceValue => Price * Stock;
-
-        [DisplayFormat(DataFormatString = "{0:P2}")]
-        [Display(Name = "% Pure Profit")]
-        public decimal RealProfit => Cost == 0 ? 0 : Profit / Cost;
-
-        [DisplayFormat(DataFormatString = "{0:P2}")]
-        [Display(Name = "% Desired Profit")]
-        [Required(ErrorMessage = "Field {0} is required.")]
-        public decimal DesiredProfit { get; set; }
-
-        [DisplayFormat(DataFormatString = "{0:N2}")]
-        [Display(Name = "Inventory")]
-        [Required(ErrorMessage = "Field {0} is required.")]
+        public string Barcode { get; set; } = null!;          
         public decimal Stock { get; set; }
         public bool HasSerial { get; set; }
         public DateTime CreatedAt { get; set; }
@@ -75,5 +39,6 @@ namespace Sale.Share.Entities
         public ICollection<Rating>? rating { get; set; }
         public ICollection<OrderDetail>? orderDetail { get; set; }
         public ICollection<ProductTranslation>? ProductTranslations { get; set; }
+        public ICollection<ProductPrice>? ProductPrices { get; set; }
     }
  }

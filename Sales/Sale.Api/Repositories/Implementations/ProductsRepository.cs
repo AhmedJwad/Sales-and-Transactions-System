@@ -29,9 +29,9 @@ namespace Sale.Api.Repositories.Implementations
                 var product = new Product
                 {                    
                     Stock = productDTO.Stock,
-                    Cost = productDTO.Cost,
+                   // Cost = productDTO.Cost,
                     Barcode = string.IsNullOrEmpty(productDTO.Barcode) ? GenerateBarcode() : productDTO.Barcode,
-                    Price = productDTO.Price,
+                  //  Price = productDTO.Price,
                     HasSerial = productDTO.HasSerial,
                     CreatedAt = DateTime.UtcNow,
                     productsubCategories = new List<ProductsubCategory>(),
@@ -368,7 +368,7 @@ namespace Sale.Api.Repositories.Implementations
             var queryable = _context.Products.Include(pt => pt.ProductTranslations!.Where(t => t.Language.ToLower() == pagination.Language!.ToLower()))
                 .Include(x => x.productsubCategories!).ThenInclude(x => x.Category!.SubcategoryTranslations!.Where(t => t.Language.ToLower() == pagination.Language!.ToLower())).Include(x => x.productColor!)
                 .ThenInclude(x => x.color).Include(x => x.ProductImages).Include(x => x.brand).ThenInclude(b => b.BrandTranslations!.Where(t => t.Language.ToLower() == pagination.Language!.ToLower())).Include(x => x.serialNumbers).Include(x => x.productSize!).ThenInclude(x => x.size)
-               .AsQueryable();
+               .Include(p=>p.ProductPrices!).ThenInclude(pc=>pc.Currency).AsQueryable();
 
 
             if (!string.IsNullOrWhiteSpace(pagination.Filter))
@@ -388,9 +388,11 @@ namespace Sale.Api.Repositories.Implementations
                 {
                     Id = p.Id,                   
                     Barcode = p.Barcode,                  
-                    Price = p.Price,
-                    Cost = p.Cost,
-                    DesiredProfit = p.DesiredProfit,
+                    Price = p.ProductPrices!.Where(pp=>pp.Currency!.Code.ToUpper()==pagination.CurrencyCode!.ToUpper()).Select(pp=>pp.Price)
+                    .FirstOrDefault(),
+                    Cost = p.ProductPrices!.Where(pp => pp.Currency!.Code.ToUpper() == pagination.CurrencyCode!.ToUpper()).Select(pp => pp.Cost)
+                    .FirstOrDefault(),
+                   // DesiredProfit = p.DesiredProfit,
                     Stock = p.Stock,
                     BrandId = p.BrandId,
                     HasSerial = p.HasSerial,
@@ -558,10 +560,10 @@ namespace Sale.Api.Repositories.Implementations
                         Message = "Product does not exist",
                     };
                 }             
-                product.Price = productDTO.Price;
-                product.Stock = productDTO.Stock;
-                product.Cost = productDTO.Cost;
-                product.DesiredProfit = productDTO.DesiredProfit / 100;
+               // product.Price = productDTO.Price;
+                //product.Stock = productDTO.Stock;
+               // product.Cost = productDTO.Cost;
+               // product.DesiredProfit = productDTO.DesiredProfit / 100;
                 product.Barcode=productDTO.Barcode;               
                 _context.productsubCategories.RemoveRange(product.productsubCategories!);
                 product.productsubCategories = new List<ProductsubCategory>();
@@ -669,9 +671,9 @@ namespace Sale.Api.Repositories.Implementations
                {                 
                    Id = p.Id,                  
                    Barcode = p.Barcode,                 
-                   Price = p.Price,
-                   Cost = p.Cost,
-                   DesiredProfit = p.DesiredProfit,
+                  // Price = p.Price,
+                  // Cost = p.Cost,
+                  // DesiredProfit = p.DesiredProfit,
                    Stock = p.Stock,
                    BrandId = p.BrandId,
                    HasSerial = p.HasSerial,
@@ -720,19 +722,19 @@ namespace Sale.Api.Repositories.Implementations
             }
             if (productFilterDto.MaxPrice.HasValue)
             {
-               var temp = queryable.Where(p => p.Price <= productFilterDto.MaxPrice);
-                if (await temp.AnyAsync())
-                {
-                    queryable = temp;
-                }
+               //var temp = queryable.Where(p => p.Price <= productFilterDto.MaxPrice);
+                //if (await temp.AnyAsync())
+                //{
+                //    queryable = temp;
+                //}
             }
             if (productFilterDto.MinPrice.HasValue)
             {
-                var temp = queryable.Where(p => p.Price >= productFilterDto.MinPrice);
-                if (await temp.AnyAsync())
-                {
-                    queryable = temp;
-                }
+                //var temp = queryable.Where(p => p.Price >= productFilterDto.MinPrice);
+                //if (await temp.AnyAsync())
+                //{
+                //    queryable = temp;
+                //}
             }
             var products = await queryable.ToListAsync();
             if (!products.Any())
@@ -746,12 +748,12 @@ namespace Sale.Api.Repositories.Implementations
             var productresponse = products.Select(p => new ProductResponseDTO
             {
                 Id = p.Id,              
-                DesiredProfit = p.DesiredProfit,
+                //DesiredProfit = p.DesiredProfit,
                 Barcode = p.Barcode,
                 //brand = tobrand(p.brand),
-                Price = p.Price,
+               // Price = p.Price,
                 BrandId = p.BrandId,
-                Cost = p.Cost,
+                //Cost = p.Cost,
                 HasSerial = p.HasSerial,
                 ProductColor = p.productColor!.Select(pc => pc.color!.Name).ToList(),
                 ProductSize = p.productSize!.Select(ps => ps.size!.Name).ToList(),
@@ -797,12 +799,12 @@ namespace Sale.Api.Repositories.Implementations
             var product =await _context.Products.Select(p => new ProductResponseDTO
             {
                 Id = p.Id,               
-                DesiredProfit = p.DesiredProfit,
+                //DesiredProfit = p.DesiredProfit,
                 Barcode = p.Barcode,
-                Cost = p.Cost,
+                //Cost = p.Cost,
                 Stock = p.Stock,
                 HasSerial = p.HasSerial,
-                Price = p.Price,
+               // Price = p.Price,
                 CreatedAt=p.CreatedAt,
                 brand = p.brand != null ? new BrandDTO
                 {

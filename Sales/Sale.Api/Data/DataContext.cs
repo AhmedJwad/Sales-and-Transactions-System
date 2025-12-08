@@ -35,12 +35,18 @@ namespace Sale.Api.Data
         public DbSet<SubcategoryTranslation> subcategoryTranslations { get; set; }
         public DbSet<BrandTranslation> brandTranslations { get; set; }
         public DbSet<ProductTranslation> productTranslations { get; set; }
+        public DbSet<ProductPrice> productPrices { get; set; }
+        public DbSet<Currency> currencies { get; set; }
+        public DbSet<ExchangeRate> exchangeRates { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Country>().HasIndex(country => country.Name).IsUnique();
             modelBuilder.Entity<State>().HasIndex(state => state.Name).IsUnique();
             modelBuilder.Entity<City>().HasIndex(city => city.Name).IsUnique();
+            modelBuilder.Entity<ProductPrice>()
+                           .HasIndex(p => new { p.ProductId, p.CurrencyId })
+                           .IsUnique();  
             // =============================
             // 🔹 Category - Translations - Subcategories
             // =============================
@@ -133,7 +139,19 @@ namespace Sale.Api.Data
                 .WithOne(t => t.Product)
                 .HasForeignKey(t => t.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
-           
+            // =============================
+            // 🔹 Currencies - ExchangeRates - ProductPrices
+            // =============================
+            modelBuilder.Entity<ExchangeRate>()
+                .HasOne(er => er.BaseCurrency)
+                .WithMany(c => c.ExchangeRatesAsBase)
+                .HasForeignKey(er => er.BaseCurrencyId)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<ExchangeRate>()
+                .HasOne(er => er.TargetCurrency)
+                .WithMany(c => c.ExchangeRatesAsTarget)
+                .HasForeignKey(er => er.TargetCurrencyId)
+                .OnDelete(DeleteBehavior.Restrict);
 
         }
     }

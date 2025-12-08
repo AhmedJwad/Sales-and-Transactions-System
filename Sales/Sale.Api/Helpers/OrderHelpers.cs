@@ -92,7 +92,7 @@ namespace Sale.Api.Helpers
                     var product = products.First(p => p.Id == item.ProductId);
                     return new OrderDetail
                     {
-                        Price = product.Price,                       
+                        //Price = product.Price,                       
                         Image = product.MainImage!,
                         Quantity = item.Quantity,
                         Remarks = orderDTO.Remarks,

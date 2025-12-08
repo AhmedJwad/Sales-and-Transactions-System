@@ -32,10 +32,23 @@ namespace Sale.Api.Data
             await CheckRolesAsync();
             await CheckUsersAsync();
             await CheckBrandAsunc();
+            await CheckCurrenciesAsync();
             await CheckProductsAsync();
+           
         }
 
-      
+        private async Task CheckCurrenciesAsync()
+        {
+            if (!_context.currencies.Any())
+            {
+                _context.currencies.AddRange(                   
+                    new Currency { Code = "IQ", Name = "Iraqi Dinar" },
+                    new Currency { Code = "USD", Name = "US Dollar" }
+                );
+
+                await _context.SaveChangesAsync();
+            }
+        }
 
         private async Task CheckRolesAsync()
         {
@@ -408,89 +421,85 @@ namespace Sale.Api.Data
         {
             if (!_context.Products.Any())
             {
-                await AddProductAsync(["Adidas Barracuda",  "Adidas Barracuda Shoes", "en", "أديداس باراكودا", "أحذية أديداس باراكودا", "ar"], 270000M, ["Men's Shoes", "Fitness Equipment"], ["adidas_barracuda.png"], "Adidas", 230000M, 0.3M);
+                await AddProductAsync(["Adidas Barracuda",  "Adidas Barracuda Shoes", "en", "أديداس باراكودا", "أحذية أديداس باراكودا", "ar"], ["270000", "207.69"], ["Men's Shoes", "Fitness Equipment"], ["adidas_barracuda.png"], "Adidas");
                 //await AddProductAsync(["أديداس باراكودا", "أحذية أديداس باراكودا", "ar"], 270000M, ["Men's Shoes", "Fitness Equipment"], ["adidas_barracuda.png"], "Adidas", 230000M, 0.3M);
-                await AddProductAsync(["Adidas Superstar", "Adidas Superstar Shoes", "en", "أديداس سوبر ستار", "أحذية أديداس سوبر ستار", "ar"], 250000M, ["Men's Shoes", "Fitness Equipment"], ["Adidas_superstar.png"], "Adidas", 200000M, 0.3M);
+                await AddProductAsync(["Adidas Superstar", "Adidas Superstar Shoes", "en", "أديداس سوبر ستار", "أحذية أديداس سوبر ستار", "ar"], ["250000", "192.3077"], ["Men's Shoes", "Fitness Equipment"], ["Adidas_superstar.png"], "Adidas");
                 //await AddProductAsync(["أديداس سوبر ستار", "أحذية أديداس سوبر ستار", "ar"], 250000M, ["Men's Shoes", "Fitness Equipment"], ["Adidas_superstar.png"], "Adidas", 200000M, 0.3M);
-                await AddProductAsync(["Avocado", "Fresh Avocado Fruit", "en", "أفوكادو", "فاكهة أفوكادو طازجة", "ar"], 5000M, ["Snacks"], ["Aguacate1.jpg", "Aguacate2.jpg", "Aguacate3.jpg"], "Nature Made", 4000M, 0.3M);
+                await AddProductAsync(["Avocado", "Fresh Avocado Fruit", "en", "أفوكادو", "فاكهة أفوكادو طازجة", "ar"],["5000", "3.8461"], ["Snacks"], ["Aguacate1.jpg", "Aguacate2.jpg", "Aguacate3.jpg"], "Nature Made");
                 //await AddProductAsync(["أفوكادو", "فاكهة أفوكادو طازجة", "ar"], 5000M, ["Snacks"], ["Aguacate1.jpg", "Aguacate2.jpg", "Aguacate3.jpg"], "Nature Made", 4000M, 0.3M);
-                await AddProductAsync(["AirPods", "Apple AirPods Wireless Earbuds", "en", "آيربودز", "سماعات آبل اللاسلكية", "ar"], 1300000M, ["Smartphones", "iPhone 16"], ["airpos.png", "airpos2.png"], "Apple", 1000000M, 0.3M);
+                await AddProductAsync(["AirPods", "Apple AirPods Wireless Earbuds", "en", "آيربودز", "سماعات آبل اللاسلكية", "ar"], ["1300000", "1,000"], ["Smartphones", "iPhone 16"], ["airpos.png", "airpos2.png"], "Apple");
                 //await AddProductAsync(["آيربودز", "سماعات آبل اللاسلكية", "ar"], 1300000M, ["Smartphones", "iPhone 16"], ["airpos.png", "airpos2.png"], "Apple", 1000000M, 0.3M);
-                await AddProductAsync(["Akai APC40 MKII", "Akai MIDI Controller for Music Production", "en", "أكاي APC40 MKII", "جهاز تحكم MIDI من أكاي لإنتاج الموسيقى", "ar"], 2650000M, ["Laptops"], ["Akai1.jpg", "Akai2.jpg", "Akai3.jpg"], "Akai", 2150000M, 0.3M);
+                await AddProductAsync(["Akai APC40 MKII", "Akai MIDI Controller for Music Production", "en", "أكاي APC40 MKII", "جهاز تحكم MIDI من أكاي لإنتاج الموسيقى", "ar"], ["2650000", "2038.46"], ["Laptops"], ["Akai1.jpg", "Akai2.jpg", "Akai3.jpg"], "Akai");
                 //await AddProductAsync(["أكاي APC40 MKII", "جهاز تحكم MIDI من أكاي لإنتاج الموسيقى", "ar"], 2650000M, ["Laptops"], ["Akai1.jpg", "Akai2.jpg", "Akai3.jpg"], "Akai", 2150000M, 0.3M);
-                await AddProductAsync(["Apple Watch Ultra", "Apple Watch Ultra Smartwatch", "en", "ساعة آبل ألترا", "ساعة آبل الذكية ألترا", "ar"], 4500000M, ["iPhone 16", "Smartphones"], ["AppleWatchUltra1.jpg", "AppleWatchUltra2.jpg"], "Apple", 4000000M, 0.3M);
+                await AddProductAsync(["Apple Watch Ultra", "Apple Watch Ultra Smartwatch", "en", "ساعة آبل ألترا", "ساعة آبل الذكية ألترا", "ar"], ["4000000", "3076.923"], ["iPhone 16", "Smartphones"], ["AppleWatchUltra1.jpg", "AppleWatchUltra2.jpg"], "Apple");
                // await AddProductAsync(["ساعة آبل ألترا", "ساعة آبل الذكية ألترا", "ar"], 4500000M, ["iPhone 16", "Smartphones"], ["AppleWatchUltra1.jpg", "AppleWatchUltra2.jpg"], "Apple", 4000000M, 0.3M);
-                await AddProductAsync(["Bose Headphones", "Bose Wireless Headphones", "en", "سماعات بوز", "سماعات بوز اللاسلكية", "ar"], 870000M, ["Smartphones"], ["audifonos_bose.png"], "Bose", 800000M, 0.3M);
+                await AddProductAsync(["Bose Headphones", "Bose Wireless Headphones", "en", "سماعات بوز", "سماعات بوز اللاسلكية", "ar"], ["870000", "669.2307"], ["Smartphones"], ["audifonos_bose.png"], "Bose");
                 //await AddProductAsync(["سماعات بوز", "سماعات بوز اللاسلكية", "ar"], 870000M, ["Smartphones"], ["audifonos_bose.png"], "Bose", 800000M, 0.3M);
-                await AddProductAsync(["Ribble Bicycle", "Ribble Road Bicycle for Outdoor Sports", "en", "دراجة ريبل", "دراجة ريبل للطريق والرياضات الخارجية", "ar"], 12000000M, ["Outdoor Sports"], ["bicicleta_ribble.png"], "Ribble", 10000000M, 0.3M);
+                await AddProductAsync(["Ribble Bicycle", "Ribble Road Bicycle for Outdoor Sports", "en", "دراجة ريبل", "دراجة ريبل للطريق والرياضات الخارجية", "ar"], ["120000","92.56"], ["Outdoor Sports"], ["bicicleta_ribble.png"], "Ribble");
                 //await AddProductAsync(["دراجة ريبل", "دراجة ريبل للطريق والرياضات الخارجية", "ar"], 12000000M, ["Outdoor Sports"], ["bicicleta_ribble.png"], "Ribble", 10000000M, 0.3M);
-                await AddProductAsync(["Plaid Shirt", "Men's Plaid Casual Shirt", "en", "قميص مربعات", "قميص كاجوال رجالي بنقشة مربعات", "ar"], 56000M, ["Men's Clothing"], ["camisa_cuadros.png"], "H&M", 50000M, 0.3M);
+                await AddProductAsync(["Plaid Shirt", "Men's Plaid Casual Shirt", "en", "قميص مربعات", "قميص كاجوال رجالي بنقشة مربعات", "ar"], ["65002", "55.32"], ["Men's Clothing"], ["camisa_cuadros.png"], "H&M");
                 //await AddProductAsync(["قميص مربعات", "قميص كاجوال رجالي بنقشة مربعات", "ar"], 56000M, ["Men's Clothing"], ["camisa_cuadros.png"], "H&M", 50000M, 0.3M);
-                await AddProductAsync(["Bicycle Helmet", "Protective Bicycle Helmet for Outdoor Sports", "en", "خوذة الدراجة", "خوذة حماية للدراجات للرياضات الخارجية", "ar"], 820000M, ["Outdoor Sports"], ["casco_bicicleta.png", "casco.png"], "Outward Hound", 750000M, 0.3M);
+                await AddProductAsync(["Bicycle Helmet", "Protective Bicycle Helmet for Outdoor Sports", "en", "خوذة الدراجة", "خوذة حماية للدراجات للرياضات الخارجية", "ar"], ["8995522", "55.33"], ["Outdoor Sports"], ["casco_bicicleta.png", "casco.png"], "Outward Hound");
                 //await AddProductAsync(["خوذة الدراجة", "خوذة حماية للدراجات للرياضات الخارجية", "ar"], 820000M, ["Outdoor Sports"], ["casco_bicicleta.png", "casco.png"], "Outward Hound", 750000M, 0.3M);
-                await AddProductAsync(["Sports Glasses", "Protective Sports Glasses for Outdoor Activities", "en", "نظارات رياضية", "نظارات حماية للرياضات الخارجية", "ar"], 160000M, ["Outdoor Sports"], ["Gafas1.jpg", "Gafas2.jpg"], "Columbia", 130000M, 0.3M);
+                await AddProductAsync(["Sports Glasses", "Protective Sports Glasses for Outdoor Activities", "en", "نظارات رياضية", "نظارات حماية للرياضات الخارجية", "ar"], ["8995555", "2235.22"], ["Outdoor Sports"], ["Gafas1.jpg", "Gafas2.jpg"], "Columbia");
                 //await AddProductAsync(["نظارات رياضية", "نظارات حماية للرياضات الخارجية", "ar"], 160000M, ["Outdoor Sports"], ["Gafas1.jpg", "Gafas2.jpg"], "Columbia", 130000M, 0.3M);
-                await AddProductAsync(["Triple Meat Burger", "Delicious Triple Meat Burger Snack", "en", "برجر اللحم الثلاثي", "برجر لذيذ من ثلاثة أنواع لحم", "ar"], 25500M, ["Snacks"], ["Hamburguesa1.jpg", "Hamburguesa2.jpg", "Hamburguesa3.jpg"], "Nestle", 16500M, 0.3M);
+                await AddProductAsync(["Triple Meat Burger", "Delicious Triple Meat Burger Snack", "en", "برجر اللحم الثلاثي", "برجر لذيذ من ثلاثة أنواع لحم", "ar"], ["8995522", "55.33"], ["Snacks"], ["Hamburguesa1.jpg", "Hamburguesa2.jpg", "Hamburguesa3.jpg"], "Nestle");
                 //await AddProductAsync(["برجر اللحم الثلاثي", "برجر لذيذ من ثلاثة أنواع لحم", "ar"], 25500M, ["Snacks"], ["Hamburguesa1.jpg", "Hamburguesa2.jpg", "Hamburguesa3.jpg"], "Nestle", 16500M, 0.3M);
-                await AddProductAsync(["iPad", "Apple iPad Tablet with Retina Display", "en", "آيباد", "جهاز آيباد من أبل بشاشة Retina", "ar"], 2300000M, ["iPad Air", "Smartphones"], ["ipad.png"], "Apple", 200000M, 0.3M);
+                await AddProductAsync(["iPad", "Apple iPad Tablet with Retina Display", "en", "آيباد", "جهاز آيباد من أبل بشاشة Retina", "ar"], ["8995555", "2235.22"], ["iPad Air", "Smartphones"], ["ipad.png"], "Apple");
                 //await AddProductAsync(["آيباد", "جهاز آيباد من أبل بشاشة Retina", "ar"], 2300000M, ["iPad Air", "Smartphones"], ["ipad.png"], "Apple", 200000M, 0.3M);
-                await AddProductAsync(["iPhone 13", "Apple iPhone 13 with A15 Bionic Chip", "en", "آيفون 13", "هاتف آيفون 13 من أبل بشريحة A15 Bionic", "ar"], 5200000M, ["iPhone 16", "Smartphones"], ["iphone13.png", "iphone13b.png", "iphone13c.png", "iphone13d.png"], "Apple", 4900000M, 0.3M);
+                await AddProductAsync(["iPhone 13", "Apple iPhone 13 with A15 Bionic Chip", "en", "آيفون 13", "هاتف آيفون 13 من أبل بشريحة A15 Bionic", "ar"], ["8995555", "2235.22"], ["iPhone 16", "Smartphones"], ["iphone13.png", "iphone13b.png", "iphone13c.png", "iphone13d.png"], "Apple");
                 //await AddProductAsync(["آيفون 13", "هاتف آيفون 13 من أبل بشريحة A15 Bionic", "ar"], 5200000M, ["iPhone 16", "Smartphones"], ["iphone13.png", "iphone13b.png", "iphone13c.png", "iphone13d.png"], "Apple", 49000, 0.3M);
-                await AddProductAsync(["MacBook Pro", "Apple MacBook Pro Laptop with M1 Chip", "en", "ماك بوك برو", "حاسوب محمول ماك بوك برو من أبل بشريحة M1", "ar"], 12100000M, ["MacBook Pro", "Laptops"], ["mac_book_pro.png"], "Apple", 11500000M, 0.3M);
+                await AddProductAsync(["MacBook Pro", "Apple MacBook Pro Laptop with M1 Chip", "en", "ماك بوك برو", "حاسوب محمول ماك بوك برو من أبل بشريحة M1", "ar"], ["89955", "2235.22"], ["MacBook Pro", "Laptops"], ["mac_book_pro.png"], "Apple");
                 //await AddProductAsync(["ماك بوك برو", "حاسوب محمول ماك بوك برو من أبل بشريحة M1", "ar"], 12100000M, ["MacBook Pro", "Laptops"], ["mac_book_pro.png"], "Apple", 11500000M, 0.3M);
-                await AddProductAsync(["Dumbbells", "Set of adjustable dumbbells for home workouts", "en", "أثقال", "مجموعة أثقال قابلة للتعديل للتمارين المنزلية", "ar"], 370000M, ["Fitness Equipment"], ["mancuernas.png"], "Bowflex", 300000M, 0.3M);
+                await AddProductAsync(["Dumbbells", "Set of adjustable dumbbells for home workouts", "en", "أثقال", "مجموعة أثقال قابلة للتعديل للتمارين المنزلية", "ar"], ["8995555", "2235.22"], ["Fitness Equipment"], ["mancuernas.png"], "Bowflex");
                // await AddProductAsync(["أثقال", "مجموعة أثقال قابلة للتعديل للتمارين المنزلية", "ar"], 370000M, ["Fitness Equipment"], ["mancuernas.png"], "Bowflex", 300000M, 0.3M);
-                await AddProductAsync(["Face Mask", "Nourishing face mask for all skin types", "en", "قناع الوجه", "قناع وجه مغذي لجميع أنواع البشرة", "ar"], 26000M, ["Skincare"], ["mascarilla_cara.png"], "Nivea", 20000M, 0.3M);
+                await AddProductAsync(["Face Mask", "Nourishing face mask for all skin types", "en", "قناع الوجه", "قناع وجه مغذي لجميع أنواع البشرة", "ar"], ["8995555", "2235.22"], ["Skincare"], ["mascarilla_cara.png"], "Nivea");
                 //await AddProductAsync(["قناع الوجه", "قناع وجه مغذي لجميع أنواع البشرة", "ar"], 26000M, ["Skincare"], ["mascarilla_cara.png"], "Nivea", 20000M, 0.3M);
-                await AddProductAsync(["New Balance 530", "Men's running shoes for everyday comfort", "en", "نيو بالانس 530", "حذاء جري رجالي للراحة اليومية", "ar"], 180000M, ["Men's Shoes", "Fitness Equipment"], ["newbalance530.png"], "New Balance", 140000M, 0.3M);
+                await AddProductAsync(["New Balance 530", "Men's running shoes for everyday comfort", "en", "نيو بالانس 530", "حذاء جري رجالي للراحة اليومية", "ar"], ["8995555", "2235.22"], ["Men's Shoes", "Fitness Equipment"], ["newbalance530.png"], "New Balance");
                // await AddProductAsync(["نيو بالانس 530", "حذاء جري رجالي للراحة اليومية", "ar"], 180000M, ["Men's Shoes", "Fitness Equipment"], ["newbalance530.png"], "New Balance", 140000M, 0.3M);
-                await AddProductAsync(["New Balance 565", "Men's sneakers for casual and sports use", "en", "نيو بالانس 565", "حذاء رياضي رجالي للاستخدام اليومي والرياضي", "ar"], 179000M, ["Men's Shoes", "Fitness Equipment"], ["newbalance565.png"], "New Balance", 155000M, 0.3M);
+                await AddProductAsync(["New Balance 565", "Men's sneakers for casual and sports use", "en", "نيو بالانس 565", "حذاء رياضي رجالي للاستخدام اليومي والرياضي", "ar"], ["8995555", "2235.22"], ["Men's Shoes", "Fitness Equipment"], ["newbalance565.png"], "New Balance");
                 //await AddProductAsync(["نيو بالانس 565", "حذاء رياضي رجالي للاستخدام اليومي والرياضي", "ar"], 179000M, ["Men's Shoes", "Fitness Equipment"], ["newbalance565.png"], "New Balance", 155000M, 0.3M);
-                await AddProductAsync(["Nike Air", "Comfortable men's sneakers for sports and casual wear", "en", "نايكي إير", "حذاء رياضي رجالي مريح للرياضة والاستخدام اليومي", "ar"], 233000M, ["Men's Shoes", "Fitness Equipment"], ["nike_air.png"], "Nike", 200000M, 0.3M);
+                await AddProductAsync(["Nike Air", "Comfortable men's sneakers for sports and casual wear", "en", "نايكي إير", "حذاء رياضي رجالي مريح للرياضة والاستخدام اليومي", "ar"], ["8995555", "2235.22"], ["Men's Shoes", "Fitness Equipment"], ["nike_air.png"], "Nike");
                 //await AddProductAsync(["نايكي إير", "حذاء رياضي رجالي مريح للرياضة والاستخدام اليومي", "ar"], 233000M, ["Men's Shoes", "Fitness Equipment"], ["nike_air.png"], "Nike", 200000M, 0.3M);
-                await AddProductAsync(["Nike Zoom", "High-performance men's running shoes", "en", "نايكي زووم", "حذاء عداء رجالي عالي الأداء", "ar"], 249900M, ["Men's Shoes", "Fitness Equipment"], ["nike_zoom.png"], "Nike", 200000M, 0.3M);
+                await AddProductAsync(["Nike Zoom", "High-performance men's running shoes", "en", "نايكي زووم", "حذاء عداء رجالي عالي الأداء", "ar"], ["8995555", "2235.22"], ["Men's Shoes", "Fitness Equipment"], ["nike_zoom.png"], "Nike");
                 //await AddProductAsync(["نايكي زووم", "حذاء عداء رجالي عالي الأداء", "ar"], 249900M, ["Men's Shoes", "Fitness Equipment"], ["nike_zoom.png"], "Nike", 200000M, 0.3M);
-                await AddProductAsync(["Adidas Women's Sweatshirt", "Comfortable and stylish women's sweatshirt", "en", "سويت شيرت أديداس للنساء", "سويت شيرت مريح وأنيق للنساء", "ar"], 134000M, ["Women's Clothing", "Fitness Equipment"], ["buso_adidas.png"], "Adidas", 100000M, 0.3M);
+                await AddProductAsync(["Adidas Women's Sweatshirt", "Comfortable and stylish women's sweatshirt", "en", "سويت شيرت أديداس للنساء", "سويت شيرت مريح وأنيق للنساء", "ar"], ["8995555", "2235.22"], ["Women's Clothing", "Fitness Equipment"], ["buso_adidas.png"], "Adidas");
                // await AddProductAsync(["سويت شيرت أديداس للنساء", "سويت شيرت مريح وأنيق للنساء", "ar"], 134000M, ["Women's Clothing", "Fitness Equipment"], ["buso_adidas.png"], "Adidas", 100000M, 0.3M);
-                await AddProductAsync(["Boost Original Supplement", "Nutritious protein supplement for energy", "en", "مكمل Boost الأصلي", "مكمل بروتين مغذي للطاقة", "ar"], 15600M, ["Supplements"], ["Boost_Original.png"], "Optimum Nutrition", 150000M, 0.3M);
+                await AddProductAsync(["Boost Original Supplement", "Nutritious protein supplement for energy", "en", "مكمل Boost الأصلي", "مكمل بروتين مغذي للطاقة", "ar"], ["8995555", "2235.22"], ["Supplements"], ["Boost_Original.png"], "Optimum Nutrition");
                // await AddProductAsync(["مكمل Boost الأصلي", "مكمل بروتين مغذي للطاقة", "ar"], 15600M, ["Supplements"], ["Boost_Original.png"], "Optimum Nutrition", 150000M, 0.3M);
-                await AddProductAsync(["Whey Protein", "High-quality protein powder for muscle growth", "en", "بروتين واي", "مسحوق بروتين عالي الجودة لنمو العضلات", "ar"], 252000M, ["Supplements"], ["whey_protein.png"], "MuscleTech", 200000M, 0.3M);
+                await AddProductAsync(["Whey Protein", "High-quality protein powder for muscle growth", "en", "بروتين واي", "مسحوق بروتين عالي الجودة لنمو العضلات", "ar"], ["8995555", "2235.22"], ["Supplements"], ["whey_protein.png"], "MuscleTech");
                //await AddProductAsync(["بروتين واي", "مسحوق بروتين عالي الجودة لنمو العضلات", "ar"], 252000M, ["Supplements"], ["whey_protein.png"], "MuscleTech", 200000M, 0.3M);
-                await AddProductAsync(["Pet Harness", "Durable harness for small and medium pets", "en", "حزام للحيوانات الأليفة", "حزام متين للحيوانات الصغيرة والمتوسطة", "ar"], 25000M, ["Pet Accessories"], ["arnes_mascota.png"], "KONG", 20000M, 0.3M);
+                await AddProductAsync(["Pet Harness", "Durable harness for small and medium pets", "en", "حزام للحيوانات الأليفة", "حزام متين للحيوانات الصغيرة والمتوسطة", "ar"], ["8995555", "2235.22"], ["Pet Accessories"], ["arnes_mascota.png"], "KONG");
                 //await AddProductAsync(["حزام للحيوانات الأليفة", "حزام متين للحيوانات الصغيرة والمتوسطة", "ar"], 25000M, ["Pet Accessories"], ["arnes_mascota.png"], "KONG", 20000M, 0.3M);
-                await AddProductAsync(["Pet Bed", "Comfortable bed for pets", "en", "سرير للحيوانات الأليفة", "سرير مريح للحيوانات الأليفة", "ar"], 99000M, ["Pet Accessories"], ["cama_mascota.png"], "Outward Hound", 78000M, 0.3M);
+                await AddProductAsync(["Pet Bed", "Comfortable bed for pets", "en", "سرير للحيوانات الأليفة", "سرير مريح للحيوانات الأليفة", "ar"], ["8995555", "2235.22"], ["Pet Accessories"], ["cama_mascota.png"], "Outward Hound");
                // await AddProductAsync(["سرير للحيوانات الأليفة", "سرير مريح للحيوانات الأليفة", "ar"], 99000M, ["Pet Accessories"], ["cama_mascota.png"], "Outward Hound", 78000M, 0.3M);
-                await AddProductAsync(["Gamer Keyboard", "High-performance keyboard for gaming", "en", "لوحة مفاتيح للألعاب", "لوحة مفاتيح عالية الأداء للألعاب", "ar"], 67000M, ["Accessories", "Laptops"], ["teclado_gamer.png"], "Razer", 53000M, 0.3M);
+                await AddProductAsync(["Gamer Keyboard", "High-performance keyboard for gaming", "en", "لوحة مفاتيح للألعاب", "لوحة مفاتيح عالية الأداء للألعاب", "ar"], ["8995555", "2235.22"], ["Accessories", "Laptops"], ["teclado_gamer.png"], "Razer");
                // await AddProductAsync(["لوحة مفاتيح للألعاب", "لوحة مفاتيح عالية الأداء للألعاب", "ar"], 67000M, ["Accessories", "Laptops"], ["teclado_gamer.png"], "Razer", 53000M, 0.3M);
-                await AddProductAsync(["Luxury Ring 17", "Elegant luxury ring", "en", "خاتم فاخر 17", "خاتم فاخر وأنيق", "ar"], 1600000M, ["Luxury Cars"], ["Ring1.jpg", "Ring2.jpg"], "BMW", 1350000M, 0.3M);
+                await AddProductAsync(["Luxury Ring 17", "Elegant luxury ring", "en", "خاتم فاخر 17", "خاتم فاخر وأنيق", "ar"], ["8995555", "2235.22"], ["Luxury Cars"], ["Ring1.jpg", "Ring2.jpg"], "BMW");
                // await AddProductAsync(["خاتم فاخر 17", "خاتم فاخر وأنيق", "ar"], 1600000M, ["Luxury Cars"], ["Ring1.jpg", "Ring2.jpg"], "BMW", 1350000M, 0.3M);
-                await AddProductAsync(["Gamer Chair", "Comfortable gaming chair", "en", "كرسي ألعاب", "كرسي ألعاب مريح", "ar"], 980000M, ["Accessories", "Laptops"], ["silla_gamer.png"], "Logitech", 715000M, 0.3M);
+                await AddProductAsync(["Gamer Chair", "Comfortable gaming chair", "en", "كرسي ألعاب", "كرسي ألعاب مريح", "ar"], ["8995555", "2235.22"], ["Accessories", "Laptops"], ["silla_gamer.png"], "Logitech");
                // await AddProductAsync(["كرسي ألعاب", "كرسي ألعاب مريح", "ar"], 980000M, ["Accessories", "Laptops"], ["silla_gamer.png"], "Logitech", 715000M, 0.3M);
-                await AddProductAsync(["Gamer Mouse", "High precision gaming mouse", "en", "فأرة ألعاب", "فأرة ألعاب عالية الدقة", "ar"], 132000M, ["Accessories", "Laptops"], ["mouse_gamer.png"], "Logitech", 99900M, 0.3M);
+                await AddProductAsync(["Gamer Mouse", "High precision gaming mouse", "en", "فأرة ألعاب", "فأرة ألعاب عالية الدقة", "ar"], ["8995555", "2235.22"], ["Accessories", "Laptops"], ["mouse_gamer.png"], "Logitech");
                 //await AddProductAsync(["فأرة ألعاب", "فأرة ألعاب عالية الدقة", "ar"], 132000M, ["Accessories", "Laptops"], ["mouse_gamer.png"], "Logitech", 99900M, 0.3M);
 
                 await _context.SaveChangesAsync();
             }
         }
 
-        private async Task AddProductAsync(List<string>Producttranslation, decimal price, List<string> Subcategories, List<string> images, string brandNames,
-            decimal cost, decimal desiredProfit)
+        private async Task AddProductAsync(List<string>Producttranslation, List<string> prices, List<string> Subcategories, List<string> images, string brandNames)
         {
             var barcode = Guid.NewGuid().ToString("N").Substring(0, 12).ToUpper();           
             Product product = new()
             {              
-                Barcode = barcode,
-                Cost = cost,
-                Price = price,
-                Stock = 10,
-                DesiredProfit = desiredProfit,
+                Barcode = barcode,               
+                Stock = 10,              
                 CreatedAt=DateTime.UtcNow,
                 serialNumbers = new List<SerialNumber>(),
                 HasSerial = true,
                 ProductImages = new List<ProductImage>(),
                 productsubCategories = new List<ProductsubCategory>(),  
                 ProductTranslations=new List<ProductTranslation>(),
-
+                ProductPrices=new List<ProductPrice>(),
             };
             for (int i = 0; i < Producttranslation.Count; i += 6)
             {
@@ -568,8 +577,18 @@ namespace Sale.Api.Data
                         PurchaseDate = DateTime.Now,
                     });
                 }
-           
-           
+            var currencies = await _context.currencies.ToListAsync();
+            for (int i = 0; i < prices.Count; i++)
+            {
+                product.ProductPrices.Add(new ProductPrice
+                {
+                    CurrencyId= currencies[i].Id,
+                    Price = decimal.Parse(prices[i]),
+                    CreatedAt=DateTime.UtcNow,
+                    Cost= decimal.Parse(prices[i]),
+                });
+            }
+
             _context.Products.Add(product);
             }
 

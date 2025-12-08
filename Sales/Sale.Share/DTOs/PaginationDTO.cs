@@ -15,6 +15,7 @@ namespace Sale.Share.DTOs
         public string? CategoryFilter { get; set; }
         public string? Language { get; set; }
         public int? CategoryId { get; set; }
+        public string? CurrencyCode { get; set; }
 
     }
 }
