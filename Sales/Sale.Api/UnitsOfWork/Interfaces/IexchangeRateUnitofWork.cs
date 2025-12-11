@@ -6,7 +6,7 @@ namespace Sale.Api.UnitsOfWork.Interfaces
 {
     public interface IexchangeRateUnitofWork
     {
-        Task<IEnumerable<ExchangeRate>> GetComboAsync();
+        Task<IEnumerable<Currency>> GetComboAsync();
         Task<ActionResponse<int>> GetRecordsNumberAsync(PaginationDTO paginationDTO);
         Task<ActionResponse<ExchangeRate>> GetAsync(int id);
         Task<ActionResponse<IEnumerable<ExchangeRate>>> GetAsync(PaginationDTO pagination);

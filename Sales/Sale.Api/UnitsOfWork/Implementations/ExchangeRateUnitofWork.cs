@@ -25,7 +25,7 @@ namespace Sale.Api.UnitsOfWork.Implementations
         public override async Task<ActionResponse<IEnumerable<ExchangeRate>>> GetAsync(PaginationDTO pagination)
         => await _exchangeRateRepository.GetAsync(pagination);
 
-        public async Task<IEnumerable<ExchangeRate>> GetComboAsync()
+        public async Task<IEnumerable<Currency>> GetComboAsync()
         => await _exchangeRateRepository.GetComboAsync();   
 
         public override async Task<ActionResponse<int>> GetRecordsNumberAsync(PaginationDTO paginationDTO)

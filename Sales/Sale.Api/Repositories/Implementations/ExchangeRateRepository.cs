@@ -98,9 +98,9 @@ namespace Sale.Api.Repositories.Implementations
             }; 
         }
 
-        public async Task<IEnumerable<ExchangeRate>> GetComboAsync()
+        public async Task<IEnumerable<Currency>> GetComboAsync()
         {
-            return await _context.exchangeRates.ToListAsync();
+            return await _context.currencies.ToListAsync();
         }
 
         public override async Task<ActionResponse<int>> GetRecordsNumberAsync(PaginationDTO paginationDTO)

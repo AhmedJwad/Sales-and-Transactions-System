@@ -15,11 +15,13 @@ namespace Sale.Api.Repositories.Implementations
     {
         private readonly DataContext _context;
         private readonly IFileStorage _fileStorage;
+        private readonly ICurrencyConverter _currencyConverter;
 
-        public ProductsRepository(DataContext context , IFileStorage fileStorage) : base(context)
+        public ProductsRepository(DataContext context , IFileStorage fileStorage , ICurrencyConverter currencyConverter) : base(context)
         {
-            _context = context;
+           _context = context;
           _fileStorage = fileStorage;
+          _currencyConverter = currencyConverter;
         }
 
         public async Task<ActionResponse<Product>> AddFullAsync(ProductDTO productDTO)
@@ -129,6 +131,26 @@ namespace Sale.Api.Repositories.Implementations
                     Name=t.name,
                     Description=t.description,
                 }).ToList();
+                var currency = await _context.currencies.FirstOrDefaultAsync(c => c.Code == "IQ");
+                if (currency == null)
+                {
+                    return new ActionResponse<Product>
+                    {
+                        WasSuccess = false,
+                        Message = "Currency IQD not found.",
+                    };
+                }
+                product.ProductPrices = new List<ProductPrice>
+                {
+                    new ProductPrice
+                    {
+                        ProductId = product.Id,
+                        CurrencyId = currency.Id,
+                        Price = productDTO.Price,
+                        Cost = productDTO.Cost,
+                        CreatedAt = DateTime.UtcNow
+                    }
+                };
                 _context.Add(product);
                 await _context.SaveChangesAsync();
                 return new ActionResponse<Product>
@@ -258,12 +280,12 @@ namespace Sale.Api.Repositories.Implementations
             
         }
 
-        public override async Task<ActionResponse<Product>> GetAsync(int id)
+        public override  async Task<ActionResponse<Product>> GetAsync(int id)
         {
             var product = await _context.Products!.Include(p => p.ProductTranslations).Include(x => x.ProductImages!)
                 .Include(x => x.productsubCategories!).ThenInclude(x => x.Category).ThenInclude(x => x.SubcategoryTranslations).Include(x => x.serialNumbers)
                 .Include(x => x.productColor!).ThenInclude(x => x.color).Include(x => x.productSize!).ThenInclude(x => x.size)
-                .Include(x => x.brand).ThenInclude(bt=>bt.BrandTranslations).AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+                .Include(x => x.brand).ThenInclude(bt=>bt.BrandTranslations).Include(p=>p.ProductPrices).AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
             if (product == null)
             {
                 return new ActionResponse<Product>
@@ -277,45 +299,44 @@ namespace Sale.Api.Repositories.Implementations
                 WasSuccess = true,
                 Result = product,
             };
-            //var product = await _context.Products
+            //var productDTO = await _context.Products
             //    .Where(p => p.Id == id)
             //    .Select(p => new ProductDTO
             //    {
             //        Id = p.Id,
             //        Barcode = p.Barcode,
-            //        Price = p.Price,
-            //        Cost = p.Cost,
+            //        Price = p.ProductPrices!.FirstOrDefault()!.Price,
+            //        Cost = p.ProductPrices!.FirstOrDefault()!.Cost,
             //        DesiredProfit = p.DesiredProfit,
             //        Stock = p.Stock,
             //        BrandId = p.BrandId,
             //        HasSerial = p.HasSerial,
             //        CreatedAt = p.CreatedAt,
 
-            //        // Images
+            //        Images
             //        ProductImages = p.ProductImages!.Select(img => img.Image).ToList(),
 
-            //        // Serial Numbers
+            //        Serial Numbers
             //        SerialNumbers = p.serialNumbers!.Select(sn => sn.SerialNumberValue).ToList(),
 
-            //        // Translations (default language = "en")
-            //        productionTranslations = p.ProductTranslations!.Select(t=> new ProductionTranslationsDTO
+            //        Translations(default language = "en")
+            //        productionTranslations = p.ProductTranslations!.Select(t => new ProductionTranslationsDTO
             //        {
-            //            language=t.Language,
-            //            name=t.Name,
-            //            description=t.Description,
-            //        }).ToList(),                      
-            //        // Categories
+            //            language = t.Language,
+            //            name = t.Name,
+            //            description = t.Description,
+            //        }).ToList(),
+            //        Categories
             //        Categories = p.productsubCategories!.Select(psc => new SubcategoryDTO
             //        {
             //            Id = psc.Category!.Id,
             //            category = psc.Category!
             //                .SubcategoryTranslations!
-            //                .Where(t => t.Language.ToLower() == lang.ToLower())
             //                .Select(t => t.Name)
             //                .ToList()
             //        }).ToList(),
 
-            //        // Colors
+            //        Colors
             //        Colors = p.productColor!.Select(pc => new ColorDTO
             //        {
             //            Id = pc.color!.Id,
@@ -323,19 +344,18 @@ namespace Sale.Api.Repositories.Implementations
             //            HexCode = pc.color!.HexCode
             //        }).ToList(),
 
-            //        // Sizes
+            //        Sizes
             //        Sizes = p.productSize!.Select(ps => new SizeDTO
             //        {
             //            Id = ps.size!.Id,
             //            Name = ps.size!.Name
             //        }).ToList(),
 
-            //        // Brand
+            //        Brand
             //        Brand = new BrandDTO
             //        {
             //            Id = p.brand!.Id,
             //            brandTranslations = p.brand.BrandTranslations!
-            //                .Where(t => t.Language.ToLower() == lang.ToLower())
             //                .Select(t => new BrandTranslationDTO
             //                {
             //                    Language = t.Language,
@@ -344,10 +364,9 @@ namespace Sale.Api.Repositories.Implementations
             //                .ToList()
             //        }
             //    })
-            //    .AsNoTracking()
             //    .FirstOrDefaultAsync();
 
-            //if (product == null)
+            //if (productDTO == null)
             //{
             //    return new ActionResponse<ProductDTO>
             //    {
@@ -359,7 +378,7 @@ namespace Sale.Api.Repositories.Implementations
             //return new ActionResponse<ProductDTO>
             //{
             //    WasSuccess = true,
-            //    Result = product
+            //    Result = productDTO
             //};
         }
 
@@ -369,7 +388,7 @@ namespace Sale.Api.Repositories.Implementations
                 .Include(x => x.productsubCategories!).ThenInclude(x => x.Category!.SubcategoryTranslations!.Where(t => t.Language.ToLower() == pagination.Language!.ToLower())).Include(x => x.productColor!)
                 .ThenInclude(x => x.color).Include(x => x.ProductImages).Include(x => x.brand).ThenInclude(b => b.BrandTranslations!.Where(t => t.Language.ToLower() == pagination.Language!.ToLower())).Include(x => x.serialNumbers).Include(x => x.productSize!).ThenInclude(x => x.size)
                .Include(p=>p.ProductPrices!).ThenInclude(pc=>pc.Currency).AsQueryable();
-
+            pagination.CurrencyCode = string.IsNullOrWhiteSpace(pagination.CurrencyCode) ? "IQ" : pagination.CurrencyCode;
 
             if (!string.IsNullOrWhiteSpace(pagination.Filter))
             {
@@ -383,14 +402,15 @@ namespace Sale.Api.Repositories.Implementations
             {
                 queryable = queryable.Where(x => x.productsubCategories!.Any(x => x.Category!.SubcategoryTranslations!.Any(c=>c.Name==pagination.CategoryFilter)));
             }
+            
             var products = await queryable.Paginate(pagination).OrderBy(p=>p.ProductTranslations!.FirstOrDefault(t=>t.Language==pagination.Language)!.Name)
                 .Select(p=> new ProductDTO
                 {
                     Id = p.Id,                   
                     Barcode = p.Barcode,                  
-                    Price = p.ProductPrices!.Where(pp=>pp.Currency!.Code.ToUpper()==pagination.CurrencyCode!.ToUpper()).Select(pp=>pp.Price)
+                    Price = p.ProductPrices!.Select(pp=>pp.Price)
                     .FirstOrDefault(),
-                    Cost = p.ProductPrices!.Where(pp => pp.Currency!.Code.ToUpper() == pagination.CurrencyCode!.ToUpper()).Select(pp => pp.Cost)
+                    Cost = p.ProductPrices!.Select(pp => pp.Cost)
                     .FirstOrDefault(),
                    // DesiredProfit = p.DesiredProfit,
                     Stock = p.Stock,
@@ -433,7 +453,19 @@ namespace Sale.Api.Repositories.Implementations
                                                 .ToList()
                     },
                 }).ToListAsync();
-           
+
+            foreach (var product in products)
+            {
+                product.Price = await _currencyConverter.ConvertFromIQDAsync(
+                    product.Price,
+                    pagination.CurrencyCode!
+                );
+
+                product.Cost = await _currencyConverter.ConvertFromIQDAsync(
+                    product.Cost,
+                    pagination.CurrencyCode!
+                );
+            }
 
             return new ActionResponse<IEnumerable<ProductDTO>>
             {
@@ -551,7 +583,7 @@ namespace Sale.Api.Repositories.Implementations
             {
                 var product = await _context.Products.Include(pt=>pt.ProductTranslations).Include(pc=> pc.productsubCategories!).ThenInclude(c => c.Category)
                     .Include(x => x.brand).Include(x => x.serialNumbers).Include(x=>x.productColor!).ThenInclude(c=>c.color)
-                    .Include(x=>x.productSize!).ThenInclude(s=>s.size).FirstOrDefaultAsync(x => x.Id == productDTO.Id);
+                    .Include(x=>x.productSize!).ThenInclude(s=>s.size).Include(p=>p.ProductPrices!).ThenInclude(p=>p.Currency).FirstOrDefaultAsync(x => x.Id == productDTO.Id);
                 if (product == null)
                 {
                     return new ActionResponse<Product>
@@ -571,7 +603,9 @@ namespace Sale.Api.Repositories.Implementations
                 product.productColor = new List<ProductColor>();
                 _context.productSizes.RemoveRange(product.productSize!);
                 product.productSize = new List<productSize>();
-                _context.productTranslations.RemoveRange(product.ProductTranslations);
+                _context.productTranslations.RemoveRange(product!.ProductTranslations!);
+                product.ProductPrices=new List<ProductPrice>();
+                _context.productPrices.RemoveRange(product.ProductPrices);
                 var subcategories = await _context.subcategories
                                   .Include(x => x.Brands)
                                   .Where(x => productDTO.ProductCategoryIds!.Contains(x.Id))
@@ -612,6 +646,26 @@ namespace Sale.Api.Repositories.Implementations
                     Name=t.name,
                     Description=t.description,                   
                 }).ToList();
+                var currency = await _context.currencies.FirstOrDefaultAsync(c => c.Code == "IQ");
+                if (currency == null)
+                {
+                    return new ActionResponse<Product>
+                    {
+                        WasSuccess = false,
+                        Message = "Currency IQD not found.",
+                    };
+                }
+                product.ProductPrices = new List<ProductPrice>
+                {
+                    new ProductPrice
+                    {
+                        ProductId = product.Id,
+                        CurrencyId = currency.Id,
+                        Price = productDTO.Price,
+                        Cost = productDTO.Cost,
+                        CreatedAt = DateTime.UtcNow
+                    }
+                };
                 _context.Update(product);
                 await _context.SaveChangesAsync();
                 return new ActionResponse<Product>

@@ -60,7 +60,7 @@ namespace Sale.Share.DTOs
         public List<ProductionTranslationsDTO>? productionTranslations{ get; set; }
         public List<SubcategoryDTO>? Categories { get; set; }
         public List<ColorDTO>? Colors { get; set; }
-        public List<SizeDTO>? Sizes { get; set; }
+        public List<SizeDTO>? Sizes { get; set; }       
         public BrandDTO? Brand { get; set; }
     }
 }
