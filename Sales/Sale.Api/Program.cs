@@ -62,6 +62,9 @@ builder.Services.AddScoped<IorderUnitofWorks,OrderUnitofWorks>();
 builder.Services.AddScoped<IexchangeRateRepository, ExchangeRateRepository>();
 builder.Services.AddScoped<IexchangeRateUnitofWork, ExchangeRateUnitofWork>();
 builder.Services.AddScoped<ICurrencyConverter, CurrencyConverter>();
+builder.Services.AddScoped<IdiscountRepository, DiscountRepository>();
+builder.Services.AddScoped<IdiscountUnitofWorks, DiscountUnitofWorks>();
+
 builder.Services.AddIdentity<User, IdentityRole>(x =>
 {
     x.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;

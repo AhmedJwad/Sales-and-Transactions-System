@@ -33,6 +33,9 @@ namespace Sale.Share.DTOs
         [Display(Name = "Price")]
         [Required(ErrorMessage = "Field {0} is required.")]
         public decimal Price { get; set; }
+        public decimal OldPrice { get; set; }           
+        public decimal DiscountPercent { get; set; }   
+        public bool HasDiscount => DiscountPercent > 0;
 
         [Column(TypeName = "decimal(18,2)")]
         [DisplayFormat(DataFormatString = "{0:C2}")]

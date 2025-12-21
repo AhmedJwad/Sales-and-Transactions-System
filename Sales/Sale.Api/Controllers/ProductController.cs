@@ -22,10 +22,11 @@ namespace Sale.Api.Controllers
         {
            _productsUnitOfWork = productsUnitofWork;
         }
+        [AllowAnonymous]
         [HttpGet("combo")]
-        public async Task<IActionResult> GetComboAsync()
+        public async Task<IActionResult> GetComboAsync(string lang = "en")
         {
-            return Ok(await _productsUnitOfWork.GetComboAsync());
+            return Ok(await _productsUnitOfWork.GetComboAsync(lang));
         }
         [AllowAnonymous]
         [HttpGet("recordsNumber")]        
@@ -76,7 +77,7 @@ namespace Sale.Api.Controllers
         [HttpGet]      
         public override async Task<IActionResult> GetAsync([FromQuery] PaginationDTO pagination)
         {
-            var response = await _productsUnitOfWork.GetAsync(pagination);
+            var response = await _productsUnitOfWork.GetAsyncProduct(pagination);
             if (response.WasSuccess)
             {        
                 return Ok(response.Result);
