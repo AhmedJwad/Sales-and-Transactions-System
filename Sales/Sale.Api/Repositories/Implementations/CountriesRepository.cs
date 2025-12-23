@@ -55,7 +55,7 @@ namespace Sale.Api.Repositories.Implementations
             return new ActionResponse<IEnumerable<Country>>
             {
                 WasSuccess = true,
-                Result =await queryable.OrderBy(x => x.Name).ToListAsync()
+                Result =await queryable.OrderBy(x => x.Name).Paginate(pagination).ToListAsync()
             };
         }
 
