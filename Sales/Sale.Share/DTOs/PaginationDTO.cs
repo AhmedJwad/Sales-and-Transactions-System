@@ -17,5 +17,13 @@ namespace Sale.Share.DTOs
         public int? CategoryId { get; set; }
         public string? CurrencyCode { get; set; }
 
+        // Product Filters
+        public int? BrandId { get; set; }
+        public List<int>? ColorIds { get; set; }
+        public List<int>? SizeIds { get; set; }
+        public decimal? MinPrice { get; set; }
+        public decimal? MaxPrice { get; set; }
+
+
     }
 }

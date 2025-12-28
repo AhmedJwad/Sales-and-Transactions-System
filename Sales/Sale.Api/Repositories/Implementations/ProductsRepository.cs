@@ -511,9 +511,13 @@ namespace Sale.Api.Repositories.Implementations
         {
             pagination.CurrencyCode ??= "IQ";
 
-            var queryable = _context.Products.AsQueryable();
+            var queryable = _context.Products.Include(pt => pt.ProductTranslations!.Where(t => t.Language.ToLower() == pagination.Language!.ToLower()))
+                .Include(x => x.productsubCategories!).ThenInclude(x => x.Category!.SubcategoryTranslations!.Where(t => t.Language.ToLower() == pagination.Language!.ToLower())).Include(x => x.productColor!)
+                .ThenInclude(x => x.color).Include(x => x.ProductImages).Include(x => x.brand).ThenInclude(b => b.BrandTranslations!.Where(t => t.Language.ToLower() == pagination.Language!.ToLower())).Include(x => x.serialNumbers).Include(x => x.productSize!).ThenInclude(x => x.size)
+                .Include(p=>p.ProductPrices!).ThenInclude(pc=>pc.Currency)
+                .Include(pd=>pd.productDiscount!).ThenInclude(d=>d.discount).Paginate(pagination).AsQueryable();
 
-            
+
             if (!string.IsNullOrWhiteSpace(pagination.Filter))
             {
                 queryable = queryable.Where(x =>
@@ -536,12 +540,48 @@ namespace Sale.Api.Repositories.Implementations
                         c.Category!.SubcategoryTranslations!.Any(t =>
                             t.Name.ToLower() == pagination.CategoryFilter.ToLower())));
             }
+            if (pagination.BrandId.HasValue)
+            {
+                queryable = queryable.Where(p => p.BrandId == pagination.BrandId);
+            }
 
-            var products = await queryable
-                .OrderBy(p => p.ProductTranslations!
-                    .FirstOrDefault(t => t.Language.ToLower() == pagination.Language!.ToLower())!.Name)
-                .Paginate(pagination)
-                .Select(p => new ProductDTO
+            if (pagination.ColorIds?.Any() == true)
+            {
+                queryable = queryable.Where(p =>
+                    p.productColor!.Any(pc => pagination.ColorIds.Contains(pc.ColorId)));
+            }
+
+            if (pagination.SizeIds?.Any() == true)
+            {
+                queryable = queryable.Where(p =>
+                    p.productSize!.Any(ps => pagination.SizeIds.Contains(ps.SizeId)));
+            }
+            if (pagination.CurrencyCode != "IQ")
+            {
+                if (pagination.MinPrice.HasValue)
+                {
+                    pagination.MinPrice = await _currencyConverter
+                        .ConvertFromIQDAsync(pagination.MinPrice.Value, pagination.CurrencyCode);
+                }
+
+                if (pagination.MaxPrice.HasValue)
+                {
+                    pagination.MaxPrice = await _currencyConverter
+                        .ConvertFromIQDAsync(pagination.MaxPrice.Value, pagination.CurrencyCode);
+                }
+            }
+            if (pagination.MinPrice.HasValue || pagination.MaxPrice.HasValue)
+            {
+                queryable = queryable.Where(p =>
+                    p.ProductPrices!.Any(pp =>
+                        (!pagination.MinPrice.HasValue || pp.Price >= pagination.MinPrice.Value) &&
+                        (!pagination.MaxPrice.HasValue || pp.Price <= pagination.MaxPrice.Value)
+                    )
+                );
+            }
+
+
+            var products = await queryable.Select(p => new ProductDTO
                 {
                     Id = p.Id,
                     Barcode = p.Barcode,
@@ -901,9 +941,7 @@ namespace Sale.Api.Repositories.Implementations
 
         public async Task<ActionResponse<IEnumerable<ProductResponseDTO>>> FilterProducts(ProductFilterDto productFilterDto)
         {
-            var queryable = _context.Products.Include(pc => pc.productColor!).ThenInclude(c => c.color).Include(ps => ps.productSize!)
-                 .ThenInclude(s => s.size).Include(b => b.brand).Include(pi => pi.ProductImages)
-                 .Include(sn => sn.serialNumbers).Include(x=>x.productsubCategories!).ThenInclude(x=>x.Category).AsQueryable();           
+            var queryable = _context.Products.AsQueryable();
 
             if (productFilterDto.BrandId.HasValue)
             {
