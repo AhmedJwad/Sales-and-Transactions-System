@@ -68,8 +68,15 @@ namespace Sale.Api.Repositories.Implementations
         }
 
         public async Task<IEnumerable<Sizep>> GetComboAsync()
-        {
-            return await _context.sizes.OrderBy(x => x.Name).ToListAsync();
+        {            
+            return await _context.productSizes!
+                       .Include(ps => ps.size)
+                       .Where(ps => ps.size != null)
+                       .Select(ps => ps.size!)
+                       .Distinct()
+                       .OrderBy(s => s.Name)
+                       .AsNoTracking()
+                       .ToListAsync();            
         }
 
         public override async Task<ActionResponse<int>> GetRecordsNumberAsync(PaginationDTO pagination)

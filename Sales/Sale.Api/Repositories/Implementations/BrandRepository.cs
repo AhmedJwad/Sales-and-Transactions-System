@@ -60,15 +60,26 @@ namespace Sale.Api.Repositories.Implementations
         {
             lang = lang.ToLower();
 
-            var brands = await _context.brands
-                .Include(b => b.Subcategory)
-                .Include(b => b.BrandTranslations!.Where(t => t.Language == lang)) 
+            var brands = await _context.Products
+                .Include(p => p.brand)
+                .ThenInclude(b => b.BrandTranslations)
+                .Where(p => p.brand != null)
+                .Select(p => p.brand!)
+                .Distinct()
                 .ToListAsync();
+           
+            foreach (var brand in brands)
+            {
+                brand.BrandTranslations = brand.BrandTranslations!
+                    .Where(t => t.Language.ToLower() == lang)
+                    .ToList();
+            }
 
-            return brands;
+            return brands.OrderBy(b => b.BrandTranslations!.FirstOrDefault()?.Name).ToList();
+
         }
 
-       
+
         public override async Task<ActionResponse<int>> GetRecordsNumberAsync(PaginationDTO pagination)
         {
             var queryable=_context.brands.Include(t=>t.BrandTranslations).AsQueryable();

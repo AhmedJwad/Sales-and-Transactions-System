@@ -5,6 +5,7 @@ using Sale.Api.Repositories.Interfaces;
 using Sale.Share.DTOs;
 using Sale.Share.Entities;
 using Sale.Share.Responses;
+using System.Drawing;
 
 namespace Sale.Api.Repositories.Implementations
 {
@@ -61,7 +62,10 @@ namespace Sale.Api.Repositories.Implementations
 
         public async Task<IEnumerable<Colour>> GetComboAsync()
         {
-            return await _context.colors.OrderBy(x=>x.Name).ToListAsync();
+            return await _context.productColors!.Include(c => c.color!)
+                .Where(pc => pc.color! != null).Select(pc => pc.color!).Distinct().OrderBy(x => x.Name)
+                .AsNoTracking().ToListAsync();
+
         }
 
         public override async Task<ActionResponse<int>> GetRecordsNumberAsync(PaginationDTO pagination)

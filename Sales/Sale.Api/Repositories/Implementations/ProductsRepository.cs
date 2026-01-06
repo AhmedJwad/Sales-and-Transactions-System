@@ -507,26 +507,184 @@ namespace Sale.Api.Repositories.Implementations
         //    };
 
         //}
+        //        public async Task<ActionResponse<IEnumerable<ProductDTO>>> GetAsyncProduct(PaginationDTO pagination)
+        //        {
+        //            pagination.CurrencyCode ??= "IQ";
+
+        //            var queryable = _context.Products.Include(pt => pt.ProductTranslations!.Where(t => t.Language.ToLower() == pagination.Language!.ToLower()))
+        //                .Include(x => x.productsubCategories!).ThenInclude(x => x.Category!.SubcategoryTranslations!.Where(t => t.Language.ToLower() == pagination.Language!.ToLower())).Include(x => x.productColor!)
+        //                .ThenInclude(x => x.color).Include(x => x.ProductImages).Include(x => x.brand).ThenInclude(b => b.BrandTranslations!.Where(t => t.Language.ToLower() == pagination.Language!.ToLower())).Include(x => x.serialNumbers).Include(x => x.productSize!).ThenInclude(x => x.size)
+        //                .Include(p => p.ProductPrices!).ThenInclude(pc => pc.Currency)
+        //                .Include(pd => pd.productDiscount!).ThenInclude(d => d.discount).AsNoTracking().AsQueryable();
+
+
+        //            if (!string.IsNullOrWhiteSpace(pagination.Filter))
+        //            {
+        //                queryable = queryable.Where(x =>
+        //                    x.ProductTranslations!.Any(t =>
+        //                        t.Language.ToLower() == pagination.Language!.ToLower() &&
+        //                        t.Name.ToLower().Contains(pagination.Filter.ToLower())));
+        //            }
+
+
+        //            if (pagination.CategoryId is > 0)
+        //            {
+        //                queryable = queryable.Where(x =>
+        //                    x.productsubCategories!.Any(c => c.subcategoryId == pagination.CategoryId));
+        //            }
+
+        //            if (!string.IsNullOrWhiteSpace(pagination.CategoryFilter))
+        //            {
+        //                queryable = queryable.Where(x =>
+        //                    x.productsubCategories!.Any(c =>
+        //                        c.Category!.SubcategoryTranslations!.Any(t =>
+        //                            t.Name.ToLower() == pagination.CategoryFilter.ToLower())));
+        //            }
+        //            if (pagination.BrandId.HasValue)
+        //            {
+        //                queryable = queryable.Where(p => p.BrandId == pagination.BrandId);
+        //            }
+
+        //            if (pagination.ColorIds?.Any() == true)
+        //            {
+        //                queryable = queryable.Where(p =>
+        //                    p.productColor!.Any(pc => pagination.ColorIds.Contains(pc.ColorId)));
+        //            }
+
+        //            if (pagination.SizeIds?.Any() == true)
+        //            {
+        //                queryable = queryable.Where(p =>
+        //                    p.productSize!.Any(ps => pagination.SizeIds.Contains(ps.SizeId)));
+        //            }
+        //               if(pagination.CurrencyCode != "IQ")
+        //{
+        //                if (pagination.MinPrice.HasValue)
+        //                {
+        //                    pagination.MinPrice = await _currencyConverter
+        //                        .ConvertFromIQDAsync(pagination.MinPrice.Value, pagination.CurrencyCode);
+        //                }
+
+        //                if (pagination.MaxPrice.HasValue)
+        //                {
+        //                    pagination.MaxPrice = await _currencyConverter
+        //                        .ConvertFromIQDAsync(pagination.MaxPrice.Value, pagination.CurrencyCode);
+        //                }
+        //            }
+        //            if (pagination.MinPrice.HasValue || pagination.MaxPrice.HasValue)
+        //            {
+        //                queryable = queryable.Where(p =>
+        //                    p.ProductPrices!.Any(pp =>
+        //                        pp.Currency!.Code == "IQ" &&
+        //                        (!pagination.MinPrice.HasValue || pp.Price >= pagination.MinPrice.Value) &&
+        //                        (!pagination.MaxPrice.HasValue || pp.Price <= pagination.MaxPrice.Value)
+        //                    )
+        //                );
+        //            }
+
+
+
+        //            var products = await queryable.Paginate(pagination).Select(p => new ProductDTO
+        //                {
+        //                    Id = p.Id,
+        //                    Barcode = p.Barcode,
+        //                    Price = p.ProductPrices!
+        //                        .Where(pp => pp.Currency!.Code == "IQ")
+        //                        .OrderByDescending(pp => pp.CreatedAt)
+        //                        .Select(pp => pp.Price)
+        //                        .FirstOrDefault(),
+        //                    DiscountPercent = p.productDiscount!
+        //                        .Select(pd => pd.discount)
+        //                        .Where(d => d.isActive &&
+        //                                    d.StartTime <= DateTime.UtcNow &&
+        //                                    d.Endtime >= DateTime.UtcNow)
+        //                        .OrderByDescending(d => d.DiscountPercent)
+        //                        .Select(d => d.DiscountPercent)
+        //                        .FirstOrDefault(),
+        //                    Cost = p.ProductPrices!.Select(pp => pp.Cost).FirstOrDefault(),
+        //                    Stock = p.Stock,
+        //                    BrandId = p.BrandId,
+        //                    HasSerial = p.HasSerial,
+        //                    CreatedAt = p.CreatedAt,
+        //                    ProductImages = p.ProductImages!.Select(img => img.Image).ToList(),
+        //                    SerialNumbers = p.serialNumbers!.Select(sn => sn.SerialNumberValue).ToList(),
+        //                    Description = p.ProductTranslations!
+        //                        .FirstOrDefault(t => t.Language.ToLower() == pagination.Language!.ToLower())!.Description,
+        //                    Name = p.ProductTranslations!
+        //                        .FirstOrDefault(t => t.Language.ToLower() == pagination.Language!.ToLower())!.Name,
+        //                    Categories = p.productsubCategories!.Select(psc => new SubcategoryDTO
+        //                    {
+        //                        Id = psc.Category!.Id,
+        //                        category = psc.Category!.SubcategoryTranslations!
+        //                            .Where(t => t.Language.ToLower() == pagination.Language!.ToLower())
+        //                            .Select(t => t.Name).ToList()
+        //                    }).ToList(),
+        //                    Colors = p.productColor!.Select(pc => new ColorDTO
+        //                    {
+        //                        Id = pc.color!.Id,
+        //                        Name = pc.color!.Name,
+        //                        HexCode = pc.color!.HexCode
+        //                    }).ToList(),
+        //                    Sizes = p.productSize!.Select(ps => new SizeDTO
+        //                    {
+        //                        Id = ps.size!.Id,
+        //                        Name = ps.size!.Name
+        //                    }).ToList(),
+        //                    Brand = new BrandDTO
+        //                    {
+        //                        Id = p.brand!.Id,
+        //                        brandTranslations = p.brand.BrandTranslations!
+        //                            .Where(t => t.Language.ToLower() == pagination.Language!.ToLower())
+        //                            .Select(t => new BrandTranslationDTO
+        //                            {
+        //                                Language = t.Language,
+        //                                Name = t.Name
+        //                            }).ToList()
+        //                    }
+        //                }).ToListAsync();            
+        //            foreach (var product in products)
+        //            {
+        //                var basePrice = product.Price;
+        //                var discount = product.DiscountPercent;
+
+        //                if (discount > 0 && basePrice > 0)
+        //                {
+        //                    product.OldPrice = basePrice;
+        //                    product.Price = basePrice - (basePrice * discount / 100);
+        //                }
+        //                else
+        //                {
+        //                    product.OldPrice = 0;
+        //                }
+
+        //                product.Price = await _currencyConverter.ConvertFromIQDAsync(product.Price, pagination.CurrencyCode!);
+
+        //                if (product.OldPrice > 0)
+        //                {
+        //                    product.OldPrice = await _currencyConverter.ConvertFromIQDAsync(product.OldPrice, pagination.CurrencyCode!);
+        //                }
+
+        //                product.Cost = await _currencyConverter.ConvertFromIQDAsync(product.Cost, pagination.CurrencyCode!);
+        //            }
+
+        //            return new ActionResponse<IEnumerable<ProductDTO>>
+        //            {
+        //                WasSuccess = true,
+        //                Result = products.OrderByDescending(p => p.CreatedAt)
+        //            };
+        //        }
         public async Task<ActionResponse<IEnumerable<ProductDTO>>> GetAsyncProduct(PaginationDTO pagination)
         {
             pagination.CurrencyCode ??= "IQ";
-
-            var queryable = _context.Products.Include(pt => pt.ProductTranslations!.Where(t => t.Language.ToLower() == pagination.Language!.ToLower()))
-                .Include(x => x.productsubCategories!).ThenInclude(x => x.Category!.SubcategoryTranslations!.Where(t => t.Language.ToLower() == pagination.Language!.ToLower())).Include(x => x.productColor!)
-                .ThenInclude(x => x.color).Include(x => x.ProductImages).Include(x => x.brand).ThenInclude(b => b.BrandTranslations!.Where(t => t.Language.ToLower() == pagination.Language!.ToLower())).Include(x => x.serialNumbers).Include(x => x.productSize!).ThenInclude(x => x.size)
-                .Include(p=>p.ProductPrices!).ThenInclude(pc=>pc.Currency)
-                .Include(pd=>pd.productDiscount!).ThenInclude(d=>d.discount).Paginate(pagination).AsQueryable();
-
-
+            var language = pagination.Language!.ToLower();          
+            var queryable = _context.Products.AsNoTracking();           
             if (!string.IsNullOrWhiteSpace(pagination.Filter))
             {
                 queryable = queryable.Where(x =>
                     x.ProductTranslations!.Any(t =>
-                        t.Language.ToLower() == pagination.Language!.ToLower() &&
+                        t.Language.ToLower() == language &&
                         t.Name.ToLower().Contains(pagination.Filter.ToLower())));
             }
 
-            
             if (pagination.CategoryId is > 0)
             {
                 queryable = queryable.Where(x =>
@@ -540,6 +698,7 @@ namespace Sale.Api.Repositories.Implementations
                         c.Category!.SubcategoryTranslations!.Any(t =>
                             t.Name.ToLower() == pagination.CategoryFilter.ToLower())));
             }
+
             if (pagination.BrandId.HasValue)
             {
                 queryable = queryable.Where(p => p.BrandId == pagination.BrandId);
@@ -556,32 +715,50 @@ namespace Sale.Api.Repositories.Implementations
                 queryable = queryable.Where(p =>
                     p.productSize!.Any(ps => pagination.SizeIds.Contains(ps.SizeId)));
             }
-            if (pagination.CurrencyCode != "IQ")
-            {
-                if (pagination.MinPrice.HasValue)
-                {
-                    pagination.MinPrice = await _currencyConverter
-                        .ConvertFromIQDAsync(pagination.MinPrice.Value, pagination.CurrencyCode);
-                }
-
-                if (pagination.MaxPrice.HasValue)
-                {
-                    pagination.MaxPrice = await _currencyConverter
-                        .ConvertFromIQDAsync(pagination.MaxPrice.Value, pagination.CurrencyCode);
-                }
-            }
+          
             if (pagination.MinPrice.HasValue || pagination.MaxPrice.HasValue)
             {
+                var minPrice = pagination.MinPrice ?? 0;
+                var maxPrice = pagination.MaxPrice ?? decimal.MaxValue;
+
                 queryable = queryable.Where(p =>
                     p.ProductPrices!.Any(pp =>
-                        (!pagination.MinPrice.HasValue || pp.Price >= pagination.MinPrice.Value) &&
-                        (!pagination.MaxPrice.HasValue || pp.Price <= pagination.MaxPrice.Value)
-                    )
-                );
-            }
+                        pp.Currency!.Code == "IQ" &&
+                        pp.Price >= minPrice &&
+                        pp.Price <= maxPrice));
+            }           
+            var productIds = await queryable
+                .OrderByDescending(p => p.CreatedAt)
+                .Skip((pagination.Page - 1) * pagination.RecordsNumber)
+                .Take(pagination.RecordsNumber)
+                .Select(p => p.Id)
+                .ToListAsync();
 
-
-            var products = await queryable.Select(p => new ProductDTO
+            if (!productIds.Any())
+            {
+                return new ActionResponse<IEnumerable<ProductDTO>>
+                {
+                    WasSuccess = true,
+                    Result = Enumerable.Empty<ProductDTO>()
+                };
+            }          
+            var products = await _context.Products
+                .AsNoTracking()
+                .AsSplitQuery()
+                .Where(p => productIds.Contains(p.Id))
+                .Include(pt => pt.ProductTranslations!.Where(t => t.Language.ToLower() == language))
+                .Include(x => x.productsubCategories!)
+                    .ThenInclude(x => x.Category!.SubcategoryTranslations!.Where(t => t.Language.ToLower() == language))
+                .Include(x => x.productColor!).ThenInclude(x => x.color)
+                .Include(x => x.ProductImages)
+                .Include(x => x.brand)
+                    .ThenInclude(b => b.BrandTranslations!.Where(t => t.Language.ToLower() == language))
+                .Include(x => x.serialNumbers)
+                .Include(x => x.productSize!).ThenInclude(x => x.size)
+                .Include(p => p.ProductPrices!.Where(pp => pp.Currency!.Code == "IQ"))
+                .Include(pd => pd.productDiscount!)
+                    .ThenInclude(d => d.discount)
+                .Select(p => new ProductDTO
                 {
                     Id = p.Id,
                     Barcode = p.Barcode,
@@ -598,7 +775,10 @@ namespace Sale.Api.Repositories.Implementations
                         .OrderByDescending(d => d.DiscountPercent)
                         .Select(d => d.DiscountPercent)
                         .FirstOrDefault(),
-                    Cost = p.ProductPrices!.Select(pp => pp.Cost).FirstOrDefault(),
+                    Cost = p.ProductPrices!
+                        .Where(pp => pp.Currency!.Code == "IQ")
+                        .Select(pp => pp.Cost)
+                        .FirstOrDefault(),
                     Stock = p.Stock,
                     BrandId = p.BrandId,
                     HasSerial = p.HasSerial,
@@ -606,14 +786,14 @@ namespace Sale.Api.Repositories.Implementations
                     ProductImages = p.ProductImages!.Select(img => img.Image).ToList(),
                     SerialNumbers = p.serialNumbers!.Select(sn => sn.SerialNumberValue).ToList(),
                     Description = p.ProductTranslations!
-                        .FirstOrDefault(t => t.Language.ToLower() == pagination.Language!.ToLower())!.Description,
+                        .FirstOrDefault(t => t.Language.ToLower() == language)!.Description,
                     Name = p.ProductTranslations!
-                        .FirstOrDefault(t => t.Language.ToLower() == pagination.Language!.ToLower())!.Name,
+                        .FirstOrDefault(t => t.Language.ToLower() == language)!.Name,
                     Categories = p.productsubCategories!.Select(psc => new SubcategoryDTO
                     {
                         Id = psc.Category!.Id,
                         category = psc.Category!.SubcategoryTranslations!
-                            .Where(t => t.Language.ToLower() == pagination.Language!.ToLower())
+                            .Where(t => t.Language.ToLower() == language)
                             .Select(t => t.Name).ToList()
                     }).ToList(),
                     Colors = p.productColor!.Select(pc => new ColorDTO
@@ -631,14 +811,15 @@ namespace Sale.Api.Repositories.Implementations
                     {
                         Id = p.brand!.Id,
                         brandTranslations = p.brand.BrandTranslations!
-                            .Where(t => t.Language.ToLower() == pagination.Language!.ToLower())
+                            .Where(t => t.Language.ToLower() == language)
                             .Select(t => new BrandTranslationDTO
                             {
                                 Language = t.Language,
                                 Name = t.Name
                             }).ToList()
                     }
-                }).ToListAsync();            
+                })
+                .ToListAsync();
             foreach (var product in products)
             {
                 var basePrice = product.Price;
@@ -663,6 +844,7 @@ namespace Sale.Api.Repositories.Implementations
 
                 product.Cost = await _currencyConverter.ConvertFromIQDAsync(product.Cost, pagination.CurrencyCode!);
             }
+
 
             return new ActionResponse<IEnumerable<ProductDTO>>
             {
