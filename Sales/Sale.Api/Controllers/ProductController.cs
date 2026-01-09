@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.EntityFrameworkCore;
 using Sale.Api.UnitsOfWork.Implementations;
 using Sale.Api.UnitsOfWork.Interfaces;
 using Sale.Share.DTOs;
@@ -165,6 +166,17 @@ namespace Sale.Api.Controllers
         public async Task<IActionResult>GetFullProduct()
         {
             var result = await _productsUnitOfWork.GetfullProduct();
+            if (result.WasSuccess)
+            {
+                return Ok(result.Result);
+            }
+            return NotFound(result.Message);
+        }
+        [AllowAnonymous]
+        [HttpGet("price-range")]
+        public async Task<IActionResult> GetPriceRange()
+        {
+            var result = await _productsUnitOfWork.GetPriceRange();
             if (result.WasSuccess)
             {
                 return Ok(result.Result);

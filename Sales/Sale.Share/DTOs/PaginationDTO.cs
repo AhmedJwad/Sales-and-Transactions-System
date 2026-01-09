@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Sale.Share.DTOs
 {
-   public class PaginationDTO
+    public class PaginationDTO
     {
         public int Id { get; set; }
         public int Page { get; set; } = 1;
-        public int RecordsNumber { get; set; } =10;
+        public int RecordsNumber { get; set; } = 10;
         public string? Filter { get; set; }
         public string? CategoryFilter { get; set; }
         public string? Language { get; set; }
@@ -23,7 +23,6 @@ namespace Sale.Share.DTOs
         public List<int>? SizeIds { get; set; }
         public decimal? MinPrice { get; set; }
         public decimal? MaxPrice { get; set; }
-
 
     }
 }

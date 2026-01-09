@@ -152,6 +152,24 @@ namespace Sale.Api.Data
                 .WithMany(c => c.ExchangeRatesAsTarget)
                 .HasForeignKey(er => er.TargetCurrencyId)
                 .OnDelete(DeleteBehavior.Restrict);
+            // =============================
+            // 🔹price- min price - max price
+            // =============================
+            modelBuilder.Entity<ProductPrice>()
+                .Property(p => p.Price)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<ProductPrice>()
+                .Property(p => p.Cost)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<Product>()
+                .Property(p => p.Stock)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<ExchangeRate>()
+                .Property(e => e.Rate)
+                .HasColumnType("decimal(18,6)");
 
         }
     }

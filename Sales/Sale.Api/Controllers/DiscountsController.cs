@@ -47,7 +47,7 @@ namespace Sale.Api.Controllers
             }
             return Ok(action);
         }      
-      
+        [AllowAnonymous]
         [HttpGet]
         public override async Task<IActionResult> GetAsync([FromQuery] PaginationDTO pagination)
         {

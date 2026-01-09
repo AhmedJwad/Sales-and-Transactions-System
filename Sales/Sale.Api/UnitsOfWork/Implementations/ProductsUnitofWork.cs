@@ -48,5 +48,8 @@ namespace Sale.Api.UnitsOfWork.Implementations
 
         public async Task<ActionResponse<List<Product>>> GetProductsByIdsAsync(List<int> ids)
         => await _productRepository.GetProductsByIdsAsync(ids);
+
+        public async Task<ActionResponse<IEnumerable<PriceRangeDTO>>> GetPriceRange()
+        => await _productRepository.GetPriceRange();
     }
 }

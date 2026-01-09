@@ -675,8 +675,8 @@ namespace Sale.Api.Repositories.Implementations
         public async Task<ActionResponse<IEnumerable<ProductDTO>>> GetAsyncProduct(PaginationDTO pagination)
         {
             pagination.CurrencyCode ??= "IQ";
-            var language = pagination.Language!.ToLower();          
-            var queryable = _context.Products.AsNoTracking();           
+            var language = pagination.Language!.ToLower();
+            var queryable = _context.Products.AsNoTracking();            
             if (!string.IsNullOrWhiteSpace(pagination.Filter))
             {
                 queryable = queryable.Where(x =>
@@ -715,7 +715,20 @@ namespace Sale.Api.Repositories.Implementations
                 queryable = queryable.Where(p =>
                     p.productSize!.Any(ps => pagination.SizeIds.Contains(ps.SizeId)));
             }
-          
+            var allPricesQuery = queryable
+                                .SelectMany(p => p.ProductPrices!)
+                                .Where(pp => pp.Currency!.Code == "IQ");
+
+                                        var minPriceInDb = await allPricesQuery.MinAsync(pp => pp.Price);
+                                        var maxPriceInDb = await allPricesQuery.MaxAsync(pp => pp.Price); 
+            if(pagination.MinPrice==0)
+            {
+                pagination.MinPrice = minPriceInDb;
+            }
+             if(pagination.MaxPrice==0)
+            {
+                pagination.MaxPrice = maxPriceInDb;
+            }                                       
             if (pagination.MinPrice.HasValue || pagination.MaxPrice.HasValue)
             {
                 var minPrice = pagination.MinPrice ?? 0;
@@ -726,13 +739,13 @@ namespace Sale.Api.Repositories.Implementations
                         pp.Currency!.Code == "IQ" &&
                         pp.Price >= minPrice &&
                         pp.Price <= maxPrice));
-            }           
+            }
             var productIds = await queryable
-                .OrderByDescending(p => p.CreatedAt)
-                .Skip((pagination.Page - 1) * pagination.RecordsNumber)
-                .Take(pagination.RecordsNumber)
-                .Select(p => p.Id)
-                .ToListAsync();
+                           .OrderByDescending(p => p.CreatedAt)
+                           .Skip((pagination.Page - 1) * pagination.RecordsNumber)
+                           .Take(pagination.RecordsNumber)
+                           .Select(p => p.Id)
+                           .ToListAsync();
 
             if (!productIds.Any())
             {
@@ -1277,5 +1290,24 @@ namespace Sale.Api.Repositories.Implementations
             }
         }
 
+        public async Task<ActionResponse<IEnumerable<PriceRangeDTO>>> GetPriceRange()
+        {
+            var allPricesQuery = _context.Products
+                 .SelectMany(p => p.ProductPrices!)
+                 .Where(pp => pp.Currency!.Code == "IQ");
+
+            var minPrice = await allPricesQuery.MinAsync(pp => pp.Price);
+            var maxPrice = await allPricesQuery.MaxAsync(pp => pp.Price);
+            return new ActionResponse<IEnumerable<PriceRangeDTO>>
+            {
+                WasSuccess=true,
+                Result = new List<PriceRangeDTO>  
+                {
+                    new PriceRangeDTO { MinPrice = minPrice, MaxPrice = maxPrice }
+                }
+            };
+
+            
+        }
     }
 }
