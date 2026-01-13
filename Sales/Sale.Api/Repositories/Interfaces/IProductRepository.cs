@@ -23,5 +23,6 @@ namespace Sale.Api.Repositories.Interfaces
         Task<ActionResponse<IEnumerable<ProductResponseDTO>>> GetfullProduct();
         Task<ActionResponse<List<Product>>> GetProductsByIdsAsync(List<int> ids);
         Task<ActionResponse<IEnumerable<PriceRangeDTO>>> GetPriceRange();
+        Task<ActionResponse<ProductDetailsDTO>> GetProductForStoreAsync(PaginationDTO paginationDTO);
     }
 }

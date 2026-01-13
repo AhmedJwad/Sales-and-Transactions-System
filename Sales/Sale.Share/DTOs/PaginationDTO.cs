@@ -14,13 +14,14 @@ namespace Sale.Share.DTOs
         public string? Filter { get; set; }
         public string? CategoryFilter { get; set; }
         public string? Language { get; set; }
-        public int? CategoryId { get; set; }
+        public List<int>? CategoryId { get; set; }
         public string? CurrencyCode { get; set; }
 
         // Product Filters
         public int? BrandId { get; set; }
         public List<int>? ColorIds { get; set; }
         public List<int>? SizeIds { get; set; }
+        public List<int>? DiscountIds { get; set; }
         public decimal? MinPrice { get; set; }
         public decimal? MaxPrice { get; set; }
 

@@ -51,5 +51,7 @@ namespace Sale.Api.UnitsOfWork.Implementations
 
         public async Task<ActionResponse<IEnumerable<PriceRangeDTO>>> GetPriceRange()
         => await _productRepository.GetPriceRange();
+        public async Task<ActionResponse<ProductDetailsDTO>> GetProductForStoreAsync(PaginationDTO paginationDTO)
+        => await _productRepository.GetProductForStoreAsync(paginationDTO);
     }
 }

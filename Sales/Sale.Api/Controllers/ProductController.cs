@@ -183,5 +183,17 @@ namespace Sale.Api.Controllers
             }
             return NotFound(result.Message);
         }
+
+        [AllowAnonymous]
+        [HttpGet("Product")]
+        public async Task<IActionResult> GetProductForStoreAsync([FromQuery] PaginationDTO pagination)
+        {
+            var result = await _productsUnitOfWork.GetProductForStoreAsync(pagination);
+            if (result.WasSuccess)
+            {
+                return Ok(result.Result);
+            }
+            return NotFound(result.Message);
+        }
     }
 }

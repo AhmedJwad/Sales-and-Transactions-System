@@ -12,5 +12,7 @@ namespace Sale.Share.DTOs
         public int Id { get; set; }      
         public string Name { get; set; } = null!;
         public string HexCode { get; set; } = null!;
+        public List<ImageDTO>? Images { get; set; } = new();
+
     }
 }
