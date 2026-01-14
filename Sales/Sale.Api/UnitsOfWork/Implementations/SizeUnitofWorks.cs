@@ -1,11 +1,10 @@
 ﻿using Sale.Api.Repositories.Interfaces;
-using Sale.Api.UnitsOfWork.Implementations;
 using Sale.Api.UnitsOfWork.Interfaces;
 using Sale.Share.DTOs;
 using Sale.Share.Entities;
 using Sale.Share.Responses;
 
-namespace Sale.Api.Repositories.Implementations
+namespace Sale.Api.UnitsOfWork.Implementations
 {
     public class SizeUnitofWorks :GenericUnitOfWork<Sizep>, IsizeUnitofWorks
     {
@@ -23,10 +22,13 @@ namespace Sale.Api.Repositories.Implementations
         public override async Task<ActionResponse<IEnumerable<Sizep>>> GetAsync(PaginationDTO pagination)
         => await _sizeRepository.GetAsync(pagination);
         public async Task<IEnumerable<Sizep>> GetComboAsync()
-        => await _sizeRepository.GetComboAsync();
+        => await _sizeRepository.GetComboAsync();       
         public override async Task<ActionResponse<int>> GetRecordsNumberAsync(PaginationDTO pagination)
         => await _sizeRepository.GetRecordsNumberAsync(pagination);
         public override async Task<ActionResponse<int>> GetTotalPagesAsync(PaginationDTO pagination)
         => await _sizeRepository.GetTotalPagesAsync(pagination);
+        public async Task<IEnumerable<Sizep>> GetCombosizeAsync()
+        => await _sizeRepository.GetCombosizeAsync();
+
     }
 }

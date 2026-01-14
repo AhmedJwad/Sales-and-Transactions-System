@@ -23,6 +23,8 @@ namespace Sale.Api.UnitsOfWork.Implementations
         => await _colourRepository.GetAsync(pagination);
         public async Task<IEnumerable<Colour>> GetComboAsync()
         => await _colourRepository.GetComboAsync();
+        public async Task<IEnumerable<Colour>> GetComboColorAsync()
+        => await _colourRepository.GetComboColorAsync();
         public override async  Task<ActionResponse<int>> GetRecordsNumberAsync(PaginationDTO pagination)
         => await _colourRepository.GetRecordsNumberAsync(pagination);
         public override async Task<ActionResponse<int>> GetTotalPagesAsync(PaginationDTO pagination)

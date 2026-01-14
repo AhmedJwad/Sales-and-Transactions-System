@@ -12,5 +12,6 @@ namespace Sale.Api.UnitsOfWork.Interfaces
         Task<ActionResponse<IEnumerable<Colour>>> GetAsync(PaginationDTO pagination);
         Task<ActionResponse<int>> GetTotalPagesAsync(PaginationDTO pagination);
         Task<IEnumerable<Colour>> GetComboAsync();
+        Task<IEnumerable<Colour>> GetComboColorAsync();
     }
 }

@@ -77,7 +77,7 @@ namespace Sale.Api.Repositories.Implementations
                        .OrderBy(s => s.Name)
                        .AsNoTracking()
                        .ToListAsync();            
-        }
+        }      
 
         public override async Task<ActionResponse<int>> GetRecordsNumberAsync(PaginationDTO pagination)
         {
@@ -108,6 +108,10 @@ namespace Sale.Api.Repositories.Implementations
                 WasSuccess = true,
                 Result = totalPage,
             };
+        }
+        public async Task<IEnumerable<Sizep>> GetCombosizeAsync()
+        {
+            return await _context.sizes.ToListAsync();
         }
     }
 }

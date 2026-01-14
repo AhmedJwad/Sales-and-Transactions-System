@@ -37,6 +37,13 @@ namespace Sale.Api.Controllers
             var response = await _colourUnitofWorks.GetComboAsync();
             return Ok(response);
         }
+        [AllowAnonymous]
+        [HttpGet("combocolor")]
+        public async Task<IActionResult> GetCombocolorAsync()
+        {
+            var response = await _colourUnitofWorks.GetComboColorAsync();
+            return Ok(response);
+        }
 
         [HttpGet("full")]
         public override async Task<IActionResult> GetAsync()

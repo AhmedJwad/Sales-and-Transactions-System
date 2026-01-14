@@ -68,6 +68,11 @@ namespace Sale.Api.Repositories.Implementations
 
         }
 
+        public async Task<IEnumerable<Colour>> GetComboColorAsync()
+        {
+            return await _context.colors.ToListAsync();
+        }
+
         public override async Task<ActionResponse<int>> GetRecordsNumberAsync(PaginationDTO pagination)
         {
             var queryable = _context.colors.AsQueryable();

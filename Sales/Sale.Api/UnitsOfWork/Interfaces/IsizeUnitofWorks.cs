@@ -12,5 +12,6 @@ namespace Sale.Api.UnitsOfWork.Interfaces
         Task<ActionResponse<IEnumerable<Sizep>>> GetAsync(PaginationDTO pagination);
         Task<ActionResponse<int>> GetTotalPagesAsync(PaginationDTO pagination);
         Task<IEnumerable<Sizep>> GetComboAsync();
+        Task<IEnumerable<Sizep>> GetCombosizeAsync();
     }
 }

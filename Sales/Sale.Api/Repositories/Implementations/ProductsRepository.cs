@@ -282,10 +282,11 @@ namespace Sale.Api.Repositories.Implementations
 
         public override async Task<ActionResponse<Product>> GetAsync(int id)
         {
-            var product = await _context.Products!.Include(p => p.ProductTranslations).Include(x => x.ProductImages!)
-                .Include(x => x.productsubCategories!).ThenInclude(x => x.Category).ThenInclude(x => x.SubcategoryTranslations).Include(x => x.serialNumbers)
+            var product = await _context.Products!.AsNoTracking()
+                 .AsSplitQuery().Include(p => p.ProductTranslations).Include(x => x.ProductImages!)
+                .Include(x => x.productsubCategories!).ThenInclude(x => x.Category).ThenInclude(x => x.SubcategoryTranslations)
                 .Include(x => x.productColor!).ThenInclude(x => x.color).Include(x => x.productSize!).ThenInclude(x => x.size)
-                .Include(x => x.brand).ThenInclude(bt => bt.BrandTranslations).Include(p => p.ProductPrices).AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+                .Include(x => x.brand).ThenInclude(bt => bt.BrandTranslations).Include(p => p.ProductPrices).FirstOrDefaultAsync(x => x.Id == id);
             if (product == null)
             {
                 return new ActionResponse<Product>
@@ -967,11 +968,12 @@ namespace Sale.Api.Repositories.Implementations
                                         Name=pc.color.Name,
                                         HexCode=pc.color.HexCode,
                                         Images = pc.color.productColorImages!
+                                        .Where(img => img.productImage!.ProductId == p.Id)
                                         .Select(img => new ImageDTO
                                         {
                                             Images = new List<string> { img.productImage!.Image } 
                                         }).ToList()
-                                    }).ToList(),
+                                    }).Distinct().ToList(),
 
                                     Sizes=p.productSize!.Select(ps=> new SizeDTO
                                     {

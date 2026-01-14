@@ -36,6 +36,13 @@ namespace Sale.Api.Controllers
             var response = await _sizeUnitofWorks.GetComboAsync();
             return Ok(response);
         }
+        
+        [HttpGet("combosize")]
+        public async Task<IActionResult> GetCombosizeAsync()
+        {
+            var response = await _sizeUnitofWorks.GetCombosizeAsync();
+            return Ok(response);
+        }
 
         [HttpGet("full")]
         public override async Task<IActionResult> GetAsync()
