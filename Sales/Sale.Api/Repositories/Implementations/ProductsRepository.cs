@@ -597,8 +597,8 @@ namespace Sale.Api.Repositories.Implementations
                         Message = "Product does not exist",
                     };
                 }             
-               // product.Price = productDTO.Price;
-                //product.Stock = productDTO.Stock;
+                 //product.Price = productDTO.Price;
+                product.Stock = productDTO.Stock;
                // product.Cost = productDTO.Cost;
                // product.DesiredProfit = productDTO.DesiredProfit / 100;
                 product.Barcode=productDTO.Barcode;               
@@ -940,7 +940,7 @@ namespace Sale.Api.Repositories.Implementations
                                                 .Where(t => t.Language.ToLower() == language)
                                                 .Select(t => t.Description)
                                                 .FirstOrDefault()!,
-
+                                    Stock=p.Stock,
                                     Price = p.ProductPrices!.OrderByDescending(p => p.CreatedAt)
                                     .Where(p=>p.Currency!.Code=="IQ")
                                     .Select(p => p.Price)
@@ -973,7 +973,7 @@ namespace Sale.Api.Repositories.Implementations
                                         {
                                             Images = new List<string> { img.productImage!.Image } 
                                         }).ToList()
-                                    }).Distinct().ToList(),
+                                    }).ToList(),
 
                                     Sizes=p.productSize!.Select(ps=> new SizeDTO
                                     {
@@ -1012,8 +1012,57 @@ namespace Sale.Api.Repositories.Implementations
                 if (productDetails.OldPrice > 0)
                 {
                     productDetails.OldPrice = await _currencyConverter.ConvertFromIQDAsync(productDetails.OldPrice, paginationDTO.CurrencyCode!);
-                }               
+                }
+                var subCategoryIds = productDetails.Categories.Select(c => c.Id).ToList();
+
+                productDetails.RelatedProducts = await _context.Products.Where(p => p.Id != productDetails.Id &&
+                 p.productsubCategories!.Any(psc => subCategoryIds.Contains(psc.subcategoryId)))
+                    .Select(p => new RelatedProductDTO {
+                        Id=p.Id,
+                        Name = p.ProductTranslations!
+                        .Where(t => t.Language.ToLower() == language)
+                        .Select(t => t.Name)
+                        .FirstOrDefault()!,
+                        OldPrice = p.ProductPrices!
+                        .OrderByDescending(pp => pp.CreatedAt)
+                        .Where(pp => pp.Currency!.Code == "IQ")
+                        .Select(pp => pp.Price)
+                        .FirstOrDefault(),
+
+                         DiscountPercent = p.productDiscount!
+                        .Select(d => d.discount.DiscountPercent)
+                        .FirstOrDefault(),
+
+                          Price = p.ProductPrices!
+                        .OrderByDescending(pp => pp.CreatedAt)
+                        .Where(pp => pp.Currency!.Code == "IQ")
+                        .Select(pp => pp.Price)
+                        .FirstOrDefault(),                      
+                         Image = p.ProductImages!
+                        .Select(i => i.Image)
+                        .FirstOrDefault()
+                    }).Take(10).AsNoTracking().ToListAsync();
             }
+            foreach (var rp in productDetails!.RelatedProducts)
+            {
+                if (rp.DiscountPercent > 0 && rp.Price > 0)
+                {
+                    rp.OldPrice = rp.Price;
+                    rp.Price = rp.Price - (rp.Price * rp.DiscountPercent / 100);
+                }
+                else
+                {
+                    rp.OldPrice = 0;
+                }
+
+                rp.Price = await _currencyConverter.ConvertFromIQDAsync(rp.Price, paginationDTO.CurrencyCode!);
+
+                if (rp.OldPrice > 0)
+                {
+                    rp.OldPrice = await _currencyConverter.ConvertFromIQDAsync(rp.OldPrice, paginationDTO.CurrencyCode!);
+                }
+            }
+
             return new ActionResponse<ProductDetailsDTO>
                 {
                     WasSuccess = true,
