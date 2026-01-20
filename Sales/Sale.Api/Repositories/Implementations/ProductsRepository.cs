@@ -949,8 +949,14 @@ namespace Sale.Api.Repositories.Implementations
                                            .Where(p => p.Currency!.Code == "IQ")
                                            .Select(p => p.Price)
                                            .FirstOrDefault(),
-                                    DiscountPercent = p.productDiscount!.Select(d => d.discount.DiscountPercent)
-                                    .FirstOrDefault(),
+                                    DiscountPercent = p.productDiscount!
+                                            .Select(pd => pd.discount)
+                                            .Where(d => d.isActive &&
+                                                        d.StartTime <= DateTime.UtcNow &&
+                                                        d.Endtime >= DateTime.UtcNow)
+                                            .OrderByDescending(d => d.DiscountPercent)
+                                            .Select(d => d.DiscountPercent)
+                                            .FirstOrDefault(),
                                     Images = p.ProductImages!.Select(i=>i.Image).ToList(),
                                     Brand=p.brand==null ? null: new BrandDTO
                                     {
@@ -1028,12 +1034,16 @@ namespace Sale.Api.Repositories.Implementations
                         .Where(pp => pp.Currency!.Code == "IQ")
                         .Select(pp => pp.Price)
                         .FirstOrDefault(),
+                        DiscountPercent = p.productDiscount!
+                                            .Select(pd => pd.discount)
+                                            .Where(d => d.isActive &&
+                                                        d.StartTime <= DateTime.UtcNow &&
+                                                        d.Endtime >= DateTime.UtcNow)
+                                            .OrderByDescending(d => d.DiscountPercent)
+                                            .Select(d => d.DiscountPercent)
+                                            .FirstOrDefault(),
 
-                         DiscountPercent = p.productDiscount!
-                        .Select(d => d.discount.DiscountPercent)
-                        .FirstOrDefault(),
-
-                          Price = p.ProductPrices!
+                        Price = p.ProductPrices!
                         .OrderByDescending(pp => pp.CreatedAt)
                         .Where(pp => pp.Currency!.Code == "IQ")
                         .Select(pp => pp.Price)

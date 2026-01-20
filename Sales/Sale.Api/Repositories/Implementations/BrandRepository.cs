@@ -64,8 +64,7 @@ namespace Sale.Api.Repositories.Implementations
                 .Include(p => p.brand)
                 .ThenInclude(b => b.BrandTranslations)
                 .Where(p => p.brand != null)
-                .Select(p => p.brand!)
-                .Distinct()
+                .Select(p => p.brand!)              
                 .ToListAsync();
            
             foreach (var brand in brands)
