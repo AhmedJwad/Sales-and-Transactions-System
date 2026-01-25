@@ -15,7 +15,9 @@ namespace Sale.Share.DTOs
         public OrderStatus OrderStatus { get; set; }
 
         public string Remarks { get; set; } = string.Empty;
-       
+
+        public string? CurrencyCode { get; set; }
+
         public List<OrderDetailDTO>? OrderDetails { get; set; }
     }
 }

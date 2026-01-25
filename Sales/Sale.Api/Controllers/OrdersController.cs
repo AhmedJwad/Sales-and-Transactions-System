@@ -53,9 +53,9 @@ namespace Sale.Api.Controllers
             return BadRequest();
         }
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetAsync(int id)
+        public async Task<IActionResult> GetAsyncbyId(PaginationDTO pagination)
         {
-            var response = await _orderUnitofWorks.GetAsync(id);
+            var response = await _orderUnitofWorks.GetAsyncbyId(pagination);
             if (response.WasSuccess)
             {
                 return Ok(response.Result);

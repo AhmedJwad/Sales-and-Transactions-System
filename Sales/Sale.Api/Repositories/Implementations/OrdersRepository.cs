@@ -33,7 +33,8 @@ namespace Sale.Api.Repositories.Implementations
                     Message = "user does not exist"
                 };
             }
-            var queryable = _context.orders.Include(u => u.User!).Include(o => o.OrderDetails!).ThenInclude(p => p.Product).AsQueryable();
+            var queryable = _context.orders.Include(u => u.User!).Include(o => o.OrderDetails!).ThenInclude(p => p.Product)
+                .ThenInclude(pt=>pt.ProductTranslations).AsQueryable();
             if (!string.IsNullOrEmpty(pagination.Filter))
             {
                 queryable = queryable.Where(x => x.User!.FirstName.ToLower().Contains(pagination.Filter.ToLower()));
@@ -58,11 +59,29 @@ namespace Sale.Api.Repositories.Implementations
                 orderDetailResponseDTOs=o.OrderDetails!.Select(od=> new OrderDetailResponseDTO
                 {
                     Id=od.Id,
-                    Description=od.Description,
-                    Image=od.Image,
-                    Name=od.Name,
-                    Price=od.Price,
-                    Quantity=(int)od.Quantity,
+                    Description = od.Product!.ProductTranslations!
+                      .Where(pt => pt.Language.ToLower() == pagination.Language!.ToLower())
+                      .Select(pt => pt.Description)
+                      .FirstOrDefault()
+                 ?? od.Product!.ProductTranslations!
+                      .Select(pt => pt.Description)
+                      .FirstOrDefault()
+                 ?? "",
+                    Image = od.Image,
+                    Name = od.Product!.ProductTranslations!
+                        .Where(pt => pt.Language.ToLower() == pagination.Language!.ToLower())
+                        .Select(pt => pt.Name)
+                        .FirstOrDefault()
+                        ?? od.Product!.ProductTranslations!
+                            .Select(pt => pt.Name)
+                            .FirstOrDefault()
+                        ?? "Unknown product",
+                    Price = od.Product.ProductPrices!
+                            .Where(pp => pp.Currency!.Code == "IQ")
+                            .OrderByDescending(pp => pp.CreatedAt)
+                            .Select(pp => pp.Price)
+                            .FirstOrDefault(),
+                    Quantity =(int)od.Quantity,
                     Value=od.Value,
 
                 }).ToList(),                
@@ -75,12 +94,14 @@ namespace Sale.Api.Repositories.Implementations
 
         }
 
-        public  async Task<ActionResponse<OrderResponseDTO>> GetAsync(int id)
+        public async Task<ActionResponse<OrderResponseDTO>> GetAsyncbyId(PaginationDTO pagination)
         {
             var order = await _context.orders.Include(u => u.User!)
                         .ThenInclude(c => c.City!).ThenInclude(s => s.State!).ThenInclude(cn => cn.Country!)
-                        .Include(o => o.OrderDetails!).ThenInclude(p => p.Product).ThenInclude(pi => pi.ProductImages)
-                        .FirstOrDefaultAsync(o => o.Id == id);
+                        .Include(o => o.OrderDetails!).ThenInclude(p => p.Product)
+                        .ThenInclude(pt=>pt.ProductTranslations!)
+                        .ThenInclude(p => p.Product).ThenInclude(pi => pi.ProductImages)
+                        .FirstOrDefaultAsync(o => o.Id == pagination.Id);
             if (order == null)
             {
                 return new ActionResponse<OrderResponseDTO>
@@ -97,6 +118,7 @@ namespace Sale.Api.Repositories.Implementations
                 UserFullName = order.User!.FirstName + " " + order.User.LastName,
                 UserEmail = order.User!.Email,
                 UserPhoto = order.User!.Photo ?? "/no-image.png",
+                PhneNumber=order.User!.PhoneNumber,
                 Lines = order.Lines,
                 Quantity = (int)order.Quantity,
                 Value = order.Value,
@@ -104,9 +126,27 @@ namespace Sale.Api.Repositories.Implementations
                 orderDetailResponseDTOs = order.OrderDetails!.Select(od => new OrderDetailResponseDTO
                 {
                     Id = od.Id,
-                    Name = od.Name,
-                    Description = od.Description,
-                    Price = od.Price,
+                    Description = od.Product!.ProductTranslations!
+                      .Where(pt => pt.Language.ToLower() == pagination.Language!.ToLower())
+                      .Select(pt => pt.Description)
+                      .FirstOrDefault()
+                 ?? od.Product!.ProductTranslations!
+                      .Select(pt => pt.Description)
+                      .FirstOrDefault()
+                 ?? "",                   
+                    Name = od.Product!.ProductTranslations!
+                        .Where(pt => pt.Language.ToLower() == pagination.Language!.ToLower())
+                        .Select(pt => pt.Name)
+                        .FirstOrDefault()
+                        ?? od.Product!.ProductTranslations!
+                            .Select(pt => pt.Name)
+                            .FirstOrDefault()
+                        ?? "Unknown product",
+                    Price = od.Product.ProductPrices!
+                            .Where(pp => pp.Currency!.Code == "IQ")
+                            .OrderByDescending(pp => pp.CreatedAt)
+                            .Select(pp => pp.Price)
+                            .FirstOrDefault(),
                     Quantity = (int)od.Quantity,
                     Value = od.Value,
                     Image = od.Image ?? "/no-image.png"

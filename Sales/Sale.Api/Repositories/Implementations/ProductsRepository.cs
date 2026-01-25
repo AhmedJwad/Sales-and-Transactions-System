@@ -885,8 +885,8 @@ namespace Sale.Api.Repositories.Implementations
             try
             {
                 var products = await _context.Products
-                    .Where(p => ids.Contains(p.Id)).Include(pi=>pi.ProductImages)                    
-                    .ToListAsync();
+                    .Where(p => ids.Contains(p.Id)).Include(pi=>pi.ProductImages).Include(p=>p.ProductPrices!)
+                    .ThenInclude(pc=>pc.Currency).ToListAsync();
 
                 return new ActionResponse<List<Product>>
                 {
@@ -1039,7 +1039,8 @@ namespace Sale.Api.Repositories.Implementations
                                             .Where(d => d.isActive &&
                                                         d.StartTime <= DateTime.UtcNow &&
                                                         d.Endtime >= DateTime.UtcNow)
-                                            .OrderByDescending(d => d.DiscountPercent)
+                                            .OrderByDescending(d => d.StartTime)
+                                            .ThenByDescending(d=>d.Endtime)
                                             .Select(d => d.DiscountPercent)
                                             .FirstOrDefault(),
 
