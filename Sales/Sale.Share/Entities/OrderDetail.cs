@@ -11,7 +11,6 @@ namespace Sale.Share.Entities
     public class OrderDetail
     {
         public int Id { get; set; }
-
         public Order? Order { get; set; }
         public int OrderId { get; set; }
 
@@ -35,7 +34,9 @@ namespace Sale.Share.Entities
         [DisplayFormat(DataFormatString = "{0:C2}")]
         [Display(Name = "Price")]
         [Required(ErrorMessage = "Field {0} is required.")]
-        public decimal Price { get; set; }
+        public decimal Price { get; set; }       
+        public decimal DiscountPercent { get; set; } 
+        public string? CurrencyCode { get; set; }  
 
         [Display(Name = "Image")]
         public string Image { get; set; } = null!;
@@ -48,5 +49,12 @@ namespace Sale.Share.Entities
         [DisplayFormat(DataFormatString = "{0:C2}")]
         [Display(Name = "Value")]
         public decimal Value => (decimal)Quantity * Price;
+        public int? ColorId { get; set; }
+        public int? SizeId { get; set; }
+        public string? ColorName { get; set; }
+        public string? SizeName { get; set; }
+
+
+
     }
 }

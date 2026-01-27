@@ -117,16 +117,39 @@ namespace Sale.Api.Helpers
                             Message = $"Price for product {product.ProductTranslations?.FirstOrDefault()?.Name ?? "Unknown"} is not available"
                         };
                     }
+                    var activeDiscount = product.productDiscount?
+                                        .Select(pd => pd.discount)
+                                        .Where(d =>
+                                            d.isActive &&
+                                            d.StartTime <= DateTime.UtcNow &&
+                                            d.Endtime >= DateTime.UtcNow)
+                                        .OrderByDescending(d => d.DiscountPercent)
+                                        .FirstOrDefault();
+                    var discountPercent = activeDiscount?.DiscountPercent ?? 0;
+                    var finalPrice = discountPercent > 0
+                                    ? price.Value - (price.Value * discountPercent / 100)
+                                    : price.Value;
+
 
                     order.OrderDetails.Add(new OrderDetail
                     {
                         ProductId = item.ProductId,
                         Quantity = item.Quantity,
-                        Price = price.Value,
+                        Price =finalPrice,
+                        DiscountPercent = discountPercent,
+                        CurrencyCode = orderDTO.CurrencyCode,
                         Image = product.MainImage,
                         Remarks = orderDTO.Remarks,
                         Description=item.Description,
                         Name=item.Name,
+                        ColorId = item.ColorId,
+                        SizeId = item.SizeId,
+                        ColorName = product.productColor?
+                        .FirstOrDefault(pc => pc.ColorId == item.ColorId)?
+                        .color?.HexCode,
+                        SizeName = product.productSize?
+                        .FirstOrDefault(ps => ps.SizeId == item.SizeId)?
+                        .size?.Name
                     });
                 }               
                 await _orderUnitofWorks.AddAsync(order);

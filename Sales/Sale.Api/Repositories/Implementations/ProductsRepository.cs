@@ -886,7 +886,9 @@ namespace Sale.Api.Repositories.Implementations
             {
                 var products = await _context.Products
                     .Where(p => ids.Contains(p.Id)).Include(pi=>pi.ProductImages).Include(p=>p.ProductPrices!)
-                    .ThenInclude(pc=>pc.Currency).ToListAsync();
+                    .ThenInclude(pc=>pc.Currency).Include(pd=>pd.productDiscount!)
+                    .ThenInclude(d=>d.discount).Include(pc=>pc.productColor!).ThenInclude(c=>c.color)
+                    .Include(ps=>ps.productSize!).ThenInclude(s=>s.size).ToListAsync();
 
                 return new ActionResponse<List<Product>>
                 {

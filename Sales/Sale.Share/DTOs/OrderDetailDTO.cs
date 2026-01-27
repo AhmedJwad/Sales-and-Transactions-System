@@ -18,7 +18,10 @@ namespace Sale.Share.DTOs
         public decimal Price { get; set; }       
         public string Image { get; set; } = null!;      
         public float Quantity { get; set; }
-         
+        public int? ColorId { get; set; }
+        public int? SizeId { get; set; }
+       
+
 
     }
 }
