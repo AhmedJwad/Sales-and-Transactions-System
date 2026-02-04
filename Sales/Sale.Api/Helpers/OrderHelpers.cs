@@ -15,13 +15,16 @@ namespace Sale.Api.Helpers
         private readonly IUsersUnitOfWork _usersUnitOfWork;
         private readonly IorderUnitofWorks _orderUnitofWorks;
         private readonly IProductsUnitofWork _productsUnitofWork;
+        private readonly ICurrencyConverter _currencyConverter;
 
-        public OrderHelpers(DataContext context,  IUsersUnitOfWork usersUnitOfWork, IorderUnitofWorks orderUnitofWorks , IProductsUnitofWork productsUnitofWork)
+        public OrderHelpers(DataContext context,  IUsersUnitOfWork usersUnitOfWork, IorderUnitofWorks orderUnitofWorks ,
+            IProductsUnitofWork productsUnitofWork, ICurrencyConverter currencyConverter)
         {
             _context = context;
             _usersUnitOfWork = usersUnitOfWork;
            _orderUnitofWorks = orderUnitofWorks;
            _productsUnitofWork = productsUnitofWork;
+           _currencyConverter = currencyConverter;
         }
         public async Task<ActionResponse<bool>> ProcessOrderAsync(string email, OrderDTO orderDTO)
         {
@@ -29,7 +32,7 @@ namespace Sale.Api.Helpers
 
             try
             {
-               orderDTO.CurrencyCode ??= "IQ";
+               orderDTO.currency ??= "IQ";
                 var user = await _usersUnitOfWork.GetUserAsync(email);
                 if (user == null)
                 {
@@ -95,7 +98,7 @@ namespace Sale.Api.Helpers
                     Date = DateTime.UtcNow,
                     UserId = user.Id, 
                     Remarks = orderDTO.Remarks,
-                    OrderStatus = OrderStatus.New,
+                    OrderStatus = OrderStatus.New,                   
                     OrderDetails = new List<OrderDetail>()
                 };
 
@@ -104,10 +107,14 @@ namespace Sale.Api.Helpers
                     var product = productsDict[item.ProductId];
                     
                     var price = product.ProductPrices?                      
-                        .Where(pp => pp.Currency!.Code == orderDTO.CurrencyCode)
+                        .Where(pp => pp.Currency!.Code == "IQ")
                         .OrderByDescending(pp => pp.CreatedAt)
                         .Select(pp => pp.Price)
                         .FirstOrDefault();
+                    if(orderDTO.currency == "USD")
+                    {
+                     price= await _currencyConverter.ConvertFromIQDAsync(price.Value, orderDTO.currency);
+                    }
 
                     if (price == null || price <= 0)
                     {
@@ -137,7 +144,7 @@ namespace Sale.Api.Helpers
                         Quantity = item.Quantity,
                         Price =finalPrice,
                         DiscountPercent = discountPercent,
-                        CurrencyCode = orderDTO.CurrencyCode,
+                        CurrencyCode = orderDTO.currency,
                         Image = product.MainImage,
                         Remarks = orderDTO.Remarks,
                         Description=item.Description,
@@ -149,7 +156,8 @@ namespace Sale.Api.Helpers
                         .color?.HexCode,
                         SizeName = product.productSize?
                         .FirstOrDefault(ps => ps.SizeId == item.SizeId)?
-                        .size?.Name
+                        .size?.Name,                       
+                        
                     });
                 }               
                 await _orderUnitofWorks.AddAsync(order);
@@ -160,7 +168,7 @@ namespace Sale.Api.Helpers
                 {
                     WasSuccess = true,
                     Message = "Order placed successfully",
-                    Result = true
+                    
                 };
             }
             catch (Exception)

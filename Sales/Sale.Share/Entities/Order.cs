@@ -15,10 +15,8 @@ namespace Sale.Share.Entities
         [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd hh:mm tt}")]
         [Display(Name = "Date")]
         [Required(ErrorMessage = "Field {0} is required.")]
-        public DateTime Date { get; set; }
-
-        public User? User { get; set; }       
-
+        public DateTime Date { get; set; }      
+        public User? User { get; set; }    
         public string? UserId { get; set; }
 
         [DataType(DataType.MultilineText)]

@@ -23,7 +23,7 @@ namespace Sale.Api.Repositories.Implementations
         }
 
         public async Task<ActionResponse<IEnumerable<OrderResponseDTO>>> GetAsync(string email, PaginationDTO pagination)
-        {
+        {            
             var user = await _usersRepository.GetUserAsync(email);
             if (user == null)
             {
@@ -33,18 +33,45 @@ namespace Sale.Api.Repositories.Implementations
                     Message = "user does not exist"
                 };
             }
-            var queryable = _context.orders.Include(u => u.User!).Include(o => o.OrderDetails!).ThenInclude(p => p.Product)
-                .ThenInclude(pt=>pt.ProductTranslations).AsQueryable();
+            //var queryable = _context.orders.Include(u => u.User!)
+            //            .ThenInclude(c => c.City!).ThenInclude(s => s.State!).ThenInclude(cn => cn.Country!)
+            //            .Include(o => o.OrderDetails!).ThenInclude(p => p.Product)
+            //            .ThenInclude(pt => pt.ProductTranslations!).Include(o => o.OrderDetails!)
+            //            .ThenInclude(p => p.Product).ThenInclude(pi => pi.ProductImages)
+            //            .Include(o => o.OrderDetails!).ThenInclude(p => p.Product).ThenInclude(pi => pi.productColor!)
+            //            .ThenInclude(c=>c.color).Include(o => o.OrderDetails!).ThenInclude(p => p.Product).ThenInclude(pi => pi.productSize!)
+            //            .ThenInclude(s =>s.size).AsQueryable();
+            var queryable = _context.orders.Include(u=>u.User).AsNoTracking();           
+
             if (!string.IsNullOrEmpty(pagination.Filter))
             {
                 queryable = queryable.Where(x => x.User!.FirstName.ToLower().Contains(pagination.Filter.ToLower()));
-            }
+            }           
             var isAdmin = await _usersRepository.IsUserInRoleAsync(user, UserType.Admin.ToString());
             if (!isAdmin)
             {
                 queryable = queryable.Where(u => u.User!.Email == email);
             }
-            var result=queryable.Select(o=> new OrderResponseDTO
+            var ordersIds = await queryable.OrderByDescending(o => o.Date)
+              .Skip((pagination.Page - 1) * pagination.RecordsNumber)
+              .Take(pagination.RecordsNumber)
+              .Select(o => o.Id)
+              .ToListAsync();
+            if (!ordersIds.Any())
+            {
+                return new ActionResponse<IEnumerable<OrderResponseDTO>>
+                {
+                    WasSuccess = true,
+                    Result = Enumerable.Empty<OrderResponseDTO>()
+                };
+            }
+            var result=_context.orders.AsNoTracking().AsSplitQuery()
+                .Where(o=>ordersIds.Contains(o.Id)).Include(u=>u.User)
+                .ThenInclude(c=>c.City).ThenInclude(s=>s.State).ThenInclude(co=>co.Country!)
+                .Include(p=>p.OrderDetails!).ThenInclude(p=>p.Product!).ThenInclude(pi=>pi.ProductImages)
+                .Include(ot=>ot.OrderDetails!).ThenInclude(p=>p.Product).ThenInclude(pt=>pt.ProductTranslations)
+                .Include(ot => ot.OrderDetails!).ThenInclude(p => p.Product).ThenInclude(pc => pc.productColor)
+                .Include(ot => ot.OrderDetails!).ThenInclude(p => p.Product).ThenInclude(ps => ps.productSize).Select(o=> new OrderResponseDTO
             {
                 Id=o.Id,
                 Date=o.Date,
@@ -56,7 +83,9 @@ namespace Sale.Api.Repositories.Implementations
                 Quantity=(int)o.Quantity,
                 Value=o.Value,
                 orderStatus=o.OrderStatus,
-                orderDetailResponseDTOs=o.OrderDetails!.Select(od=> new OrderDetailResponseDTO
+                PhoneNumber=o.User.CountryCode + o.User.PhoneNumber,
+                City=o.User.City!.Name+ "," +o.User.City.State!.Name + "," + o.User.City.State.Country!.Name,
+                    orderDetailResponseDTOs =o.OrderDetails!.Select(od=> new OrderDetailResponseDTO
                 {
                     Id=od.Id,
                     Description = od.Product!.ProductTranslations!
@@ -118,11 +147,12 @@ namespace Sale.Api.Repositories.Implementations
                 UserFullName = order.User!.FirstName + " " + order.User.LastName,
                 UserEmail = order.User!.Email,
                 UserPhoto = order.User!.Photo ?? "/no-image.png",
-                PhneNumber=order.User!.PhoneNumber,
+                PhoneNumber=order.User!.CountryCode + order.User.PhoneNumber,
                 Lines = order.Lines,
                 Quantity = (int)order.Quantity,
                 Value = order.Value,
                 orderStatus = order.OrderStatus,
+                City=order.User.City!.Name + order.User.City.State!.Name + order.User.City.State.Country!.Name,
                 orderDetailResponseDTOs = order.OrderDetails!.Select(od => new OrderDetailResponseDTO
                 {
                     Id = od.Id,

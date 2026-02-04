@@ -830,25 +830,7 @@ namespace Sale.Api.Repositories.Implementations
 
         }
 
-        private static BrandDTO tobrand(Brand? brand, string lang)
-        {
-            if (brand == null)
-            {
-                return new BrandDTO();
-            }
-           
-           
-            return new BrandDTO
-            {
-                Id = brand!.Id,
-                brandTranslations = brand.BrandTranslations!
-                             .Select(t => new BrandTranslationDTO
-                              {                                  
-                                  Language = t.Language,
-                                  Name = t.Name
-                              }).ToList()
-            };
-          }
+       
         
 
         public async Task<ActionResponse<IEnumerable<ProductResponseDTO>>> GetfullProduct()

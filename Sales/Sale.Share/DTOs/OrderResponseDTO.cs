@@ -15,7 +15,8 @@ namespace Sale.Share.DTOs
         public string? UserFullName { get; set; }
         public string? UserEmail { get; set; }
         public string? UserPhoto { get; set; }
-        public string? PhneNumber { get; set; }  
+        public string? PhoneNumber { get; set; }  
+        public string? City { get; set; }
         public int Lines { get; set; }
         public int Quantity { get; set; }
         public decimal Value { get; set; }
